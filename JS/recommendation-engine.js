@@ -46,7 +46,7 @@
     }
 
     function score(candidate, ids, intent) {
-        let score = 0;
+        let score = 0;\n        if (ingredientIntelligence) {\n            const analysis = ingredientIntelligence.analyze(ids);\n            score += Math.min(18, analysis.averageCompatibility * 0.18);\n            const suggestions = ingredientIntelligence.suggestions(ids, 8);\n            if (recipe.ingredients?.some(row => suggestions.some(item => item.id === row.productId))) score += 6;\n        }
         const reasons = [];
 
         const intelligence = window.recipeProIntelligence?.compatible?.(candidate.type, ids, intent);
