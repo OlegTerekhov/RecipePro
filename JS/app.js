@@ -3964,7 +3964,8 @@ document.addEventListener("DOMContentLoaded", () => {
     servings,
     targetCalories,
     changes,
-    warnings
+    warnings,
+    preserveProtein = false
   ) {
     let nutrition =
       calculateIngredientsNutrition(
@@ -3972,241 +3973,139 @@ document.addEventListener("DOMContentLoaded", () => {
         servings
       );
 
-
-    if (
-      nutrition.calories <=
-      targetCalories
-    ) {
+    if (nutrition.calories <= targetCalories) {
       return nutrition;
     }
 
+    const candidates = ingredients.filter(
+      (ingredient) =>
+        Number(ingredient.amount) > (ingredient.unit === "шт" ? 1 : 1) &&
+        (!preserveProtein ||
+          !isProteinProduct(ingredient.product))
+    );
+
+    if (!candidates.length) {
+      warnings.push(
+        `Невозможно безопасно снизить калорийность до ${targetCalories} ккал без уменьшения основных белковых продуктов.`
+      );
+      return nutrition;
+    }
 
     let changed = false;
 
-
-    /*
-      Этап 1.
-      Сильно уменьшаем калорийные добавки.
-    */
-
-    ingredients
-      .filter(
-        (ingredient) =>
-          isCalorieDenseProduct(
-            ingredient.product
-          )
-      )
-      .forEach(
-        (ingredient) => {
-          const before =
-            Number(
-              ingredient.amount
-            ) || 0;
-
-          reduceIngredient(
-            ingredient,
-            0.5
-          );
-
-          if (
-            Number(
-              ingredient.amount
-            ) < before
-          ) {
-            changed = true;
-          }
-        }
-      );
-
-
-    nutrition =
-      calculateIngredientsNutrition(
-        ingredients,
-        servings
-      );
-
-
-    if (changed) {
-      addChange(
-        changes,
-        "снижены калорийные ингредиенты"
-      );
-    }
-
-
-    if (
-      nutrition.calories <=
-      targetCalories
-    ) {
-      return nutrition;
-    }
-
-
-    /*
-      Этап 2.
-      Уменьшаем углеводную основу.
-    */
-
-    changed = false;
-
-
-    ingredients
-      .filter(
-        (ingredient) =>
-          isCarbHeavyProduct(
-            ingredient.product
-          )
-      )
-      .forEach(
-        (ingredient) => {
-          const before =
-            Number(
-              ingredient.amount
-            ) || 0;
-
-          reduceIngredient(
-            ingredient,
-            0.75
-          );
-
-          if (
-            Number(
-              ingredient.amount
-            ) < before
-          ) {
-            changed = true;
-          }
-        }
-      );
-
-
-    nutrition =
-      calculateIngredientsNutrition(
-        ingredients,
-        servings
-      );
-
-
-    if (changed) {
-      addChange(
-        changes,
-        "уменьшена углеводная основа"
-      );
-    }
-
-
-    if (
-      nutrition.calories <=
-      targetCalories
-    ) {
-      return nutrition;
-    }
-
-
-    /*
-      Этап 3.
-      Дополнительно уменьшаем некритичные продукты.
-      Белок не уменьшаем.
-    */
-
-    changed = false;
-
-
-    ingredients
-      .filter(
-        (ingredient) =>
-          !isProteinProduct(
-            ingredient.product
-          ) &&
-          !isCalorieDenseProduct(
-            ingredient.product
-          ) &&
-          !isCarbHeavyProduct(
-            ingredient.product
-          )
-      )
-      .forEach(
-        (ingredient) => {
-          const before =
-            Number(
-              ingredient.amount
-            ) || 0;
-
-          reduceIngredient(
-            ingredient,
-            0.8
-          );
-
-          if (
-            Number(
-              ingredient.amount
-            ) < before
-          ) {
-            changed = true;
-          }
-        }
-      );
-
-
-    nutrition =
-      calculateIngredientsNutrition(
-        ingredients,
-        servings
-      );
-
-
-    if (changed) {
-      addChange(
-        changes,
-        "дополнительно уменьшены второстепенные ингредиенты"
-      );
-    }
-
-
-    /*
-      Этап 4.
-      Если есть очень калорийный углеводный продукт,
-      пробуем уменьшить его ещё сильнее.
-    */
-
-    if (
-      nutrition.calories >
-      targetCalories
-    ) {
-      ingredients
-        .filter(
-          (ingredient) =>
-            isCarbHeavyProduct(
-              ingredient.product
-            )
-        )
-        .forEach(
-          (ingredient) => {
-            if (
-              nutrition.calories >
-              targetCalories
-            ) {
-              reduceIngredient(
-                ingredient,
-                0.8
-              );
-
-              nutrition =
-                calculateIngredientsNutrition(
-                  ingredients,
-                  servings
-                );
-            }
-          }
+    for (let pass = 0; pass < 8; pass += 1) {
+      nutrition =
+        calculateIngredientsNutrition(
+          ingredients,
+          servings
         );
 
+      if (nutrition.calories <= targetCalories) {
+        break;
+      }
 
-      addChange(
-        changes,
-        "дополнительно скорректировано количество углеводных продуктов"
-      );
+      const currentCalories =
+        Math.max(
+          1,
+          Number(nutrition.calories) || 1
+        );
+
+      const desiredRatio =
+        Math.max(
+          0.35,
+          Math.min(
+            0.92,
+            targetCalories / currentCalories
+          )
+        );
+
+      const ranked =
+        candidates
+          .map((ingredient) => {
+            const product =
+              getProduct(ingredient.product);
+
+            if (!product || !product.raw) {
+              return {
+                ingredient,
+                calories: 0
+              };
+            }
+
+            let amount =
+              Number(ingredient.amount) || 0;
+
+            if (
+              ingredient.unit === "шт" &&
+              product.pieceWeight
+            ) {
+              amount *= Number(product.pieceWeight);
+            }
+
+            return {
+              ingredient,
+              calories:
+                Number(product.raw.kcal || 0) *
+                (amount / 100)
+            };
+          })
+          .sort(
+            (a, b) =>
+              b.calories - a.calories
+          );
+
+      let passChanged = false;
+
+      ranked.forEach(({ ingredient }) => {
+        nutrition =
+          calculateIngredientsNutrition(
+            ingredients,
+            servings
+          );
+
+        if (
+          nutrition.calories <=
+          targetCalories
+        ) {
+          return;
+        }
+
+        const before =
+          Number(ingredient.amount) || 0;
+
+        reduceIngredient(
+          ingredient,
+          desiredRatio
+        );
+
+        if (
+          Number(ingredient.amount) <
+          before
+        ) {
+          passChanged = true;
+          changed = true;
+        }
+      });
+
+      if (!passChanged) {
+        break;
+      }
     }
 
+    nutrition =
+      calculateIngredientsNutrition(
+        ingredients,
+        servings
+      );
+
+    if (changed) {
+      addChange(
+        changes,
+        preserveProtein
+          ? "точечно снижены наиболее калорийные ингредиенты с сохранением основного источника белка"
+          : "количество наиболее калорийных ингредиентов рассчитано под заданный лимит"
+      );
+    }
 
     if (
       nutrition.calories >
@@ -4217,10 +4116,8 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     }
 
-
     return nutrition;
   }
-
 
   /* =========================================================
      ADAPTATION - PROTEIN TARGET
@@ -4888,7 +4785,8 @@ document.addEventListener("DOMContentLoaded", () => {
         servings,
         parsed.maxCalories,
         changes,
-        warnings
+        warnings,
+        parsed.minProtein !== null
       );
     }
 
@@ -4965,12 +4863,13 @@ document.addEventListener("DOMContentLoaded", () => {
       ) {
         nutrition =
           adaptToMaxCalories(
-            ingredients,
-            servings,
-            parsed.maxCalories,
-            changes,
-            warnings
-          );
+        ingredients,
+        servings,
+        parsed.maxCalories,
+        changes,
+        warnings,
+        parsed.minProtein !== null
+      );
       }
     }
 
