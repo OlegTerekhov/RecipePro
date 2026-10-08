@@ -77,18 +77,20 @@
         const missing=[];
         const replacements=[];
 
-        dish.requires.forEach(requiredId=>{
-            const exact=ingredientMatches(requiredId,requiredId,dish);
+        (dish.requires||[]).forEach(requiredId=>{
             if(hasId(ids,requiredId)){
                 score+=45;
                 matched.push(requiredId);
                 return;
             }
-            const replacement=Object.entries(dish.replaceable||{}).find(([key,values])=>key===requiredId && values.some(value=>hasId(ids,value)));
+
+            const replacementValues=(dish.replaceable?.[requiredId]||[]);
+            const replacement=replacementValues.find(value=>hasId(ids,value));
+
             if(replacement){
                 score+=30;
-                matched.push(replacement[1].find(value=>hasId(ids,value)));
-                replacements.push(requiredId+" → "+replacement[1].find(value=>hasId(ids,value)));
+                matched.push(replacement);
+                replacements.push(requiredId+" → "+replacement);
             }else{
                 score-=52;
                 missing.push(requiredId);
@@ -96,25 +98,33 @@
         });
 
         if(dish.anyOf){
-            if(hasCategory(ids,dish.anyOf[0])){
+            const category=dish.anyOf.find(item=>hasCategory(ids,item));
+            if(category){
                 score+=30;
-                matched.push(dish.anyOf[0]);
+                matched.push(category);
             }else{
                 score-=20;
-                missing.push(dish.anyOf[0]);
+                missing.push(dish.anyOf.join(" / "));
             }
         }
 
-        dish.supports.forEach(id=>{ if(hasId(ids,id)){score+=9;matched.push(id);} });
+        (dish.supports||[]).forEach(id=>{
+            if(hasId(ids,id)){
+                score+=9;
+                matched.push(id);
+            }
+        });
 
         if(intent.type===dish.type) score+=55;
         if(intent.maxTime) score+=dish.time<=intent.maxTime?28:-Math.min(22,(dish.time-intent.maxTime)*0.5);
         if(intent.minTime) score+=dish.time>=intent.minTime?8:-10;
         if(intent.faster) score+=dish.time<=20?22:0;
+
         if(intent.highProtein||intent.minProtein){
             if(hasCategory(ids,"protein")||hasCategory(ids,"eggs")) score+=16;
             if(["bowl","stew","salad"].includes(dish.type)) score+=5;
         }
+
         if(intent.lessCalories) score+=["salad","bowl","omelet","porridge"].includes(dish.type)?8:0;
 
         return {
@@ -135,10 +145,14 @@
 
     function chooseType(ids,intent={},allowedTypes=Object.keys(TYPE_REQUIREMENTS)){
         const candidates=findDishCandidates(ids,intent,12).filter(item=>allowedTypes.includes(item.dish.type));
-        const compatible=candidates.find(item=>item.compatible);
-        if(compatible) return {type:compatible.dish.type,score:compatible.score,dish:compatible.dish};
 
-        return candidates[0] ? {type:candidates[0].dish.type,score:candidates[0].score,dish:candidates[0].dish} : null;
+        const compatible=candidates.filter(item=>item.compatible);
+        if(compatible.length){
+            compatible.sort((a,b)=>b.score-a.score);
+            return {type:compatible[0].dish.type,score:compatible[0].score,dish:compatible[0].dish};
+        }
+
+        return null;
     }
 
     function compatible(type,ids,intent={}){
