@@ -97,6 +97,21 @@ document.addEventListener("DOMContentLoaded", () => {
         return "сырое";
     }
 
+    function getRawEquivalent(row) {
+        const amount = Math.max(0, Number(row.amount || 0));
+        const ratio = Number(row.product?.cookedWeightRatio);
+
+        if (
+            row.state === "raw" ||
+            !Number.isFinite(ratio) ||
+            ratio <= 0
+        ) {
+            return amount;
+        }
+
+        return amount / ratio;
+    }
+
     function formatNumber(value) {
         const rounded = Number(Number(value || 0).toFixed(1));
 
@@ -120,16 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         const amount = Math.max(0, Number(row.amount || 0));
-        let rawEquivalent = amount;
-
-        if (
-            row.state !== "raw" &&
-            Number(product.cookedWeightRatio) > 0
-        ) {
-            rawEquivalent =
-                amount / Number(product.cookedWeightRatio);
-        }
-
+        const rawEquivalent = getRawEquivalent(row);
         const multiplier = rawEquivalent / 100;
 
         const result = {
@@ -253,6 +259,19 @@ document.addEventListener("DOMContentLoaded", () => {
                                     ' г · ' +
                                     getStateLabel(row.state) +
                                 '</span>' +
+                                (
+                                    row.state !== "raw" &&
+                                    Math.abs(
+                                        getRawEquivalent(row) -
+                                        Number(row.amount)
+                                    ) >= 1
+                                        ? '<small>≈ ' +
+                                            formatNumber(
+                                                getRawEquivalent(row)
+                                            ) +
+                                            ' г сырого продукта</small>'
+                                        : ''
+                                ) +
                             '</div>' +
 
                             '<div class="nutrition-row-values">' +
