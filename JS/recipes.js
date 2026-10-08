@@ -27,26 +27,22 @@ window.recipes = [
             {
                 product: "курица",
                 amount: 300,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             },
             {
                 product: "картофель",
                 amount: 400,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             },
             {
                 product: "лук",
                 amount: 1,
-                unit: "шт",
-            state: "raw"
+                unit: "шт"
             },
             {
                 product: "масло",
                 amount: 10,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             }
         ],
 
@@ -92,20 +88,17 @@ window.recipes = [
             {
                 product: "яйца",
                 amount: 3,
-                unit: "шт",
-            state: "raw"
+                unit: "шт"
             },
             {
                 product: "сыр",
                 amount: 50,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             },
             {
                 product: "помидоры",
                 amount: 1,
-                unit: "шт",
-            state: "raw"
+                unit: "шт"
             }
         ],
 
@@ -146,26 +139,22 @@ window.recipes = [
             {
                 product: "рис",
                 amount: 200,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             },
             {
                 product: "курица",
                 amount: 300,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             },
             {
                 product: "лук",
                 amount: 1,
-                unit: "шт",
-            state: "raw"
+                unit: "шт"
             },
             {
                 product: "морковь",
                 amount: 1,
-                unit: "шт",
-            state: "raw"
+                unit: "шт"
             }
         ],
 
@@ -208,20 +197,17 @@ window.recipes = [
             {
                 product: "паста",
                 amount: 200,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             },
             {
                 product: "курица",
                 amount: 250,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             },
             {
                 product: "сыр",
                 amount: 70,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             }
         ],
 
@@ -264,20 +250,17 @@ window.recipes = [
             {
                 product: "картофель",
                 amount: 500,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             },
             {
                 product: "сыр",
                 amount: 100,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             },
             {
                 product: "яйца",
                 amount: 2,
-                unit: "шт",
-            state: "raw"
+                unit: "шт"
             }
         ],
 
@@ -320,26 +303,22 @@ window.recipes = [
             {
                 product: "курица",
                 amount: 300,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             },
             {
                 product: "картофель",
                 amount: 300,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             },
             {
                 product: "морковь",
                 amount: 1,
-                unit: "шт",
-            state: "raw"
+                unit: "шт"
             },
             {
                 product: "лук",
                 amount: 1,
-                unit: "шт",
-            state: "raw"
+                unit: "шт"
             }
         ],
 
@@ -382,20 +361,17 @@ window.recipes = [
             {
                 product: "овсянка",
                 amount: 60,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             },
             {
                 product: "банан",
                 amount: 1,
-                unit: "шт",
-            state: "raw"
+                unit: "шт"
             },
             {
                 product: "молоко",
                 amount: 200,
-                unit: "мл",
-            state: "raw"
+                unit: "мл"
             }
         ],
 
@@ -438,14 +414,12 @@ window.recipes = [
             {
                 product: "творог",
                 amount: 200,
-                unit: "г",
-            state: "raw"
+                unit: "г"
             },
             {
                 product: "банан",
                 amount: 1,
-                unit: "шт",
-            state: "raw"
+                unit: "шт"
             }
         ],
 
