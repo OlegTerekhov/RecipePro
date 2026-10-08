@@ -151,6 +151,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    /* AI RECIPE GENERATOR */
+    const aiGeneratorBtn =
+      $("#aiRecipeGeneratorBtn");
+
+    if (aiGeneratorBtn) {
+      aiGeneratorBtn.addEventListener(
+        "click",
+        openAiRecipeGenerator
+      );
+    }
+
+
     /* Popular products */
 
     $$(".popular-item").forEach(
@@ -6115,6 +6127,873 @@ document.addEventListener("DOMContentLoaded", () => {
         /'/g,
         "&#039;"
       );
+  }
+
+
+  /* =========================================================
+     AI RECIPE GENERATOR
+  ========================================================= */
+
+  let aiGeneratorDraft = null;
+
+
+  function ensureAiRecipeGeneratorModal() {
+    if ($("#aiRecipeGeneratorModal")) {
+      return;
+    }
+
+    const modal =
+      document.createElement("div");
+
+    modal.id =
+      "aiRecipeGeneratorModal";
+
+    modal.className =
+      "ai-generator-overlay";
+
+    modal.innerHTML = `
+      <div
+        class="ai-generator-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="aiGeneratorTitle"
+      >
+        <button
+          class="ai-generator-close"
+          id="aiGeneratorClose"
+          type="button"
+          aria-label="Закрыть"
+        >×</button>
+
+        <div class="ai-generator-header">
+          <div class="ai-generator-eyebrow">
+            RECIPEPRO AI · GENERATOR
+          </div>
+
+          <h2 id="aiGeneratorTitle">
+            Соберём блюдо из того, что есть
+          </h2>
+
+          <p>
+            Напиши продукты — RecipePro подберёт сочетание,
+            создаст рецепт и автоматически рассчитает КБЖУ.
+          </p>
+        </div>
+
+        <div class="ai-generator-body">
+          <label class="ai-generator-label" for="aiGeneratorInput">
+            Что есть дома?
+          </label>
+
+          <textarea
+            id="aiGeneratorInput"
+            class="ai-generator-input"
+            rows="4"
+            placeholder="Например: яйца, творог и банан"
+          ></textarea>
+
+          <div class="ai-generator-examples">
+            <button type="button" data-generator-example="яйца, творог и банан">
+              яйца · творог · банан
+            </button>
+            <button type="button" data-generator-example="курица, картофель и лук">
+              курица · картофель · лук
+            </button>
+            <button type="button" data-generator-example="рис, курица и помидоры">
+              рис · курица · помидоры
+            </button>
+          </div>
+
+          <div
+            class="ai-generator-result"
+            id="aiGeneratorResult"
+            hidden
+          ></div>
+
+          <div class="ai-generator-actions">
+            <button
+              class="adaptation-secondary-button"
+              id="aiGeneratorCancel"
+              type="button"
+            >
+              Закрыть
+            </button>
+
+            <button
+              class="adaptation-primary-button"
+              id="aiGeneratorCreate"
+              type="button"
+            >
+              ✨ Создать рецепт
+              <span>→</span>
+            </button>
+
+            <button
+              class="adaptation-primary-button adaptation-save-button"
+              id="aiGeneratorSave"
+              type="button"
+              hidden
+            >
+              Сохранить в мои рецепты
+              <span>→</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    $("#aiGeneratorClose")?.addEventListener(
+      "click",
+      closeAiRecipeGenerator
+    );
+
+    $("#aiGeneratorCancel")?.addEventListener(
+      "click",
+      closeAiRecipeGenerator
+    );
+
+    modal.addEventListener(
+      "click",
+      (event) => {
+        if (event.target === modal) {
+          closeAiRecipeGenerator();
+        }
+      }
+    );
+
+    $("#aiGeneratorCreate")?.addEventListener(
+      "click",
+      generateAiRecipe
+    );
+
+    $("#aiGeneratorSave")?.addEventListener(
+      "click",
+      saveAiGeneratedRecipe
+    );
+
+    modal
+      .querySelectorAll(
+        "[data-generator-example]"
+      )
+      .forEach(
+        (button) => {
+          button.addEventListener(
+            "click",
+            () => {
+              const input =
+                $("#aiGeneratorInput");
+
+              if (input) {
+                input.value =
+                  button.dataset.generatorExample || "";
+
+                input.focus();
+              }
+            }
+          );
+        }
+      );
+  }
+
+
+  function openAiRecipeGenerator() {
+    ensureAiRecipeGeneratorModal();
+
+    aiGeneratorDraft = null;
+
+    const modal =
+      $("#aiRecipeGeneratorModal");
+
+    const input =
+      $("#aiGeneratorInput");
+
+    const result =
+      $("#aiGeneratorResult");
+
+    const saveButton =
+      $("#aiGeneratorSave");
+
+    if (input) {
+      input.value = "";
+    }
+
+    if (result) {
+      result.hidden = true;
+      result.innerHTML = "";
+    }
+
+    if (saveButton) {
+      saveButton.hidden = true;
+    }
+
+    modal?.classList.add("active");
+    document.body.classList.add("modal-open");
+
+    setTimeout(
+      () => input?.focus(),
+      50
+    );
+  }
+
+
+  function closeAiRecipeGenerator() {
+    const modal =
+      $("#aiRecipeGeneratorModal");
+
+    if (modal) {
+      modal.classList.remove("active");
+    }
+
+    document.body.classList.remove("modal-open");
+  }
+
+
+  function getGeneratedProductOrder(products) {
+    const priority = [
+      "курица",
+      "куриное-бедро",
+      "индейка",
+      "говядина",
+      "свинина",
+      "лосось",
+      "тунец",
+      "креветки",
+      "яйца",
+      "творог",
+      "сыр",
+      "моцарелла",
+      "рис",
+      "гречка",
+      "паста",
+      "картофель",
+      "чечевица",
+      "фасоль",
+      "овсянка",
+      "помидоры",
+      "огурец",
+      "перец",
+      "брокколи",
+      "кабачок",
+      "капуста",
+      "лук",
+      "морковь",
+      "банан",
+      "яблоко",
+      "апельсин",
+      "молоко",
+      "йогурт",
+      "сметана",
+      "хлеб"
+    ];
+
+    return [...products].sort(
+      (a, b) =>
+        priority.indexOf(a) -
+        priority.indexOf(b)
+    );
+  }
+
+
+  function getGeneratedAmount(productId) {
+    const amounts = {
+      "курица": 250,
+      "куриное-бедро": 250,
+      "индейка": 250,
+      "говядина": 250,
+      "свинина": 250,
+      "лосось": 220,
+      "тунец": 180,
+      "креветки": 220,
+      "яйца": 3,
+      "творог": 200,
+      "сыр": 60,
+      "моцарелла": 80,
+      "рис": 180,
+      "гречка": 180,
+      "паста": 180,
+      "картофель": 350,
+      "чечевица": 180,
+      "фасоль": 180,
+      "овсянка": 60,
+      "помидоры": 2,
+      "огурец": 1,
+      "перец": 1,
+      "брокколи": 200,
+      "кабачок": 1,
+      "капуста": 250,
+      "лук": 1,
+      "морковь": 1,
+      "банан": 1,
+      "яблоко": 1,
+      "апельсин": 1,
+      "молоко": 200,
+      "йогурт": 150,
+      "сметана": 40,
+      "хлеб": 2
+    };
+
+    return amounts[productId] || 100;
+  }
+
+
+  function getGeneratedUnit(productId) {
+    const pieceProducts = [
+      "яйца",
+      "помидоры",
+      "огурец",
+      "перец",
+      "кабачок",
+      "лук",
+      "морковь",
+      "банан",
+      "яблоко",
+      "апельсин",
+      "хлеб"
+    ];
+
+    return pieceProducts.includes(
+      productId
+    )
+      ? "шт"
+      : "г";
+  }
+
+
+  function getGeneratedState(productId) {
+    const boiledProducts = [
+      "рис",
+      "гречка",
+      "паста",
+      "картофель",
+      "чечевица",
+      "фасоль",
+      "овсянка"
+    ];
+
+    const rawProducts = [
+      "творог",
+      "сыр",
+      "моцарелла",
+      "молоко",
+      "йогурт",
+      "сметана",
+      "банан",
+      "яблоко",
+      "апельсин",
+      "огурец"
+    ];
+
+    if (rawProducts.includes(productId)) {
+      return "raw";
+    }
+
+    if (boiledProducts.includes(productId)) {
+      return "boiled";
+    }
+
+    return "fried";
+  }
+
+
+  function buildGeneratedRecipe(products) {
+    const ordered =
+      getGeneratedProductOrder(
+        products
+      );
+
+    const hasProtein =
+      ordered.some(
+        (id) =>
+          [
+            "курица",
+            "куриное-бедро",
+            "индейка",
+            "говядина",
+            "свинина",
+            "лосось",
+            "тунец",
+            "креветки",
+            "яйца",
+            "творог",
+            "сыр",
+            "моцарелла"
+          ].includes(id)
+      );
+
+    const hasCarb =
+      ordered.some(
+        (id) =>
+          [
+            "рис",
+            "гречка",
+            "паста",
+            "картофель",
+            "чечевица",
+            "фасоль",
+            "овсянка",
+            "хлеб"
+          ].includes(id)
+      );
+
+    const hasFruit =
+      ordered.some(
+        (id) =>
+          [
+            "банан",
+            "яблоко",
+            "апельсин"
+          ].includes(id)
+      );
+
+    const hasDairy =
+      ordered.some(
+        (id) =>
+          [
+            "творог",
+            "йогурт",
+            "молоко"
+          ].includes(id)
+      );
+
+    let title =
+      "Авторское блюдо RecipePro";
+
+    let description =
+      "RecipePro собрал это блюдо из продуктов, которые уже есть дома.";
+
+    let time = 20;
+    let emoji = "🍽️";
+    let steps = [];
+
+    if (
+      hasDairy &&
+      hasFruit &&
+      !hasCarb
+    ) {
+      title =
+        "Творожный боул с фруктами";
+      description =
+        "Быстрый белковый завтрак из доступных продуктов.";
+      time = 5;
+      emoji = "🥣";
+
+      steps = [
+        "Выложите творог или йогурт в глубокую миску.",
+        "Нарежьте фрукт небольшими кусочками.",
+        "Добавьте фрукт к творогу и аккуратно перемешайте.",
+        "При желании добавьте немного молока для более нежной текстуры."
+      ];
+    } else if (
+      hasProtein &&
+      hasCarb
+    ) {
+      const proteinName =
+        ordered.find(
+          (id) =>
+            [
+              "курица",
+              "куриное-бедро",
+              "индейка",
+              "говядина",
+              "свинина",
+              "лосось",
+              "тунец",
+              "креветки",
+              "яйца"
+            ].includes(id)
+        );
+
+      const carbName =
+        ordered.find(
+          (id) =>
+            [
+              "рис",
+              "гречка",
+              "паста",
+              "картофель",
+              "чечевица",
+              "фасоль"
+            ].includes(id)
+        );
+
+      title =
+        `${getProductName(proteinName)} с ${getProductName(carbName).toLowerCase()}`;
+
+      description =
+        "Сытное домашнее блюдо, собранное RecipePro из твоих продуктов.";
+      time = 25;
+      emoji =
+        carbName === "рис"
+          ? "🍚"
+          : carbName === "паста"
+            ? "🍝"
+            : carbName === "картофель"
+              ? "🍗"
+              : "🍲";
+
+      steps = [
+        `Подготовьте ${getProductName(proteinName).toLowerCase()} и нарежьте порционными кусочками.`,
+        `Подготовьте ${getProductName(carbName).toLowerCase()} согласно его способу приготовления.`,
+        `Приготовьте основной белковый продукт до полной готовности.`,
+        "Соедините ингредиенты, добавьте соль и специи по вкусу.",
+        "Дайте блюду постоять 2–3 минуты и подавайте горячим."
+      ];
+    } else if (
+      hasProtein
+    ) {
+      const proteinName =
+        ordered.find(
+          (id) =>
+            [
+              "курица",
+              "куриное-бедро",
+              "индейка",
+              "говядина",
+              "свинина",
+              "лосось",
+              "тунец",
+              "креветки",
+              "яйца",
+              "творог"
+            ].includes(id)
+        );
+
+      title =
+        `${getProductName(proteinName)} с овощами`;
+      description =
+        "Белковое блюдо RecipePro из доступных ингредиентов.";
+      time = 20;
+      emoji = "🍳";
+
+      steps = [
+        `Подготовьте ${getProductName(proteinName).toLowerCase()}.`,
+        "Нарежьте остальные ингредиенты небольшими кусочками.",
+        "Приготовьте белковую основу до готовности.",
+        "Добавьте овощи и готовьте ещё 7–10 минут.",
+        "Приправьте по вкусу и подавайте горячим."
+      ];
+    } else if (
+      hasCarb
+    ) {
+      const carbName =
+        ordered.find(
+          (id) =>
+            [
+              "рис",
+              "гречка",
+              "паста",
+              "картофель",
+              "чечевица",
+              "фасоль",
+              "овсянка"
+            ].includes(id)
+        );
+
+      title =
+        `Домашнее блюдо с ${getProductName(carbName).toLowerCase()}`;
+      description =
+        "Простой вариант блюда из продуктов, которые уже есть под рукой.";
+      time = 20;
+      emoji = "🥘";
+
+      steps = [
+        `Подготовьте ${getProductName(carbName).toLowerCase()}.`,
+        "Нарежьте остальные продукты.",
+        "Приготовьте основу до мягкости.",
+        "Соедините ингредиенты и прогрейте вместе.",
+        "Посолите, добавьте специи и подавайте."
+      ];
+    } else {
+      title =
+        "Домашний микс RecipePro";
+      description =
+        "Быстрый вариант, собранный из доступных продуктов.";
+      time = 10;
+      emoji = "🥗";
+
+      steps = [
+        "Подготовьте все продукты.",
+        "Нарежьте ингредиенты удобными кусочками.",
+        "Соедините продукты в одной миске или форме.",
+        "Добавьте специи по вкусу.",
+        "Подавайте сразу после приготовления."
+      ];
+    }
+
+    const ingredients =
+      ordered.map(
+        (productId) => ({
+          product: productId,
+          amount:
+            getGeneratedAmount(
+              productId
+            ),
+          unit:
+            getGeneratedUnit(
+              productId
+            ),
+          state:
+            getGeneratedState(
+              productId
+            )
+        })
+      );
+
+    const nutrition =
+      calculateRecipeNutrition({
+        ingredients,
+        servings: 2
+      });
+
+    return {
+      id:
+        `ai-generated-${Date.now()}`,
+      title:
+        `${title} — AI`,
+      description,
+      emoji,
+      tags: [
+        "AI-рецепт",
+        hasProtein
+          ? "Высокобелковая"
+          : "Домашняя кухня"
+      ],
+      filters: [
+        hasProtein
+          ? "protein"
+          : "all"
+      ],
+      time,
+      servings: 2,
+      ingredients,
+      steps,
+      nutrition,
+      isAiGenerated: true,
+      aiGeneratedAt:
+        new Date().toISOString(),
+      aiSourceProducts:
+        [...products]
+    };
+  }
+
+
+  function renderAiGeneratedRecipe(recipe, detectedProducts) {
+    const result =
+      $("#aiGeneratorResult");
+
+    if (!result) {
+      return;
+    }
+
+    const nutrition =
+      calculateRecipeNutrition(
+        recipe
+      );
+
+    const ingredientsHtml =
+      recipe.ingredients
+        .map(
+          (ingredient) => `
+            <span>
+              ${escapeHtml(
+                getProductName(
+                  ingredient.product
+                )
+              )}
+              ·
+              ${escapeHtml(
+                ingredient.amount
+              )}
+              ${escapeHtml(
+                ingredient.unit
+              )}
+            </span>
+          `
+        )
+        .join("");
+
+    result.hidden = false;
+
+    result.innerHTML = `
+      <div class="ai-generator-result-top">
+        <div class="ai-generator-result-emoji">
+          ${escapeHtml(recipe.emoji)}
+        </div>
+
+        <div>
+          <span class="ai-generator-result-kicker">
+            Сгенерировано из твоих продуктов
+          </span>
+          <h3>
+            ${escapeHtml(recipe.title)}
+          </h3>
+          <p>
+            ${escapeHtml(recipe.description)}
+          </p>
+        </div>
+      </div>
+
+      <div class="ai-generator-products">
+        <span>Использованы</span>
+        <div>
+          ${ingredientsHtml}
+        </div>
+      </div>
+
+      <div class="ai-generator-metrics">
+        <div>
+          <strong>${nutrition.calories}</strong>
+          <span>ккал / порция</span>
+        </div>
+        <div>
+          <strong>${nutrition.protein}</strong>
+          <span>белки, г</span>
+        </div>
+        <div>
+          <strong>${nutrition.fat}</strong>
+          <span>жиры, г</span>
+        </div>
+        <div>
+          <strong>${nutrition.carbs}</strong>
+          <span>углеводы, г</span>
+        </div>
+      </div>
+
+      <div class="ai-generator-steps">
+        <span>Как приготовить</span>
+        <ol>
+          ${recipe.steps
+            .map(
+              (step) =>
+                `<li>${escapeHtml(step)}</li>`
+            )
+            .join("")}
+        </ol>
+      </div>
+
+      <div class="ai-generator-note">
+        КБЖУ рассчитано по базе RecipePro. Для приготовленных продуктов
+        используется ориентировочный коэффициент изменения веса.
+      </div>
+    `;
+
+    if (detectedProducts.length) {
+      result.insertAdjacentHTML(
+        "beforeend",
+        `
+          <div class="ai-generator-detected">
+            ✓ RecipePro распознал: ${escapeHtml(
+              detectedProducts
+                .map(getProductName)
+                .join(", ")
+            )}
+          </div>
+        `
+      );
+    }
+  }
+
+
+  function generateAiRecipe() {
+    const input =
+      $("#aiGeneratorInput");
+
+    if (!input) {
+      return;
+    }
+
+    const request =
+      input.value.trim();
+
+    if (!request) {
+      input.classList.add(
+        "adaptation-input-error"
+      );
+      input.focus();
+
+      setTimeout(
+        () =>
+          input.classList.remove(
+            "adaptation-input-error"
+          ),
+        900
+      );
+
+      return;
+    }
+
+    const detected =
+      detectProducts(request);
+
+    if (!detected.length) {
+      const result =
+        $("#aiGeneratorResult");
+
+      if (result) {
+        result.hidden = false;
+        result.innerHTML = `
+          <div class="ai-generator-empty">
+            <strong>Пока не нашёл продукты из базы RecipePro.</strong>
+            <span>Попробуй, например: курица, рис и помидоры.</span>
+          </div>
+        `;
+      }
+
+      return;
+    }
+
+    aiGeneratorDraft =
+      buildGeneratedRecipe(
+        detected
+      );
+
+    renderAiGeneratedRecipe(
+      aiGeneratorDraft,
+      detected
+    );
+
+    const saveButton =
+      $("#aiGeneratorSave");
+
+    if (saveButton) {
+      saveButton.hidden = false;
+    }
+  }
+
+
+  function saveAiGeneratedRecipe() {
+    if (!aiGeneratorDraft) {
+      return;
+    }
+
+    state.userRecipes.push(
+      aiGeneratorDraft
+    );
+
+    saveUserData();
+
+    closeAiRecipeGenerator();
+
+    renderRecipes();
+    renderMyRecipes();
+    renderHero();
+
+    const section =
+      $("#my-recipes");
+
+    if (section) {
+      setTimeout(
+        () => {
+          section.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        },
+        100
+      );
+    }
   }
 
 
