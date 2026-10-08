@@ -70,70 +70,78 @@
         ids = unique(ids);
         if (!ids.length) return null;
 
-        const dishChoice = window.recipeProIntelligence?.getBestDish?.(ids, intent);
-        const type = intent.type || dishChoice?.dish?.type || chooseType(ids, intent);
-        const template = TYPES[type] || TYPES.bowl;
+        const intelligence=window.recipeProIntelligence;
+        const dishChoice=intelligence?.getBestDish?.(ids,intent);
+        const compatibleDish=dishChoice?.compatible ? dishChoice : null;
+        const selectedType=intent.type || compatibleDish?.dish?.type || chooseType(ids,intent);
 
-        const selected = [];
-        ids.forEach(id => {
-            const role = classify(id);
-            if (["protein","carb","vegetable","fruit","dairy","fat","aromatic","eggs"].includes(role)) {
-                selected.push(id);
-            }
+        if(!selectedType) {
+            const fallbackType=chooseType(ids,{...intent,type:null});
+            if(!fallbackType) return null;
+        }
+
+        const type=intent.type || compatibleDish?.dish?.type || chooseType(ids,intent);
+        if(!type) return null;
+
+        const template=TYPES[type] || TYPES.bowl;
+        const selected=ids.filter(id=>{
+            const r=classify(id);
+            return ["protein","carb","vegetable","fruit","dairy","fat","aromatic","eggs"].includes(r);
         });
 
-        const ingredients = selected.map(id => ({
+        const ingredients=selected.map(id=>({
             productId:id,
             product:id,
-            name:window.products?.[id]?.name || id,
-            amount: roleAmount(classify(id)),
+            name:window.products?.[id]?.name||id,
+            amount:roleAmount(classify(id)),
             unit:"г",
             state:"raw",
             required:true,
             source:"user"
         }));
 
-        const pantryIngredients = pantry(type, ids).map(item => ({
+        const pantryIngredients=pantry(type,ids).map(item=>({
             productId:item.key,
             product:item.key,
-            name:item.key === "cookingOil" ? "Растительное масло" : item.key === "salt" ? "Соль" : item.key === "pepper" ? "Чёрный перец" : "Вода",
-            amount:item.key === "cookingOil" ? 10 : item.key === "water" ? 250 : 2,
-            unit:item.key === "water" ? "мл" : "г",
+            name:item.key==="cookingOil"?"Растительное масло":item.key==="salt"?"Соль":item.key==="pepper"?"Чёрный перец":"Вода",
+            amount:item.key==="cookingOil"?10:item.key==="water"?250:2,
+            unit:item.key==="water"?"мл":"г",
             state:"raw",
             required:false,
             pantry:true,
             source:"RecipePro"
         }));
 
-        const allIngredients = ingredients.concat(pantryIngredients);
-        const warnings = [];
-        if (dishChoice?.missing?.length) warnings.push("Для классической версии блюда не хватает: " + dishChoice.missing.join(", ") + ".");
-        if (dishChoice?.replacements?.length) warnings.push("Использованы допустимые замены: " + dishChoice.replacements.join(", ") + ".");
+        const allIngredients=ingredients.concat(pantryIngredients);
+        const warnings=[];
+        if(dishChoice?.missing?.length) warnings.push("Для классической версии блюда не хватает: "+dishChoice.missing.join(", ")+".");
+        if(dishChoice?.replacements?.length) warnings.push("Использованы допустимые замены: "+dishChoice.replacements.join(", ")+".");
+        if(!selected.length) warnings.push("RecipePro не нашёл продуктов с известной пищевой ролью. Рецепт собран как базовая закуска.");
 
         return {
-            id:"generated-" + Date.now(),
-            title:titleFor(type, selected),
-            emoji:dishChoice?.dish?.emoji || template.emoji,
+            id:"generated-"+Date.now(),
+            title:titleFor(type,selected),
+            emoji:compatibleDish?.dish?.emoji||template.emoji,
             description:"Рецепт собран RecipePro из продуктов, которые указал пользователь.",
-            time:dishChoice?.dish?.time || template.time,
-            servings:intent.targetServings || 2,
+            time:compatibleDish?.dish?.time||template.time,
+            servings:intent.targetServings||2,
             tags:["AI Recipe","Из ваших продуктов"],
             filters:["protein"],
             type,
             ingredients:allIngredients,
             pantryIngredients,
             requiredProducts:ingredients.map(item=>item.productId),
-            steps:dishChoice?.dish?.steps || template.steps,
+            steps:compatibleDish?.dish?.steps||template.steps,
             aiGenerated:true,
             generatedBy:"RecipePro Recipe Builder",
             intelligence:{
-                dishId:dishChoice?.dish?.id || null,
-                dishMatch:dishChoice?.compatible ?? false,
-                matchScore:dishChoice?.score ?? 0,
-                missing:dishChoice?.missing || [],
-                replacements:dishChoice?.replacements || [],
-                compatibility:window.recipeProIngredientIntelligence?.analyze?.(ids) || null,
-                suggestions:window.recipeProIngredientIntelligence?.suggestions?.(ids) || []
+                dishId:compatibleDish?.dish?.id||null,
+                dishMatch:!!compatibleDish,
+                matchScore:compatibleDish?.score??0,
+                missing:compatibleDish?.missing||[],
+                replacements:compatibleDish?.replacements||[],
+                compatibility:window.recipeProIngredientIntelligence?.analyze?.(ids)||null,
+                suggestions:window.recipeProIngredientIntelligence?.suggestions?.(ids)||[]
             },
             warnings
         };
