@@ -38,6 +38,8 @@
         if (type === "salad" && protein) return "Салат с " + (window.products?.[protein]?.name || protein);
         if (type === "salad" && vegetable) return "Овощная закуска с " + (window.products?.[vegetable]?.name || vegetable);
         if (type === "salad" && ids.length) return "Закуска из " + names.slice(0,2).join(" и ");
+        if (type === "salad" && vegetable) return "Овощная закуска с " + (window.products?.[vegetable]?.name || vegetable);
+        if (type === "salad" && ids.length) return "Закуска из " + names.slice(0,2).join(" и ");
         if (type === "omelet") return "Омлет с " + (vegetable ? (window.products?.[vegetable]?.name || vegetable) : "добавками");
         if (type === "pasta" && protein) return "Паста с " + (window.products?.[protein]?.name || protein);
         if (type === "porridge") return "Каша с " + (names[1] || names[0]);
