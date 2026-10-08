@@ -78,7 +78,7 @@
 .ai-generator-constraints{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 2px}.ai-generator-constraint{padding:6px 9px;border-radius:999px;background:#e9f2ed;color:#315846;font:600 11px Inter,sans-serif}
 .ai-generator-warning{margin-top:12px;padding:11px 13px;border-radius:12px;background:#fff5df;color:#795d22;font:600 12px/1.5 Inter,sans-serif}
 .ai-generator-save-row{margin-top:18px;display:flex;justify-content:flex-end}.ai-generator-saved{margin-top:12px;padding:11px 13px;border-radius:12px;background:#e9f2ed;color:#315846;font:600 12px Inter,sans-serif}
-.ai-generator-changes{margin-top:16px;padding:14px;border-radius:15px;background:#fff;border:1px solid rgba(32,55,47,.08)}.ai-generator-changes strong{display:block;margin-bottom:6px;font:600 12px Inter,sans-serif;color:#20372F}.ai-generator-changes ul{margin:0;padding-left:18px;color:#56635d;font:12px/1.6 Inter,sans-serif}
+.ai-generator-alternatives{margin-top:20px;padding-top:18px;border-top:1px solid rgba(32,55,47,.1)}.ai-generator-alternatives-title{font:600 12px Inter,sans-serif;color:#20372F;margin-bottom:10px}.ai-generator-alternative{display:flex;align-items:center;gap:12px;padding:12px;margin-top:8px;border-radius:14px;background:#fff;border:1px solid rgba(32,55,47,.08)}.ai-generator-alternative.is-best{border-color:rgba(32,55,47,.2);box-shadow:0 6px 18px rgba(32,55,47,.06)}.ai-generator-alternative-emoji{font-size:25px;width:38px;text-align:center}.ai-generator-alternative-main{min-width:0;flex:1}.ai-generator-alternative-main strong{display:block;font:600 13px Inter,sans-serif;color:#20372F}.ai-generator-alternative-main small{display:block;margin-top:4px;color:#718078;font:11px Inter,sans-serif}.ai-generator-alternative-score{font:700 11px Inter,sans-serif;color:#315846}.ai-generator-changes{margin-top:16px;padding:14px;border-radius:15px;background:#fff;border:1px solid rgba(32,55,47,.08)}.ai-generator-changes strong{display:block;margin-bottom:6px;font:600 12px Inter,sans-serif;color:#20372F}.ai-generator-changes ul{margin:0;padding-left:18px;color:#56635d;font:12px/1.6 Inter,sans-serif}
 @media(max-width:640px){.ai-generator-overlay{padding:12px}.ai-generator-head,.ai-generator-body{padding-left:20px;padding-right:20px}.ai-generator-head h2{font-size:26px}.ai-generator-ingredients{grid-template-columns:1fr}.ai-generator-actions{flex-direction:column}.ai-generator-actions button{width:100%}}
 `;
         document.head.appendChild(style);
@@ -318,7 +318,7 @@
         return out;
     }
 
-    function renderResult(recipe,detected,constraints){
+    function renderResult(recipe,detected,constraints,alternatives=[]){
         const ingredientHtml=recipe.ingredients.map(item=>`<div class="ai-generator-ingredient"><span>${esc(getProductName(item.product))}</span><span>${item.amount} ${esc(item.unit)}</span></div>`).join("");
         const stepHtml=recipe.steps.map(step=>`<li>${esc(step)}</li>`).join("");
         const chips=constraintHtml(constraints).map(x=>`<span class="ai-generator-constraint">${esc(x)}</span>`).join("");
@@ -333,6 +333,7 @@ ${warnings}
 <strong class="ai-generator-label">Ингредиенты</strong><div class="ai-generator-ingredients">${ingredientHtml}</div>
 <strong class="ai-generator-label" style="margin-top:18px">Как приготовить</strong><ol class="ai-generator-steps">${stepHtml}</ol>
 ${changes}
+${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-generator-alternatives-title">Другие варианты</div>${alternatives.map((item,index)=>`<div class="ai-generator-alternative ${index===0?"is-best":""}"><div class="ai-generator-alternative-emoji">${item.recipe.emoji}</div><div class="ai-generator-alternative-main"><strong>${esc(item.recipe.title)}</strong><small>${item.recipe.time} мин · ${item.recipe.nutrition.calories} ккал · ${item.recipe.nutrition.protein} г белка · ${esc(item.reason||"подходит по продуктам")}</small></div><div class="ai-generator-alternative-score">${Math.round(item.score)}</div></div>`).join("")}</div>`:""}
 <div class="ai-generator-note">Распознано: ${detected.map(id=>esc(getProductName(id)||id)).join(", ")}. Локальная база RecipePro дополнена внешней базой продуктов при необходимости; КБЖУ является ориентировочной оценкой.</div>
 <div class="ai-generator-save-row"><button class="primary-button large" id="aiGeneratorSave" type="button">Сохранить в мои рецепты →</button></div>
 </div>`;
@@ -372,8 +373,12 @@ ${changes}
             return;
         }
         const constraints=parseRequest(input);
-        const recipe=adaptRecipe(buildRecipe(detected),constraints);
-        renderResult(recipe,detected,constraints);
+        const recommendation=window.recipeProRecommendationEngine?.recommend(detected,constraints);
+        const ranked=recommendation?.candidates||[];
+        const primary=ranked[0]?.recipe||buildRecipe(detected,constraints);
+        const recipe=adaptRecipe(primary,constraints);
+        const alternatives=ranked.slice(1,4).map(item=>({ ...item, recipe:adaptRecipe(item.recipe,constraints) }));
+        renderResult(recipe,detected,constraints,alternatives);
         $("#aiGeneratorSave")?.addEventListener("click",()=>handleSave(recipe,constraints,input));
     }
 
