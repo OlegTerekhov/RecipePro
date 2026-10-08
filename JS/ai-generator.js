@@ -119,7 +119,7 @@
 .ai-generator-ingredient{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;background:#fff;font:12px Inter,sans-serif;color:#33453d}
 .ai-generator-ingredient span:last-child{color:#728078}
 .ai-generator-steps{margin:12px 0 0;padding-left:20px;color:#53615b;font:13px/1.65 Inter,sans-serif}
-.ai-generator-note{margin-top:18px;color:#7a847f;font:11px/1.5 Inter,sans-serif}
+.ai-generator-note{margin-top:18px;color:#7a847f;font:11px/1.5 Inter,sans-serif}\n.ai-generator-save-row{margin-top:18px;display:flex;justify-content:flex-end}\n.ai-generator-saved{margin-top:12px;padding:11px 13px;border-radius:12px;background:#e9f2ed;color:#315846;font:600 12px Inter,sans-serif;text-align:center}
 @media(max-width:640px){.ai-generator-overlay{padding:12px}.ai-generator-head,.ai-generator-body{padding-left:20px;padding-right:20px}.ai-generator-head h2{font-size:26px}.ai-generator-ingredients{grid-template-columns:1fr}.ai-generator-actions{flex-direction:column}.ai-generator-actions button{width:100%}}
 `;
         document.head.appendChild(style);
@@ -280,15 +280,71 @@
         if(modal) modal.classList.remove("is-open");
     }
 
+    function saveRecipe(recipe) {
+        const key = "recipepro_user_recipes";
+        let saved = [];
+
+        try {
+            const raw = localStorage.getItem(key);
+            saved = raw ? JSON.parse(raw) : [];
+            if (!Array.isArray(saved)) saved = [];
+        } catch (error) {
+            saved = [];
+        }
+
+        const recipeToSave = {
+            ...recipe,
+            id: "ai-" + Date.now() + "-" + Math.random().toString(36).slice(2, 8),
+            title: recipe.title + " — AI-рецепт",
+            tags: ["Рецепт пользователя", "AI Recipe"],
+            filters: ["protein"],
+            isAiGenerated: true,
+            aiGeneratedAt: new Date().toISOString(),
+            aiSourceProducts: recipe.ingredients.map(item => item.product)
+        };
+
+        saved.push(recipeToSave);
+        localStorage.setItem(key, JSON.stringify(saved));
+        return recipeToSave;
+    }
+
+    function handleSave(recipe) {
+        try {
+            saveRecipe(recipe);
+
+            const result = $("#aiGeneratorResult");
+            result.insertAdjacentHTML(
+                "beforeend",
+                '<div class="ai-generator-saved">✓ Рецепт сохранён в «Мои рецепты»</div>'
+            );
+
+            setTimeout(() => {
+                close();
+                window.location.hash = "#my-recipes";
+                window.location.reload();
+            }, 700);
+        } catch (error) {
+            console.error("RecipePro AI save error:", error);
+            alert("Не удалось сохранить рецепт. Попробуй ещё раз.");
+        }
+    }
+
     function generate() {
         const input=$("#aiGeneratorInput").value.trim();
         const detected=detectProducts(input);
         const result=$("#aiGeneratorResult");
+
         if(!detected.length){
             result.innerHTML=`<div class="ai-generator-result"><strong>Не нашёл продукты</strong><p style="margin-top:7px">Попробуй написать, например: «курица, картошка и лук».</p></div>`;
             return;
         }
-        renderResult(buildRecipe(detected),detected);
+
+        const recipe = buildRecipe(detected);
+        renderResult(recipe,detected);
+
+        setTimeout(() => {
+            $("#aiGeneratorSave")?.addEventListener("click", () => handleSave(recipe));
+        }, 0);
     }
 
     document.addEventListener("DOMContentLoaded",()=>{
