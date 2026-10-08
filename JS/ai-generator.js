@@ -220,67 +220,63 @@
         const changes=[],warnings=[];
         r.servings=constraints.targetServings||r.servings||2;
 
-        const main=r.ingredients.find(item=>getRole(item.product)==="protein");
-        const carb=r.ingredients.find(item=>getRole(item.product)==="carb");
-        const optionalFats=r.ingredients.filter(item=>getRole(item.product)==="fat"&&getRole(item.product)!=="protein");
+        const getItemId=item=>item.product||item.productId;
+        const main=r.ingredients.find(item=>getRole(getItemId(item))==="protein");
+        const carb=r.ingredients.find(item=>getRole(getItemId(item))==="carb");
+        const fats=r.ingredients.filter(item=>getRole(getItemId(item))==="fat");
+        const calorieAdditions=r.ingredients.filter(item=>["fat","dairy"].includes(getRole(getItemId(item))));
+        const minAmount=20;
+
+        function recalc(){ finalize(r); }
+
+        function changeAmount(item,factor,label){
+            if(!item)return false;
+            const before=Number(item.amount)||0;
+            const next=Math.max(minAmount,Math.round(before*factor/10)*10);
+            if(next!==before){
+                item.amount=next;
+                changes.push(label||("скорректирован "+getProductName(getItemId(item))));
+                return true;
+            }
+            return false;
+        }
 
         if(constraints.highProtein||constraints.minProtein){
-            if(main){
-                const before=main.amount;
-                main.amount=Math.round(before*1.45/10)*10;
-                if(main.amount!==before)changes.push("увеличена белковая основа");
-            }
-            optionalFats.forEach(item=>{
-                if(["сыр","моцарелла","сметана","масло","сливочное-масло"].includes(item.product)){
-                    const before=item.amount;
-                    item.amount=Math.max(20,Math.round(before*.6/10)*10);
-                    if(item.amount!==before)changes.push("уменьшены калорийные добавки");
-                }
-            });
+            changeAmount(main,1.25,"увеличена белковая основа");
+            calorieAdditions.forEach(item=>changeAmount(item,.75,"уменьшены калорийные добавки"));
+            recalc();
         }
 
         if(constraints.lessCalories||constraints.maxCalories){
-            optionalFats.forEach(item=>{
-                if(!PROTEINS.includes(item.product)){
-                    const before=item.amount;
-                    item.amount=Math.max(10,Math.round(before*.45/10)*10);
-                    if(item.amount!==before)changes.push("снижены калорийные добавки");
-                }
-            });
-            if(carb){
-                const before=carb.amount;
-                carb.amount=Math.max(30,Math.round(before*.7/10)*10);
-                if(carb.amount!==before)changes.push("скорректирован объём гарнира");
-            }
+            calorieAdditions.forEach(item=>changeAmount(item,.65,"снижены калорийные добавки"));
+            if(carb)changeAmount(carb,.75,"скорректирован объём гарнира");
+            recalc();
         }
 
-        finalize(r);
-
-        if(constraints.maxCalories&&r.nutrition.calories>constraints.maxCalories){
-            const target=constraints.maxCalories;
-            const scale=Math.max(.35,target/r.nutrition.calories);
-            if(carb){
-                const before=carb.amount;
-                carb.amount=Math.max(30,Math.round(before*scale/10)*10);
-                if(carb.amount!==before)changes.push("гарнир дополнительно уменьшен под лимит калорий");
+        if(constraints.maxCalories){
+            for(let pass=0;pass<5 && r.nutrition.calories>constraints.maxCalories;pass++){
+                const ratio=constraints.maxCalories/r.nutrition.calories;
+                let changed=false;
+                const targets=[...calorieAdditions,...(carb?[carb]:[])];
+                for(const item of targets){
+                    const factor=Math.max(.35,Math.min(.85,ratio));
+                    changed=changeAmount(item,factor,"рецепт дополнительно адаптирован под лимит калорий")||changed;
+                }
+                recalc();
+                if(!changed)break;
             }
-            finalize(r);
         }
 
         if(constraints.highProtein||constraints.minProtein){
-            if(main&&r.nutrition.protein < (constraints.minProtein||0)){
-                const before=main.amount;
-                main.amount=Math.round(before*1.25/10)*10;
-                if(main.amount!==before)changes.push("белковая основа увеличена ещё раз");
-                finalize(r);
-            }
-            if(constraints.minProtein&&r.nutrition.protein<constraints.minProtein){
-                warnings.push("Цель по белку не достигнута: "+r.nutrition.protein+" г при цели "+constraints.minProtein+" г на порцию.");
+            for(let pass=0;pass<3 && constraints.minProtein && r.nutrition.protein<constraints.minProtein;pass++){
+                if(!main)break;
+                if(!changeAmount(main,1.2,"белковая основа увеличена для достижения цели"))break;
+                recalc();
             }
         }
 
         if(constraints.faster){
-            r.time=Math.max(15,Math.round(r.time*.7));
+            r.time=Math.max(10,Math.round(r.time*.7));
             changes.push("выбран более быстрый способ приготовления");
         }
         if(constraints.maxTime&&r.time>constraints.maxTime){
@@ -289,7 +285,15 @@
         }
 
         if(constraints.minCalories&&r.nutrition.calories<constraints.minCalories){
-            warnings.push("Калорийность ниже минимума: "+r.nutrition.calories+" ккал при цели от "+constraints.minCalories+" ккал.");
+            const target=constraints.minCalories;
+            const ratio=Math.min(2,target/Math.max(1,r.nutrition.calories));
+            const targets=[main,carb,...fats].filter(Boolean);
+            targets.slice(0,2).forEach(item=>changeAmount(item,ratio,"увеличены ингредиенты для достижения минимума калорий"));
+            recalc();
+        }
+
+        if(constraints.minProtein&&r.nutrition.protein<constraints.minProtein){
+            warnings.push("Цель по белку не достигнута: "+r.nutrition.protein+" г при цели "+constraints.minProtein+" г на порцию.");
         }
         if(constraints.maxProtein&&r.nutrition.protein>constraints.maxProtein){
             warnings.push("Белка получилось больше максимума: "+r.nutrition.protein+" г при лимите "+constraints.maxProtein+" г.");
@@ -298,9 +302,11 @@
             warnings.push("Цель по калориям не достигнута: "+r.nutrition.calories+" ккал при лимите "+constraints.maxCalories+" ккал.");
         }
 
-        if(constraints.highProtein)r.description="Адаптировано под высокий белок: увеличена белковая основа и убраны лишние калорийные добавки.";
-        if(constraints.maxCalories)r.description+=" Калорийность скорректирована под заданный лимит насколько позволили указанные продукты.";
-        r.aiChanges=changes;r.aiWarnings=warnings;
+        if(constraints.highProtein)r.description="Адаптировано под высокий белок: RecipePro увеличил белковую основу и сократил лишние калорийные добавки.";
+        if(constraints.maxCalories)r.description+=" Калорийность автоматически скорректирована под заданный лимит насколько позволяют ингредиенты.";
+
+        r.aiChanges=changes;
+        r.aiWarnings=warnings;
         return r;
     }
 
