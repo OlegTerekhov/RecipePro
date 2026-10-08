@@ -4958,3 +4958,46 @@ p {
   font-weight: 600;
   letter-spacing: .01em;
 }
+
+/* =========================================================
+   RECIPE INGREDIENT STATE
+========================================================= */
+
+.recipe-ingredient-state {
+    display: inline-block;
+    margin-left: 7px;
+    color: var(--green-700);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    opacity: .72;
+}
+
+.ingredient-row {
+    grid-template-columns: minmax(0, 1fr) 110px 82px 110px 42px;
+}
+
+.ingredient-state {
+    min-width: 0;
+}
+
+@media (max-width: 900px) {
+    .ingredient-row {
+        grid-template-columns: minmax(0, 1fr) 100px 78px 100px 42px;
+    }
+}
+
+@media (max-width: 700px) {
+    .ingredient-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .ingredient-row .ingredient-product {
+        grid-column: 1 / -1;
+    }
+
+    .ingredient-row .ingredient-remove {
+        grid-column: 2;
+    }
+}
