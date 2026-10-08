@@ -1301,18 +1301,12 @@ document.addEventListener("DOMContentLoaded", () => {
         recipe
       );
 
-    let matchedIngredients = 0;
-    let requiredCriteria = 0;
-    let matchedCriteria = 0;
-
-
-    /* =====================================================
-       1. INGREDIENTS — HARD REQUIREMENT
-    ===================================================== */
 
     if (
       parsed.ingredients.length > 0
     ) {
+      let matchedIngredients = 0;
+
       parsed.ingredients.forEach(
         (productId) => {
           if (
@@ -1322,6 +1316,7 @@ document.addEventListener("DOMContentLoaded", () => {
             )
           ) {
             matchedIngredients += 1;
+
             score += 100;
 
             reasons.push(
@@ -1334,11 +1329,6 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-      /*
-       * If the user explicitly named ingredients,
-       * every one of them must be present.
-       * Nutrition/time/diet preferences remain soft.
-       */
       if (
         matchedIngredients !==
         parsed.ingredients.length
@@ -1346,36 +1336,23 @@ document.addEventListener("DOMContentLoaded", () => {
         return {
           recipe,
           score: -Infinity,
-          reasons: [],
-          matchPercent: 0,
-          matchedIngredients,
-          totalIngredients:
-            parsed.ingredients.length,
-          matchedCriteria: 0,
-          totalCriteria: 0
+          reasons: []
         };
       }
     }
 
 
-    /* =====================================================
-       2. CALORIES
-    ===================================================== */
-
     if (
       parsed.maxCalories !== null
     ) {
-      requiredCriteria += 1;
-
       if (
         nutrition.calories <=
         parsed.maxCalories
       ) {
-        matchedCriteria += 1;
-        score += 45;
+        score += 35;
 
         reasons.push(
-          `✓ ${nutrition.calories} ккал — в лимите`
+          `✓ ${nutrition.calories} ккал`
         );
       } else {
         const difference =
@@ -1383,14 +1360,12 @@ document.addEventListener("DOMContentLoaded", () => {
           parsed.maxCalories;
 
         score -= Math.min(
-          30,
-          difference / 8
+          35,
+          difference / 10
         );
 
         reasons.push(
-          `~ ${nutrition.calories} ккал — на ${Math.round(
-            difference
-          )} выше лимита`
+          `~ ${nutrition.calories} ккал`
         );
       }
     }
@@ -1399,17 +1374,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (
       parsed.minCalories !== null
     ) {
-      requiredCriteria += 1;
-
       if (
         nutrition.calories >=
         parsed.minCalories
       ) {
-        matchedCriteria += 1;
-        score += 30;
+        score += 25;
 
         reasons.push(
-          `✓ ${nutrition.calories} ккал — достаточно`
+          `✓ ${nutrition.calories} ккал`
         );
       } else {
         const difference =
@@ -1418,34 +1390,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
         score -= Math.min(
           25,
-          difference / 8
+          difference / 10
         );
 
         reasons.push(
-          `~ ${nutrition.calories} ккал — ниже цели`
+          `~ ${nutrition.calories} ккал`
         );
       }
     }
 
 
-    /* =====================================================
-       3. PROTEIN
-    ===================================================== */
-
     if (
       parsed.minProtein !== null
     ) {
-      requiredCriteria += 1;
-
       if (
         nutrition.protein >=
         parsed.minProtein
       ) {
-        matchedCriteria += 1;
-        score += 40;
+        score += 30;
 
         reasons.push(
-          `✓ ${nutrition.protein} г белка — цель выполнена`
+          `✓ ${nutrition.protein} г белка`
         );
       } else {
         const difference =
@@ -1458,9 +1423,7 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         reasons.push(
-          `~ ${nutrition.protein} г белка — не хватает ${Math.round(
-            difference
-          )} г`
+          `~ ${nutrition.protein} г белка`
         );
       }
     }
@@ -1469,17 +1432,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (
       parsed.maxProtein !== null
     ) {
-      requiredCriteria += 1;
-
       if (
         nutrition.protein <=
         parsed.maxProtein
       ) {
-        matchedCriteria += 1;
-        score += 30;
+        score += 25;
 
         reasons.push(
-          `✓ ${nutrition.protein} г белка — в лимите`
+          `✓ ${nutrition.protein} г белка`
         );
       } else {
         const difference =
@@ -1492,17 +1452,13 @@ document.addEventListener("DOMContentLoaded", () => {
         );
 
         reasons.push(
-          `~ ${nutrition.protein} г белка — на ${Math.round(
-            difference
-          )} выше лимита`
+          `~ ${nutrition.protein} г белка`
         );
       }
     }
 
 
     if (parsed.protein) {
-      requiredCriteria += 1;
-
       if (
         recipeInfo.includes(
           "высокобелков"
@@ -1514,8 +1470,7 @@ document.addEventListener("DOMContentLoaded", () => {
           "protein"
         )
       ) {
-        matchedCriteria += 1;
-        score += 45;
+        score += 40;
 
         reasons.push(
           "✓ высокобелковое"
@@ -1523,40 +1478,32 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (
         nutrition.protein >= 25
       ) {
-        matchedCriteria += 1;
-        score += 25;
+        score += 20;
 
         reasons.push(
-          "✓ хороший уровень белка"
+          "✓ много белка"
         );
       } else {
         score -= 15;
 
         reasons.push(
-          "~ белка меньше желаемого"
+          "~ не самое белковое"
         );
       }
     }
 
 
-    /* =====================================================
-       4. TIME — SOFT PREFERENCE
-    ===================================================== */
-
     if (
       parsed.maxTime !== null
     ) {
-      requiredCriteria += 1;
-
       if (
         recipeTime <=
         parsed.maxTime
       ) {
-        matchedCriteria += 1;
-        score += 45;
+        score += 35;
 
         reasons.push(
-          `✓ ${recipeTime} мин — укладывается в время`
+          `✓ ${recipeTime} мин`
         );
       } else {
         const difference =
@@ -1564,14 +1511,12 @@ document.addEventListener("DOMContentLoaded", () => {
           parsed.maxTime;
 
         score -= Math.min(
-          24,
-          difference * 0.8
+          35,
+          difference
         );
 
         reasons.push(
-          `~ ${recipeTime} мин — на ${Math.round(
-            difference
-          )} мин дольше желаемого`
+          `~ ${recipeTime} мин`
         );
       }
     }
@@ -1580,17 +1525,14 @@ document.addEventListener("DOMContentLoaded", () => {
     if (
       parsed.minTime !== null
     ) {
-      requiredCriteria += 1;
-
       if (
         recipeTime >=
         parsed.minTime
       ) {
-        matchedCriteria += 1;
         score += 20;
 
         reasons.push(
-          `✓ ${recipeTime} мин — подходит по времени`
+          `✓ ${recipeTime} мин`
         );
       } else {
         const difference =
@@ -1598,24 +1540,18 @@ document.addEventListener("DOMContentLoaded", () => {
           recipeTime;
 
         score -= Math.min(
-          15,
-          difference * 0.6
+          20,
+          difference
         );
 
         reasons.push(
-          `~ ${recipeTime} мин — быстрее минимального времени`
+          `~ ${recipeTime} мин`
         );
       }
     }
 
 
-    /* =====================================================
-       5. DIETS
-    ===================================================== */
-
     if (parsed.vegetarian) {
-      requiredCriteria += 1;
-
       if (
         recipeInfo.includes(
           "вегетариан"
@@ -1624,14 +1560,13 @@ document.addEventListener("DOMContentLoaded", () => {
           "vegetarian"
         )
       ) {
-        matchedCriteria += 1;
-        score += 45;
+        score += 40;
 
         reasons.push(
           "✓ вегетарианское"
         );
       } else {
-        score -= 45;
+        score -= 40;
 
         reasons.push(
           "✕ не вегетарианское"
@@ -1641,20 +1576,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     if (parsed.keto) {
-      requiredCriteria += 1;
-
       if (
         recipeInfo.includes("кето") ||
         recipeInfo.includes("keto")
       ) {
-        matchedCriteria += 1;
-        score += 45;
+        score += 40;
 
         reasons.push(
           "✓ кето"
         );
       } else {
-        score -= 45;
+        score -= 40;
 
         reasons.push(
           "✕ не кето"
@@ -1664,34 +1596,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     if (parsed.quick) {
-      requiredCriteria += 1;
-
       if (recipeTime <= 30) {
-        matchedCriteria += 1;
-        score += 35;
+        score += 30;
 
         reasons.push(
-          "✓ до 30 минут"
+          "✓ быстрое"
         );
       } else {
         const difference =
           recipeTime - 30;
 
         score -= Math.min(
-          20,
-          difference * 0.7
+          30,
+          difference
         );
 
         reasons.push(
-          `~ ${recipeTime} мин — дольше 30 минут`
+          `~ ${recipeTime} мин`
         );
       }
     }
 
-
-    /* =====================================================
-       6. FREE TEXT
-    ===================================================== */
 
     if (
       parsed.ingredients.length === 0
@@ -1744,54 +1669,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* =====================================================
-       7. MATCH PERCENT
-       Ingredients are mandatory; the percentage describes
-       how well the remaining preferences are satisfied.
-    ===================================================== */
-
-    const ingredientPercent =
-      parsed.ingredients.length > 0
-        ? (
-            matchedIngredients /
-            parsed.ingredients.length
-          ) * 100
-        : 100;
-
-    const preferencePercent =
-      requiredCriteria > 0
-        ? (
-            matchedCriteria /
-            requiredCriteria
-          ) * 100
-        : 100;
-
-    const matchPercent =
-      Math.round(
-        parsed.ingredients.length > 0
-          ? (
-              ingredientPercent * 0.6 +
-              preferencePercent * 0.4
-            )
-          : preferencePercent
-      );
-
-
     return {
       recipe,
       score,
-      reasons,
-      matchPercent,
-      matchedIngredients,
-      totalIngredients:
-        parsed.ingredients.length,
-      matchedCriteria,
-      totalCriteria:
-        requiredCriteria
+      reasons
     };
   }
 
-  
+
+  /* =========================================================
+     SEARCH RECIPES
+  ========================================================= */
 
   function searchRecipes(
     query
@@ -2102,47 +1990,21 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
-    const smartSummary =
-      getSmartSearchSummary();
-
     if (title) {
-      if (
-        smartSummary &&
-        smartSummary.ingredients.length
-      ) {
-        title.textContent =
-          "Лучшие совпадения";
-      } else {
-        title.textContent =
-          state.currentSearch.trim()
-            ? "Результаты поиска"
-            : "Рецепты";
-      }
+      title.textContent =
+        state.currentSearch.trim()
+          ? "Результаты поиска"
+          : "Рецепты";
     }
 
 
     if (count) {
-      const smartSummary =
-        getSmartSearchSummary();
-
-      if (
-        smartSummary &&
-        smartSummary.ingredients.length
-      ) {
-        count.textContent =
-          `${recipes.length} ${
-            getRecipeWord(
-              recipes.length
-            )
-          } · ингредиенты совпадают`;
-      } else {
-        count.textContent =
-          `${recipes.length} ${
-            getRecipeWord(
-              recipes.length
-            )
-          }`;
-      }
+      count.textContent =
+        `${recipes.length} ${
+          getRecipeWord(
+            recipes.length
+          )
+        }`;
     }
 
 
@@ -2159,9 +2021,8 @@ document.addEventListener("DOMContentLoaded", () => {
           </h3>
 
           <p>
-            Все указанные ингредиенты должны быть
-            в рецепте. А калории, белок и время
-            RecipePro подбирает как лучшие совпадения.
+            Попробуйте изменить ингредиенты
+            или условия поиска.
           </p>
 
           <button
@@ -2281,36 +2142,40 @@ document.addEventListener("DOMContentLoaded", () => {
         smartResult.reasons
           .slice(0, 4);
 
-      const matchPercent =
-        Number(
-          smartResult.matchPercent
-        ) || 0;
 
       smartReasonHtml = `
-        <div class="smart-match-box">
+        <div
+          style="
+            margin-top: 14px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: #f0f6f2;
+            color: #326553;
+            font-size: 13px;
+            line-height: 1.5;
+          "
+        >
 
-          <div class="smart-match-head">
+          <strong
+            style="
+              display: block;
+              margin-bottom: 5px;
+              font-size: 12px;
+              text-transform: uppercase;
+              letter-spacing: .04em;
+            "
+          >
+            Почему подходит
+          </strong>
 
-            <span class="smart-match-label">
-              Почему подходит
-            </span>
-
-            <strong class="smart-match-percent">
-              ${matchPercent}%
-            </strong>
-
-          </div>
-
-          <div class="smart-match-reasons">
-            ${reasons
-              .map(
-                (reason) =>
-                  `<div class="smart-match-reason">${escapeHtml(
-                    reason
-                  )}</div>`
-              )
-              .join("")}
-          </div>
+          ${reasons
+            .map(
+              (reason) =>
+                `<div>${escapeHtml(
+                  reason
+                )}</div>`
+            )
+            .join("")}
 
         </div>
       `;
@@ -5233,3 +5098,703 @@ document.addEventListener("DOMContentLoaded", () => {
         </option>
 
         <option value="мл">
+          мл
+        </option>
+
+        <option value="шт">
+          шт
+        </option>
+
+      </select>
+
+      <button
+        type="button"
+        class="builder-remove ingredient-remove"
+        aria-label="Удалить ингредиент"
+      >
+        ×
+      </button>
+    `;
+
+
+    builder.appendChild(
+      row
+    );
+
+
+    const remove =
+      row.querySelector(
+        ".ingredient-remove"
+      );
+
+    if (remove) {
+      remove.addEventListener(
+        "click",
+        () => {
+          row.remove();
+          updatePreview();
+        }
+      );
+    }
+
+
+    row
+      .querySelectorAll(
+        "input, select"
+      )
+      .forEach(
+        (element) => {
+          element.addEventListener(
+            "input",
+            updatePreview
+          );
+
+          element.addEventListener(
+            "change",
+            updatePreview
+          );
+        }
+      );
+
+
+    updatePreview();
+  }
+
+
+  /* =========================================================
+     STEP BUILDER
+  ========================================================= */
+
+  function ensureInitialStepRow() {
+    const builder =
+      $("#stepsBuilder");
+
+    if (!builder) {
+      return;
+    }
+
+    if (
+      !builder.querySelector(
+        ".step-row"
+      )
+    ) {
+      addStepRow();
+    }
+  }
+
+
+  function addStepRow() {
+    const builder =
+      $("#stepsBuilder");
+
+    if (!builder) {
+      return;
+    }
+
+
+    const row =
+      document.createElement(
+        "div"
+      );
+
+    row.className =
+      "step-row";
+
+
+    const number =
+      builder.querySelectorAll(
+        ".step-row"
+      ).length + 1;
+
+
+    row.innerHTML = `
+      <div class="step-number">
+        ${number}
+      </div>
+
+      <textarea
+        class="step-input"
+        rows="2"
+        placeholder="Напишите шаг приготовления..."
+      ></textarea>
+
+      <button
+        type="button"
+        class="builder-remove step-remove"
+        aria-label="Удалить шаг"
+      >
+        ×
+      </button>
+    `;
+
+
+    builder.appendChild(
+      row
+    );
+
+
+    const remove =
+      row.querySelector(
+        ".step-remove"
+      );
+
+    if (remove) {
+      remove.addEventListener(
+        "click",
+        () => {
+          row.remove();
+          renumberSteps();
+        }
+      );
+    }
+  }
+
+
+  function renumberSteps() {
+    const rows =
+      $$(".step-row");
+
+    rows.forEach(
+      (row, index) => {
+        const number =
+          row.querySelector(
+            ".step-number"
+          );
+
+        if (number) {
+          number.textContent =
+            index + 1;
+        }
+      }
+    );
+  }
+
+
+  /* =========================================================
+     PREVIEW
+  ========================================================= */
+
+  function updatePreview() {
+    const titleInput =
+      $("#recipeTitle");
+
+    const descriptionInput =
+      $("#recipeDescription");
+
+    const timeInput =
+      $("#recipeTime");
+
+    const servingsInput =
+      $("#recipeServings");
+
+
+    const previewTitle =
+      $("#previewTitle");
+
+    const previewDescription =
+      $("#previewDescription");
+
+    const previewTime =
+      $("#previewTime");
+
+    const previewServings =
+      $("#previewServings");
+
+
+    if (previewTitle) {
+      previewTitle.textContent =
+        titleInput?.value ||
+        "Название рецепта";
+    }
+
+
+    if (previewDescription) {
+      previewDescription.textContent =
+        descriptionInput?.value ||
+        "Описание рецепта";
+    }
+
+
+    if (previewTime) {
+      previewTime.textContent =
+        `${timeInput?.value || 0} мин`;
+    }
+
+
+    if (previewServings) {
+      previewServings.textContent =
+        `${servingsInput?.value || 1} порц.`;
+    }
+
+
+    const nutrition =
+      calculateBuilderNutrition();
+
+
+    const previewCalories =
+      $("#previewCalories");
+
+    const previewProtein =
+      $("#previewProtein");
+
+    const previewFat =
+      $("#previewFat");
+
+    const previewCarbs =
+      $("#previewCarbs");
+
+
+    if (previewCalories) {
+      previewCalories.textContent =
+        `${nutrition.calories} ккал`;
+    }
+
+
+    if (previewProtein) {
+      previewProtein.textContent =
+        `${nutrition.protein} г`;
+    }
+
+
+    if (previewFat) {
+      previewFat.textContent =
+        `${nutrition.fat} г`;
+    }
+
+
+    if (previewCarbs) {
+      previewCarbs.textContent =
+        `${nutrition.carbs} г`;
+    }
+
+
+    const emojiInput =
+      $("#recipeEmoji");
+
+    const previewEmoji =
+      $("#previewEmoji");
+
+
+    if (previewEmoji) {
+      previewEmoji.textContent =
+        emojiInput?.value ||
+        "🍽️";
+    }
+  }
+
+
+  function calculateBuilderNutrition() {
+    const result = {
+      calories: 0,
+      protein: 0,
+      fat: 0,
+      carbs: 0
+    };
+
+
+    const builder =
+      $("#ingredientsBuilder");
+
+    if (!builder) {
+      return result;
+    }
+
+
+    builder
+      .querySelectorAll(
+        ".ingredient-row"
+      )
+      .forEach(
+        (row) => {
+          const productSelect =
+            row.querySelector(
+              ".ingredient-product"
+            );
+
+          const amountInput =
+            row.querySelector(
+              ".ingredient-amount"
+            );
+
+          const unitSelect =
+            row.querySelector(
+              ".ingredient-unit"
+            );
+
+
+          if (!productSelect) {
+            return;
+          }
+
+
+          const product =
+            getProduct(
+              productSelect.value
+            );
+
+
+          if (
+            !product ||
+            !product.raw
+          ) {
+            return;
+          }
+
+
+          let amount =
+            Number(
+              amountInput?.value ||
+              0
+            );
+
+
+          const unit =
+            unitSelect?.value ||
+            "г";
+
+
+          if (
+            unit === "шт" &&
+            product.pieceWeight
+          ) {
+            amount *= Number(
+              product.pieceWeight
+            );
+          }
+
+
+          const multiplier =
+            amount / 100;
+
+
+          result.calories +=
+            Number(
+              product.raw.kcal || 0
+            ) * multiplier;
+
+          result.protein +=
+            Number(
+              product.raw.protein || 0
+            ) * multiplier;
+
+          result.fat +=
+            Number(
+              product.raw.fat || 0
+            ) * multiplier;
+
+          result.carbs +=
+            Number(
+              product.raw.carbs || 0
+            ) * multiplier;
+        }
+      );
+
+
+    const servings =
+      Math.max(
+        1,
+        Number(
+          $("#recipeServings")
+            ?.value || 1
+        )
+      );
+
+
+    return {
+      calories:
+        Math.round(
+          result.calories /
+          servings
+        ),
+
+      protein:
+        Math.round(
+          result.protein /
+          servings
+        ),
+
+      fat:
+        Math.round(
+          result.fat /
+          servings
+        ),
+
+      carbs:
+        Math.round(
+          result.carbs /
+          servings
+        )
+    };
+  }
+
+
+  /* =========================================================
+     CREATE USER RECIPE
+  ========================================================= */
+
+  function handleRecipeSubmit(
+    event
+  ) {
+    event.preventDefault();
+
+
+    const title =
+      $("#recipeTitle")
+        ?.value.trim();
+
+    const description =
+      $("#recipeDescription")
+        ?.value.trim();
+
+    const category =
+      $("#recipeCategory")
+        ?.value ||
+      "other";
+
+    const emoji =
+      $("#recipeEmoji")
+        ?.value.trim() ||
+      "🍽️";
+
+    const time =
+      Number(
+        $("#recipeTime")
+          ?.value || 0
+      );
+
+    const servings =
+      Number(
+        $("#recipeServings")
+          ?.value || 1
+      );
+
+
+    if (!title) {
+      alert(
+        "Введите название рецепта."
+      );
+
+      return;
+    }
+
+
+    const ingredients = [];
+
+
+    $$(".ingredient-row")
+      .forEach(
+        (row) => {
+          const product =
+            row.querySelector(
+              ".ingredient-product"
+            )?.value;
+
+          const amount =
+            Number(
+              row.querySelector(
+                ".ingredient-amount"
+              )?.value || 0
+            );
+
+          const unit =
+            row.querySelector(
+              ".ingredient-unit"
+            )?.value ||
+            "г";
+
+
+          if (
+            product &&
+            amount > 0
+          ) {
+            ingredients.push({
+              product,
+              amount,
+              unit
+            });
+          }
+        }
+      );
+
+
+    const steps = [];
+
+
+    $$(".step-row")
+      .forEach(
+        (row) => {
+          const value =
+            row.querySelector(
+              ".step-input"
+            )?.value.trim();
+
+          if (value) {
+            steps.push(value);
+          }
+        }
+      );
+
+
+    if (!ingredients.length) {
+      alert(
+        "Добавьте хотя бы один ингредиент."
+      );
+
+      return;
+    }
+
+
+    if (!steps.length) {
+      alert(
+        "Добавьте хотя бы один шаг приготовления."
+      );
+
+      return;
+    }
+
+
+    const nutrition =
+      calculateBuilderNutrition();
+
+
+    const recipe = {
+      id:
+        `user-${Date.now()}-${Math.random()
+          .toString(36)
+          .slice(2, 8)}`,
+
+      title,
+
+      description,
+
+      emoji,
+
+      tags: [
+        "Рецепт пользователя"
+      ],
+
+      filters: [
+        category
+      ],
+
+      time,
+
+      servings,
+
+      ingredients,
+
+      steps,
+
+      nutrition
+    };
+
+
+    state.userRecipes.push(
+      recipe
+    );
+
+    saveUserData();
+
+
+    closeAddRecipeModal();
+
+    resetRecipeForm();
+
+
+    renderRecipes();
+    renderMyRecipes();
+    renderHero();
+
+
+    const myRecipesSection =
+      $("#my-recipes");
+
+    if (myRecipesSection) {
+      setTimeout(
+        () => {
+          myRecipesSection.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+          });
+        },
+        100
+      );
+    }
+  }
+
+
+  /* =========================================================
+     RESET RECIPE FORM
+  ========================================================= */
+
+  function resetRecipeForm() {
+    const form =
+      $("#recipeForm");
+
+    if (form) {
+      form.reset();
+    }
+
+
+    const ingredients =
+      $("#ingredientsBuilder");
+
+    if (ingredients) {
+      ingredients.innerHTML =
+        "";
+    }
+
+
+    const steps =
+      $("#stepsBuilder");
+
+    if (steps) {
+      steps.innerHTML =
+        "";
+    }
+
+
+    ensureInitialIngredientRow();
+    ensureInitialStepRow();
+
+    updatePreview();
+  }
+
+
+  /* =========================================================
+     HTML ESCAPE
+  ========================================================= */
+
+  function escapeHtml(value) {
+    return String(
+      value ?? ""
+    )
+      .replace(
+        /&/g,
+        "&amp;"
+      )
+      .replace(
+        /</g,
+        "&lt;"
+      )
+      .replace(
+        />/g,
+        "&gt;"
+      )
+      .replace(
+        /"/g,
+        "&quot;"
+      )
+      .replace(
+        /'/g,
+        "&#039;"
+      );
+  }
+
+
+  /* =========================================================
+     START
+  ========================================================= */
+
+  init();
+});
