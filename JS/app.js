@@ -4860,6 +4860,9 @@ document.addEventListener("DOMContentLoaded", () => {
       sourceRecipeTitle:
         originalRecipe.title,
 
+      sourceRecipeIsAiAdaptation:
+        originalRecipe.isAiAdaptation === true,
+
       adaptationRequest:
         request,
 
@@ -4871,6 +4874,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       adaptationWarnings:
         warnings,
+
+      adaptationVersion:
+        1,
+
+      adaptedAt:
+        new Date().toISOString(),
 
       isAiAdaptation:
         true
