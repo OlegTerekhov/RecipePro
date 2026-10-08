@@ -4944,3 +4944,17 @@ p {
     gap: 7px;
   }
 }
+
+
+/* =========================================================
+   NUTRITION COOKING NOTE
+========================================================= */
+
+.nutrition-row-product small {
+  display: block;
+  margin-top: 4px;
+  color: var(--green-700);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .01em;
+}
