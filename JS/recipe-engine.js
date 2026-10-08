@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    const ENGINE_VERSION = "2.0.0";
+    const ENGINE_VERSION = "3.0.0";
 
     const TYPE_RULES = [
         {
@@ -9,7 +9,6 @@
             title: "Боул",
             emoji: "🥗",
             baseTime: 15,
-            roles: ["protein", "carb", "vegetable"],
             score: ids => ids.some(isProtein) && ids.some(isCarb) && ids.some(isVegetable) ? 30 : 0
         },
         {
@@ -17,7 +16,6 @@
             title: "Запечённое блюдо",
             emoji: "🍗",
             baseTime: 35,
-            roles: ["protein", "carb", "vegetable"],
             score: ids => ids.some(isProtein) && ids.some(isCarb) ? 24 : 0
         },
         {
@@ -25,7 +23,6 @@
             title: "Рагу",
             emoji: "🍲",
             baseTime: 30,
-            roles: ["protein", "vegetable"],
             score: ids => ids.some(isProtein) && ids.some(isVegetable) ? 22 : 0
         },
         {
@@ -33,7 +30,6 @@
             title: "Паста",
             emoji: "🍝",
             baseTime: 25,
-            roles: ["protein", "carb"],
             score: ids => ids.includes("паста") && (ids.some(isProtein) || ids.some(isVegetable)) ? 32 : 0
         },
         {
@@ -41,7 +37,6 @@
             title: "Каша",
             emoji: "🥣",
             baseTime: 12,
-            roles: ["carb", "fruit"],
             score: ids => ids.includes("овсянка") && ids.some(isFruit) ? 34 : 0
         },
         {
@@ -49,7 +44,6 @@
             title: "Омлет",
             emoji: "🍳",
             baseTime: 15,
-            roles: ["protein", "vegetable"],
             score: ids => ids.includes("яйца") && (ids.some(isVegetable) || ids.includes("сыр") || ids.includes("творог")) ? 36 : 0
         },
         {
@@ -57,19 +51,51 @@
             title: "Салат",
             emoji: "🥗",
             baseTime: 10,
-            roles: ["protein", "vegetable"],
             score: ids => ids.some(isVegetable) && (ids.includes("огурец") || ids.includes("помидоры")) ? 20 : 0
         }
     ];
 
+    const PANTRY = {
+        salt: {
+            product: "соль",
+            name: "соль",
+            amount: 2,
+            unit: "г",
+            category: "pantry"
+        },
+        pepper: {
+            product: "чёрный перец",
+            name: "чёрный перец",
+            amount: 1,
+            unit: "г",
+            category: "pantry"
+        },
+        water: {
+            product: "вода",
+            name: "вода",
+            amount: 150,
+            unit: "мл",
+            category: "pantry"
+        },
+        cookingOil: {
+            product: "масло",
+            name: "растительное масло",
+            amount: 5,
+            unit: "г",
+            category: "pantry"
+        }
+    };
+
     function role(id) {
         const p = window.products?.[id];
         if (p?.role) return p.role;
+
         if (["курица","куриное-бедро","индейка","говядина","свинина","лосось","тунец","креветки","яйца","творог","сыр"].includes(id)) return "protein";
         if (["картофель","рис","гречка","паста","хлеб","овсянка","чечевица","фасоль"].includes(id)) return "carb";
         if (["лук","морковь","помидоры","огурец","перец","брокколи","капуста","кабачок","чеснок"].includes(id)) return "vegetable";
         if (["банан","яблоко","апельсин"].includes(id)) return "fruit";
         if (["масло","сливочное-масло","сметана","мед","сахар"].includes(id)) return "fat";
+
         return "other";
     }
 
@@ -78,12 +104,30 @@
     const isVegetable = id => role(id) === "vegetable";
     const isFruit = id => role(id) === "fruit";
 
+    function name(id) {
+        return window.products?.[id]?.name || id;
+    }
+
+    function amount(id) {
+        const p = window.products?.[id];
+
+        if (p?.pieceWeight && ["яйца","банан","яблоко","апельсин"].includes(id)) {
+            return { amount: p.pieceWeight, unit: "г" };
+        }
+
+        if (["масло","сливочное-масло"].includes(id)) return { amount: 10, unit: "г" };
+        if (["лук","морковь","помидоры","огурец","перец","брокколи","капуста","кабачок","чеснок"].includes(id)) return { amount: 80, unit: "г" };
+        if (["картофель","рис","гречка","паста","хлеб","овсянка","чечевица","фасоль"].includes(id)) return { amount: 70, unit: "г" };
+        if (["творог","йогурт","сметана","молоко","сыр","моцарелла"].includes(id)) return { amount: 120, unit: "г" };
+
+        return { amount: 180, unit: "г" };
+    }
+
     function chooseType(ids, intent = {}) {
         const ranked = TYPE_RULES.map(rule => {
             let score = rule.score(ids);
 
             if (intent.type && rule.id === intent.type) score += 100;
-
             if (intent.faster && rule.baseTime <= 20) score += 25;
             if (intent.maxTime && rule.baseTime <= intent.maxTime) score += 30;
             if (intent.maxTime && rule.baseTime > intent.maxTime) score -= Math.min(24, (rule.baseTime - intent.maxTime) * 0.8);
@@ -103,14 +147,56 @@
         return ranked[0]?.score > 0 ? ranked[0].rule : TYPE_RULES[1];
     }
 
+    function getPantryIngredients(type, ids) {
+        const hasOil = ids.includes("масло") || ids.includes("сливочное-масло");
+
+        if (type === "stew") {
+            return [
+                { ...PANTRY.water, required: false, pantry: true },
+                { ...PANTRY.salt, required: false, pantry: true },
+                { ...PANTRY.pepper, required: false, pantry: true }
+            ];
+        }
+
+        if (type === "roast") {
+            return [
+                ...(hasOil ? [] : [{ ...PANTRY.cookingOil, required: false, pantry: true }]),
+                { ...PANTRY.salt, required: false, pantry: true },
+                { ...PANTRY.pepper, required: false, pantry: true }
+            ];
+        }
+
+        if (type === "salad") {
+            return [
+                ...(hasOil ? [] : [{ ...PANTRY.cookingOil, required: false, pantry: true }]),
+                { ...PANTRY.salt, required: false, pantry: true },
+                { ...PANTRY.pepper, required: false, pantry: true }
+            ];
+        }
+
+        if (type === "omelet") {
+            return [
+                ...(hasOil ? [] : [{ ...PANTRY.cookingOil, required: false, pantry: true }]),
+                { ...PANTRY.salt, required: false, pantry: true },
+                { ...PANTRY.pepper, required: false, pantry: true }
+            ];
+        }
+
+        return [
+            { ...PANTRY.salt, required: false, pantry: true }
+        ];
+    }
+
     function build(ids, intent = {}) {
         const unique = [...new Set(ids)].slice(0, 10);
         const type = chooseType(unique, intent);
+
         const protein = unique.find(isProtein);
         const carb = unique.find(isCarb);
         const vegetables = unique.filter(isVegetable);
         const fruits = unique.filter(isFruit);
         const fats = unique.filter(id => role(id) === "fat");
+
         let selected = [];
 
         if (type.id === "pasta") selected = ["паста", protein, ...vegetables, ...fats];
@@ -149,21 +235,33 @@
         };
 
         let time = type.baseTime;
+
         if (intent.faster) time = Math.min(time, 20);
         if (intent.maxTime) time = Math.min(time, intent.maxTime);
+
+        const ingredients = [
+            ...selected.map(id => ({
+                product: id,
+                ...amount(id),
+                required: true,
+                source: "user"
+            })),
+            ...getPantryIngredients(type.id, unique)
+        ];
 
         const recipe = {
             engineVersion: ENGINE_VERSION,
             type: type.id,
             title: titleMap[type.id] || "Блюдо RecipePro",
             emoji: type.emoji,
-            description: "Recipe Engine выбрал тип блюда по продуктам и пожеланиям пользователя.",
+            description: "RecipePro собрал блюдо из доступных продуктов и базовых кухонных ингредиентов.",
             time: Math.max(5, time),
             servings: 1,
-            ingredients: selected.map(id => ({ product:id, ...amount(id), required:true })),
+            ingredients,
             steps: stepsByType[type.id] || ["Подготовь продукты.","Приготовь до готовности.","Подавай сразу."],
             aiChanges: ["Recipe Engine выбрал формат: " + type.title],
-            aiWarnings: []
+            aiWarnings: [],
+            pantryIngredients: ingredients.filter(item => item.pantry)
         };
 
         if (intent.maxTime && type.baseTime > intent.maxTime) {
@@ -180,5 +278,11 @@
 
         return recipe;
     }
-    window.recipeProRecipeEngine = { version: ENGINE_VERSION, build, chooseType, role };
+
+    window.recipeProRecipeEngine = {
+        version: ENGINE_VERSION,
+        build,
+        chooseType,
+        role
+    };
 })();
