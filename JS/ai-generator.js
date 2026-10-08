@@ -153,7 +153,7 @@
     }
 
     function getProductName(id) {
-        return getProductName(id) || window.products?.[id]?.name || id;
+        return NAMES[id] || window.products?.[id]?.name || id;
     }
 
     function amountFor(id) {
@@ -344,7 +344,7 @@
     }
 
     function renderResult(recipe,detected,constraints){
-        const ingredientHtml=recipe.ingredients.map(item=>`<div class="ai-generator-ingredient"><span>${esc(NAMES[item.product]||item.product)}</span><span>${item.amount} ${esc(item.unit)}</span></div>`).join("");
+        const ingredientHtml=recipe.ingredients.map(item=>`<div class="ai-generator-ingredient"><span>${esc(getProductName(item.product))}</span><span>${item.amount} ${esc(item.unit)}</span></div>`).join("");
         const stepHtml=recipe.steps.map(step=>`<li>${esc(step)}</li>`).join("");
         const chips=constraintHtml(constraints).map(x=>`<span class="ai-generator-constraint">${esc(x)}</span>`).join("");
         const warnings=(recipe.aiWarnings||[]).map(x=>`<div class="ai-generator-warning">⚠️ ${esc(x)}</div>`).join("");
@@ -358,7 +358,7 @@ ${warnings}
 <strong class="ai-generator-label">Ингредиенты</strong><div class="ai-generator-ingredients">${ingredientHtml}</div>
 <strong class="ai-generator-label" style="margin-top:18px">Как приготовить</strong><ol class="ai-generator-steps">${stepHtml}</ol>
 ${changes}
-<div class="ai-generator-note">Распознано: ${detected.map(id=>esc(getProductName(id)||id)).join(", ")}. Все указанные продукты сохранены в составе; КБЖУ рассчитано по базе RecipePro и является ориентировочной оценкой.</div>
+<div class="ai-generator-note">Распознано: ${detected.map(id=>esc(getProductName(id)||id)).join(", ")}. Локальная база RecipePro дополнена внешней базой продуктов при необходимости; КБЖУ является ориентировочной оценкой.</div>
 <div class="ai-generator-save-row"><button class="primary-button large" id="aiGeneratorSave" type="button">Сохранить в мои рецепты →</button></div>
 </div>`;
     }
