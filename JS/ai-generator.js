@@ -175,58 +175,22 @@
         },{calories:0,protein:0,fat:0,carbs:0});
     }
 
-    function buildRecipe(ids) {
-        const has=id=>ids.includes(id);
-        const protein=ids.find(id=>getRole(id)==="protein");
-        const carb=ids.find(id=>getRole(id)==="carb");
-        const vegetables=ids.filter(id=>getRole(id)==="vegetable");
-        const extras=ids.filter(id=>!["protein","carb","vegetable"].includes(getRole(id)));
-        let title="Домашнее блюдо RecipePro",description="RecipePro AI собрал блюдо из продуктов, которые ты указал.",emoji="🍽️";
-        let selected=[],steps=[],time=30;
-
-        if(protein&&has("картофель")){
-            selected=[protein,"картофель",...vegetables.filter(id=>["лук","морковь","чеснок"].includes(id)),...extras.filter(id=>FATS.includes(id))];
-            title=getProductName(protein)+" с картофелем";
-            description="Сытное горячее блюдо с акцентом на белок и запечённый гарнир.";
-            emoji="🍗";
-            time=30;
-            steps=[
-                "Нарежь белковый продукт и картофель примерно одинаковыми порциями.",
-                "Картофель смешай с овощами и небольшим количеством масла, если оно есть в запросе.",
-                "Запекай или готовь под крышкой до мягкости картофеля, затем добавь белковый продукт и доведи до готовности."
-            ];
-        } else if(protein&&carb){
-            selected=[protein,carb,...vegetables,...extras.filter(id=>FATS.includes(id))].slice(0,7);
-            title=getProductName(protein)+" с "+getProductName(carb);
-            description="Сбалансированное горячее блюдо из белковой основы, гарнира и указанных овощей.";
-            emoji="🍲";
-            time=30;
-            steps=[
-                "Подготовь белковый продукт, гарнир и овощи.",
-                "Приготовь гарнир до готовности.",
-                "Отдельно приготовь белковый продукт с овощами, затем соедини всё вместе."
-            ];
-        } else if(has("яйца")&&has("творог")&&has("банан")){
-            selected=["яйца","творог","банан"];
-            title="Творожный омлет с бананом";description="Белковый завтрак без лишних добавок.";emoji="🥞";time=15;
-            steps=["Смешай яйца с творогом до однородной массы.","Добавь банан и аккуратно разомни его вилкой.","Готовь под крышкой 5–7 минут на слабом огне."];
-        } else if(has("овсянка")&&has("банан")){
-            selected=["овсянка","банан",...(has("молоко")?["молоко"]:[])];
-            title="Овсянка с бананом";description="Быстрый завтрак из овсянки и банана.";emoji="🥣";time=10;
-            steps=["Залей овсянку молоком или водой.","Готовь до мягкости 5–7 минут.","Добавь банан перед подачей."];
-        } else {
-            selected=[...ids].slice(0,7);
-            title=selected.slice(0,3).map(id=>getProductName(id)).join(" · ")||title;
-            description="Простое блюдо RecipePro из твоих продуктов без лишних покупок.";
-            emoji=protein?"🍲":"🥗";
-            time=30;
-            steps=["Подготовь и нарежь продукты.","Начни с ингредиентов, которым требуется больше времени.","Соедини остальные продукты и доведи блюдо до готовности."];
+    function buildRecipe(ids, intent = {}) {
+        if (window.recipeProRecipeEngine) {
+            return window.recipeProRecipeEngine.build(ids, intent);
         }
-
-        const ingredients=selected.map(product=>{const a=amountFor(product);return {product,amount:a.amount,unit:a.unit,state:"raw",required:true};});
-        return finalize({id:"ai-draft-"+Date.now(),title,description,emoji,time,servings:2,ingredients,steps});
+        return {
+            title: "Блюдо RecipePro",
+            description: "Не удалось запустить Recipe Engine.",
+            emoji: "🍽️",
+            time: 30,
+            servings: 1,
+            ingredients: ids.map(id => ({ product:id, amount:100, unit:"г", required:true })),
+            steps: ["Подготовь продукты.","Приготовь до готовности.","Подавай сразу."],
+            aiChanges: [],
+            aiWarnings: ["Recipe Engine недоступен."]
+        };
     }
-
     function finalize(recipe){
         const n=nutrition(recipe.ingredients), servings=recipe.servings||2;
         recipe.nutrition={calories:Math.round(n.calories/servings),protein:Math.round(n.protein/servings*10)/10,fat:Math.round(n.fat/servings*10)/10,carbs:Math.round(n.carbs/servings*10)/10};
