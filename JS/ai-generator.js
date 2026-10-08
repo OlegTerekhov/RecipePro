@@ -128,6 +128,16 @@
     function parseRequest(input) {
         const text=input.toLowerCase().replace(/ё/g,"е");
         const findNumber=patterns=>{for(const pattern of patterns){const match=text.match(pattern);if(match)return Number(match[1]);}return null;};
+        let type=null;
+        if (/суп|супа|супе/.test(text)) type="stew";
+        else if (/салат/.test(text)) type="salad";
+        else if (/паста|макарон|спагетти/.test(text)) type="pasta";
+        else if (/омлет|яичниц/.test(text)) type="omelet";
+        else if (/каша|овсян/.test(text)) type="porridge";
+        else if (/боул/.test(text)) type="bowl";
+        else if (/рагу/.test(text)) type="stew";
+        else if (/запекан|запечь|запечен/.test(text)) type="roast";
+
         return {
             targetServings:findNumber([/на\s+(\d+)\s+порц/i,/на\s+(\d+)\s+человек/i,/для\s+(\d+)\s+человек/i]),
             maxCalories:findNumber([/(?:до|максимум|не\s+больше|не\s+более)\s+(\d+)\s*(?:ккал|калори)/i]),
@@ -138,7 +148,8 @@
             minTime:findNumber([/(?:от|минимум)\s+(\d+)\s*(?:мин|минут)/i]),
             highProtein:/белков\w*|протеин\w*|много\s+белка|высок\w*\s+содержани\w*\s+белка|богат\w*\s+белк/i.test(text),
             lessCalories:/менее\s+калори|низк\w*\s+калори/i.test(text),
-            faster:/быстр\w*|за\s+полчаса|быстро\s+приготов/i.test(text)
+            faster:/быстр\w*|за\s+полчаса|быстро\s+приготов/i.test(text),
+            type
         };
     }
 
