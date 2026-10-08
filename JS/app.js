@@ -1180,10 +1180,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     if (
-      text.includes("белков") ||
-      text.includes("высокобелков") ||
+      /белков\w*/.test(text) ||
+      /протеин\w*/.test(text) ||
       text.includes("много белка") ||
-      text.includes("протеинов")
+      text.includes("высокое содержание белка") ||
+      text.includes("богат белком") ||
+      text.includes("богатое белком")
     ) {
       parsed.protein = true;
       parsed.recognized = true;
@@ -1210,10 +1212,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     if (
-      text.includes("быстро") ||
-      text.includes("быстрое") ||
-      text.includes("быстрый") ||
-      text.includes("быстрая")
+      /\bбыстр\w*/.test(text) ||
+      text.includes("за полчаса") ||
+      text.includes("быстро приготовить")
     ) {
       parsed.quick = true;
       parsed.recognized = true;
@@ -1302,35 +1303,33 @@ document.addEventListener("DOMContentLoaded", () => {
       );
 
 
+    /*
+      Ингредиенты — жёсткое условие.
+
+      Если пользователь написал:
+      "курица и картошка",
+      рецепт обязан содержать оба продукта.
+
+      Остальные параметры ниже являются
+      мягкими предпочтениями: рецепт может
+      немного выйти за лимит, но всё равно
+      останется в выдаче.
+    */
+
     if (
       parsed.ingredients.length > 0
     ) {
-      let matchedIngredients = 0;
-
-      parsed.ingredients.forEach(
-        (productId) => {
-          if (
+      const matchedIngredients =
+        parsed.ingredients.filter(
+          (productId) =>
             recipeContainsProduct(
               recipe,
               productId
             )
-          ) {
-            matchedIngredients += 1;
-
-            score += 100;
-
-            reasons.push(
-              `✓ ${getProductName(
-                productId
-              )}`
-            );
-          }
-        }
-      );
-
+        );
 
       if (
-        matchedIngredients !==
+        matchedIngredients.length !==
         parsed.ingredients.length
       ) {
         return {
@@ -1339,29 +1338,51 @@ document.addEventListener("DOMContentLoaded", () => {
           reasons: []
         };
       }
+
+      score +=
+        matchedIngredients.length * 100;
+
+      matchedIngredients.forEach(
+        (productId) => {
+          reasons.push(
+            `✓ ${getProductName(
+              productId
+            )}`
+          );
+        }
+      );
     }
 
+
+    /*
+      Калории.
+
+      Попадание в лимит получает
+      заметный бонус.
+
+      Выход за лимит не исключает
+      рецепт — штраф растёт постепенно,
+      поэтому близкий вариант остаётся
+      выше сильно неподходящего.
+    */
 
     if (
       parsed.maxCalories !== null
     ) {
-      if (
-        nutrition.calories <=
-        parsed.maxCalories
-      ) {
-        score += 35;
+      const difference =
+        nutrition.calories -
+        parsed.maxCalories;
+
+      if (difference <= 0) {
+        score += 40;
 
         reasons.push(
           `✓ ${nutrition.calories} ккал`
         );
       } else {
-        const difference =
-          nutrition.calories -
-          parsed.maxCalories;
-
         score -= Math.min(
-          35,
-          difference / 10
+          45,
+          difference / 8
         );
 
         reasons.push(
@@ -1374,23 +1395,20 @@ document.addEventListener("DOMContentLoaded", () => {
     if (
       parsed.minCalories !== null
     ) {
-      if (
-        nutrition.calories >=
-        parsed.minCalories
-      ) {
+      const difference =
+        parsed.minCalories -
+        nutrition.calories;
+
+      if (difference <= 0) {
         score += 25;
 
         reasons.push(
           `✓ ${nutrition.calories} ккал`
         );
       } else {
-        const difference =
-          parsed.minCalories -
-          nutrition.calories;
-
         score -= Math.min(
           25,
-          difference / 10
+          difference / 8
         );
 
         reasons.push(
@@ -1400,25 +1418,32 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
+    /*
+      Белок.
+
+      Для "минимум N г" — чем ближе
+      к цели, тем выше результат.
+
+      Для "до N г" — превышение мягко
+      понижает позицию.
+    */
+
     if (
       parsed.minProtein !== null
     ) {
-      if (
-        nutrition.protein >=
-        parsed.minProtein
-      ) {
-        score += 30;
+      const difference =
+        parsed.minProtein -
+        nutrition.protein;
+
+      if (difference <= 0) {
+        score += 35;
 
         reasons.push(
           `✓ ${nutrition.protein} г белка`
         );
       } else {
-        const difference =
-          parsed.minProtein -
-          nutrition.protein;
-
         score -= Math.min(
-          30,
+          35,
           difference
         );
 
@@ -1432,22 +1457,19 @@ document.addEventListener("DOMContentLoaded", () => {
     if (
       parsed.maxProtein !== null
     ) {
-      if (
-        nutrition.protein <=
-        parsed.maxProtein
-      ) {
+      const difference =
+        nutrition.protein -
+        parsed.maxProtein;
+
+      if (difference <= 0) {
         score += 25;
 
         reasons.push(
           `✓ ${nutrition.protein} г белка`
         );
       } else {
-        const difference =
-          nutrition.protein -
-          parsed.maxProtein;
-
         score -= Math.min(
-          25,
+          30,
           difference
         );
 
@@ -1459,7 +1481,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     if (parsed.protein) {
-      if (
+      const isTaggedProtein =
         recipeInfo.includes(
           "высокобелков"
         ) ||
@@ -1468,9 +1490,10 @@ document.addEventListener("DOMContentLoaded", () => {
         ) ||
         recipeInfo.includes(
           "protein"
-        )
-      ) {
-        score += 40;
+        );
+
+      if (isTaggedProtein) {
+        score += 45;
 
         reasons.push(
           "✓ высокобелковое"
@@ -1478,41 +1501,55 @@ document.addEventListener("DOMContentLoaded", () => {
       } else if (
         nutrition.protein >= 25
       ) {
-        score += 20;
+        score += 25;
 
         reasons.push(
           "✓ много белка"
+        );
+      } else if (
+        nutrition.protein >= 18
+      ) {
+        score += 10;
+
+        reasons.push(
+          "~ умеренно белковое"
         );
       } else {
         score -= 15;
 
         reasons.push(
-          "~ не самое белковое"
+          "~ мало белка"
         );
       }
     }
 
 
+    /*
+      Время — мягкое условие.
+
+      "Максимум 30 минут" не означает,
+      что 45-минутный рецепт надо скрыть.
+      Он просто должен стоять ниже
+      рецепта на 25 минут.
+    */
+
     if (
       parsed.maxTime !== null
     ) {
-      if (
-        recipeTime <=
-        parsed.maxTime
-      ) {
-        score += 35;
+      const difference =
+        recipeTime -
+        parsed.maxTime;
+
+      if (difference <= 0) {
+        score += 40;
 
         reasons.push(
           `✓ ${recipeTime} мин`
         );
       } else {
-        const difference =
-          recipeTime -
-          parsed.maxTime;
-
         score -= Math.min(
-          35,
-          difference
+          40,
+          difference * 1.25
         );
 
         reasons.push(
@@ -1525,20 +1562,17 @@ document.addEventListener("DOMContentLoaded", () => {
     if (
       parsed.minTime !== null
     ) {
-      if (
-        recipeTime >=
-        parsed.minTime
-      ) {
+      const difference =
+        parsed.minTime -
+        recipeTime;
+
+      if (difference <= 0) {
         score += 20;
 
         reasons.push(
           `✓ ${recipeTime} мин`
         );
       } else {
-        const difference =
-          parsed.minTime -
-          recipeTime;
-
         score -= Math.min(
           20,
           difference
@@ -1597,7 +1631,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (parsed.quick) {
       if (recipeTime <= 30) {
-        score += 30;
+        score += 35;
 
         reasons.push(
           "✓ быстрое"
@@ -1607,8 +1641,8 @@ document.addEventListener("DOMContentLoaded", () => {
           recipeTime - 30;
 
         score -= Math.min(
-          30,
-          difference
+          35,
+          difference * 1.25
         );
 
         reasons.push(
@@ -1617,6 +1651,12 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+
+    /*
+      Если ингредиенты не указаны,
+      используем обычный текстовый поиск
+      как дополнительный сигнал.
+    */
 
     if (
       parsed.ingredients.length === 0
