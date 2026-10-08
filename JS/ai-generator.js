@@ -13,16 +13,15 @@
 
     const ALIASES = {
         "курица":["курица","курицу","куриной","куриное","грудка","грудку"],
-        "куриное-бедро":["бедро","бедрышко"],
-        "индейка":["индейка","индейку","индейки"],
+        "куриное-бедро":["бедро","бедрышко"], "индейка":["индейка","индейку","индейки"],
         "говядина":["говядина","говядину"], "свинина":["свинина","свинину"],
         "лосось":["лосось","лосося"], "тунец":["тунец","тунца"], "креветки":["креветки","креветок"],
         "яйца":["яйца","яйцо","яиц"], "творог":["творог","творога"], "сыр":["сыр","сыра"],
         "моцарелла":["моцарелла"], "йогурт":["йогурт","йогурта"], "сметана":["сметана","сметаны"], "молоко":["молоко","молока"],
         "картофель":["картофель","картошка","картошку","картофеля"], "лук":["лук","лука"],
         "морковь":["морковь","морковку"], "помидоры":["помидоры","помидор","томат","томаты"],
-        "огурец":["огурец","огурцы"], "перец":["перец"], "брокколи":["брокколи"],
-        "капуста":["капуста","капусту"], "кабачок":["кабачок","кабачки"], "чеснок":["чеснок","чеснока"],
+        "огурец":["огурец","огурцы"], "перец":["перец"], "брокколи":["брокколи"], "капуста":["капуста","капусту"],
+        "кабачок":["кабачок","кабачки"], "чеснок":["чеснок","чеснока"],
         "рис":["рис","риса"], "гречка":["гречка","гречневую","гречневой"],
         "овсянка":["овсянка","овсянку","овсяные хлопья"], "паста":["паста","макароны","макарон","спагетти"],
         "хлеб":["хлеб","хлеба"], "чечевица":["чечевица","чечевицу"], "фасоль":["фасоль","фасоли"],
@@ -33,17 +32,19 @@
 
     const NAMES = {
         "курица":"куриная грудка","куриное-бедро":"куриное бедро","индейка":"индейка","говядина":"говядина","свинина":"свинина",
-        "лосось":"лосось","тунец":"тунец","креветки":"креветки","яйца":"яйца","творог":"творог","сыр":"сыр",
-        "моцарелла":"моцарелла","йогурт":"йогурт","сметана":"сметана","молоко":"молоко","картофель":"картофель",
-        "лук":"лук","морковь":"морковь","помидоры":"помидоры","огурец":"огурец","перец":"болгарский перец",
-        "брокколи":"брокколи","капуста":"капуста","кабачок":"кабачок","чеснок":"чеснок","рис":"рис","гречка":"гречка",
-        "овсянка":"овсянка","паста":"паста","хлеб":"хлеб","чечевица":"чечевица","фасоль":"фасоль","банан":"банан",
-        "яблоко":"яблоко","апельсин":"апельсин","масло":"растительное масло","сливочное-масло":"сливочное масло",
-        "мед":"мёд","сахар":"сахар"
+        "лосось":"лосось","тунец":"тунец","креветки":"креветки","яйца":"яйца","творог":"творог","сыр":"сыр","моцарелла":"моцарелла",
+        "йогурт":"йогурт","сметана":"сметана","молоко":"молоко","картофель":"картофель","лук":"лук","морковь":"морковь",
+        "помидоры":"помидоры","огурец":"огурец","перец":"болгарский перец","брокколи":"брокколи","капуста":"капуста",
+        "кабачок":"кабачок","чеснок":"чеснок","рис":"рис","гречка":"гречка","овсянка":"овсянка","паста":"паста",
+        "хлеб":"хлеб","чечевица":"чечевица","фасоль":"фасоль","банан":"банан","яблоко":"яблоко","апельсин":"апельсин",
+        "масло":"растительное масло","сливочное-масло":"сливочное масло","мед":"мёд","сахар":"сахар"
     };
 
     const PROTEINS = ["курица","куриное-бедро","индейка","говядина","свинина","лосось","тунец","креветки","яйца","творог","сыр"];
-    const CARB_HEAVY = ["картофель","рис","гречка","паста","хлеб","овсянка","чечевица","фасоль"];
+    const CARBS = ["картофель","рис","гречка","паста","хлеб","овсянка","чечевица","фасоль"];
+    const VEGETABLES = ["лук","морковь","помидоры","огурец","перец","брокколи","капуста","кабачок","чеснок"];
+    const FATS = ["масло","сливочное-масло","сыр","моцарелла","сметана","мед","сахар"];
+
     const $ = (selector, root=document) => root.querySelector(selector);
     const $$ = (selector, root=document) => Array.from(root.querySelectorAll(selector));
 
@@ -76,7 +77,8 @@
 .ai-generator-steps{margin:12px 0 0;padding-left:20px;color:#53615b;font:13px/1.65 Inter,sans-serif}.ai-generator-note{margin-top:18px;color:#7a847f;font:11px/1.5 Inter,sans-serif}
 .ai-generator-constraints{display:flex;flex-wrap:wrap;gap:7px;margin:14px 0 2px}.ai-generator-constraint{padding:6px 9px;border-radius:999px;background:#e9f2ed;color:#315846;font:600 11px Inter,sans-serif}
 .ai-generator-warning{margin-top:12px;padding:11px 13px;border-radius:12px;background:#fff5df;color:#795d22;font:600 12px/1.5 Inter,sans-serif}
-.ai-generator-save-row{margin-top:18px;display:flex;justify-content:flex-end}.ai-generator-saved{margin-top:12px;padding:11px 13px;border-radius:12px;background:#e9f2ed;color:#315846;font:600 12px Inter,sans-serif;text-align:center}
+.ai-generator-save-row{margin-top:18px;display:flex;justify-content:flex-end}.ai-generator-saved{margin-top:12px;padding:11px 13px;border-radius:12px;background:#e9f2ed;color:#315846;font:600 12px Inter,sans-serif}
+.ai-generator-changes{margin-top:16px;padding:14px;border-radius:15px;background:#fff;border:1px solid rgba(32,55,47,.08)}.ai-generator-changes strong{display:block;margin-bottom:6px;font:600 12px Inter,sans-serif;color:#20372F}.ai-generator-changes ul{margin:0;padding-left:18px;color:#56635d;font:12px/1.6 Inter,sans-serif}
 @media(max-width:640px){.ai-generator-overlay{padding:12px}.ai-generator-head,.ai-generator-body{padding-left:20px;padding-right:20px}.ai-generator-head h2{font-size:26px}.ai-generator-ingredients{grid-template-columns:1fr}.ai-generator-actions{flex-direction:column}.ai-generator-actions button{width:100%}}
 `;
         document.head.appendChild(style);
@@ -120,22 +122,18 @@
 
     function parseRequest(input) {
         const text=input.toLowerCase().replace(/ё/g,"е");
-        const findNumber=(patterns)=>{
-            for(const pattern of patterns){const match=text.match(pattern);if(match)return Number(match[1]);}
-            return null;
-        };
-        const targetServings=findNumber([/на\\s+(\\d+)\\s+порц/i,/на\\s+(\\d+)\\s+человек/i,/для\\s+(\\d+)\\s+человек/i]);
-        const maxCalories=findNumber([/(?:до|максимум|не\\s+больше|не\\s+более)\\s+(\\d+)\\s*(?:ккал|калори)/i]);
-        const minCalories=findNumber([/(?:от|минимум)\\s+(\\d+)\\s*(?:ккал|калори)/i]);
-        const minProtein=findNumber([/(?:минимум|от)\\s+(\\d+)\\s*г?\\s*(?:белка|протеина)/i]);
-        const maxProtein=findNumber([/(?:до|максимум|не\\s+больше|не\\s+более)\\s+(\\d+)\\s*г?\\s*(?:белка|протеина)/i]);
-        const maxTime=findNumber([/(?:до|максимум|не\\s+больше|не\\s+дольше|менее)\\s+(\\d+)\\s*(?:мин|минут)/i]);
-        const minTime=findNumber([/(?:от|минимум)\\s+(\\d+)\\s*(?:мин|минут)/i]);
+        const findNumber=patterns=>{for(const pattern of patterns){const match=text.match(pattern);if(match)return Number(match[1]);}return null;};
         return {
-            targetServings,maxCalories,minCalories,minProtein,maxProtein,maxTime,minTime,
-            highProtein:/белков\\w*|протеин\\w*|много\\s+белка|высок\\w*\\s+содержани\\w*\\s+белка|богат\\w*\\s+белк/i.test(text),
-            lessCalories:/менее\\s+калори|низк\\w*\\s+калори/i.test(text),
-            faster:/быстр\\w*|за\\s+полчаса|быстро\\s+приготов/i.test(text)
+            targetServings:findNumber([/на\s+(\d+)\s+порц/i,/на\s+(\d+)\s+человек/i,/для\s+(\d+)\s+человек/i]),
+            maxCalories:findNumber([/(?:до|максимум|не\s+больше|не\s+более)\s+(\d+)\s*(?:ккал|калори)/i]),
+            minCalories:findNumber([/(?:от|минимум)\s+(\d+)\s*(?:ккал|калори)/i]),
+            minProtein:findNumber([/(?:минимум|от)\s+(\d+)\s*г?\s*(?:белка|протеина)/i]),
+            maxProtein:findNumber([/(?:до|максимум|не\s+больше|не\s+более)\s+(\d+)\s*г?\s*(?:белка|протеина)/i]),
+            maxTime:findNumber([/(?:до|максимум|не\s+больше|не\s+дольше|менее)\s+(\d+)\s*(?:мин|минут)/i]),
+            minTime:findNumber([/(?:от|минимум)\s+(\d+)\s*(?:мин|минут)/i]),
+            highProtein:/белков\w*|протеин\w*|много\s+белка|высок\w*\s+содержани\w*\s+белка|богат\w*\s+белк/i.test(text),
+            lessCalories:/менее\s+калори|низк\w*\s+калори/i.test(text),
+            faster:/быстр\w*|за\s+полчаса|быстро\s+приготов/i.test(text)
         };
     }
 
@@ -143,8 +141,8 @@
         const p=window.products?.[id];
         if(p?.pieceWeight && ["яйца","банан","яблоко","апельсин"].includes(id)) return {amount:p.pieceWeight,unit:"г"};
         if(["масло","сливочное-масло"].includes(id)) return {amount:10,unit:"г"};
-        if(["лук","чеснок","морковь","помидоры","перец"].includes(id)) return {amount:80,unit:"г"};
-        if(["рис","гречка","овсянка","паста","чечевица","фасоль"].includes(id)) return {amount:70,unit:"г"};
+        if(VEGETABLES.includes(id)) return {amount:80,unit:"г"};
+        if(CARBS.includes(id)) return {amount:70,unit:"г"};
         if(["творог","йогурт","сметана","молоко","сыр","моцарелла"].includes(id)) return {amount:120,unit:"г"};
         return {amount:180,unit:"г"};
     }
@@ -161,33 +159,53 @@
     function buildRecipe(ids) {
         const has=id=>ids.includes(id);
         const protein=ids.find(id=>PROTEINS.includes(id));
-        const grain=ids.find(id=>["рис","гречка","паста","чечевица","фасоль"].includes(id));
-        const breakfast=has("яйца")||has("творог")||has("овсянка")||has("банан");
-        let title="Домашнее блюдо RecipePro",emoji="🍽️",steps=[],selected=[...ids];
+        const carb=ids.find(id=>CARBS.includes(id));
+        const vegetables=ids.filter(id=>VEGETABLES.includes(id));
+        const extras=ids.filter(id=>!PROTEINS.includes(id)&&!CARBS.includes(id)&&!VEGETABLES.includes(id));
+        let title="Домашнее блюдо RecipePro",description="RecipePro AI собрал блюдо из продуктов, которые ты указал.",emoji="🍽️";
+        let selected=[],steps=[],time=30;
 
-        if(has("яйца")&&has("творог")&&has("банан")){
-            title="Творожный омлет с бананом";emoji="🥞";selected=["яйца","творог","банан"];
+        if(protein&&has("картофель")){
+            selected=[protein,"картофель",...vegetables.filter(id=>["лук","морковь","чеснок"].includes(id)),...extras.filter(id=>FATS.includes(id))];
+            title=NAMES[protein]+" с картофелем";
+            description="Сытное горячее блюдо с акцентом на белок и запечённый гарнир.";
+            emoji="🍗";
+            time=30;
+            steps=[
+                "Нарежь белковый продукт и картофель примерно одинаковыми порциями.",
+                "Картофель смешай с овощами и небольшим количеством масла, если оно есть в запросе.",
+                "Запекай или готовь под крышкой до мягкости картофеля, затем добавь белковый продукт и доведи до готовности."
+            ];
+        } else if(protein&&carb){
+            selected=[protein,carb,...vegetables,...extras.filter(id=>FATS.includes(id))].slice(0,7);
+            title=NAMES[protein]+" с "+NAMES[carb];
+            description="Сбалансированное горячее блюдо из белковой основы, гарнира и указанных овощей.";
+            emoji="🍲";
+            time=30;
+            steps=[
+                "Подготовь белковый продукт, гарнир и овощи.",
+                "Приготовь гарнир до готовности.",
+                "Отдельно приготовь белковый продукт с овощами, затем соедини всё вместе."
+            ];
+        } else if(has("яйца")&&has("творог")&&has("банан")){
+            selected=["яйца","творог","банан"];
+            title="Творожный омлет с бананом";description="Белковый завтрак без лишних добавок.";emoji="🥞";time=15;
             steps=["Смешай яйца с творогом до однородной массы.","Добавь банан и аккуратно разомни его вилкой.","Готовь под крышкой 5–7 минут на слабом огне."];
-        }else if(protein&&has("картофель")){
-            title=NAMES[protein]+" с картофелем";emoji="🍗";
-            selected=[protein,"картофель",...(has("лук")?["лук"]:[]),...(has("морковь")?["морковь"]:[])];
-            steps=["Нарежь белковый продукт и овощи небольшими кусочками.","Приготовь белковый продукт на хорошо разогретой сковороде или в сотейнике.","Добавь картофель и овощи, немного воды, накрой крышкой и готовь до мягкости."];
-        }else if(protein&&grain){
-            title=NAMES[protein]+" с "+NAMES[grain];emoji="🍲";selected=[protein,grain,...(has("морковь")?["морковь"]:[]),...(has("лук")?["лук"]:[])];
-            steps=["Подготовь белковый продукт и овощи.","Приготовь крупу или пасту до готовности.","Соедини ингредиенты и прогрей вместе 3–5 минут."];
-        }else if(has("овсянка")&&has("банан")){
-            title="Овсянка с бананом";emoji="🥣";selected=["овсянка","банан",...(has("молоко")?["молоко"]:[])];
+        } else if(has("овсянка")&&has("банан")){
+            selected=["овсянка","банан",...(has("молоко")?["молоко"]:[])];
+            title="Овсянка с бананом";description="Быстрый завтрак из овсянки и банана.";emoji="🥣";time=10;
             steps=["Залей овсянку молоком или водой.","Готовь до мягкости 5–7 минут.","Добавь банан перед подачей."];
-        }else if(breakfast){
-            title="Тёплый завтрак из того, что есть";emoji="🍳";selected=ids.slice(0,5);
-            steps=["Подготовь и нарежь ингредиенты.","Соедини продукты в подходящей последовательности.","Готовь до полной готовности и подавай сразу."];
-        }else{
-            selected=ids.slice(0,5);title=selected.slice(0,3).map(id=>NAMES[id]).join(" · ");emoji=protein?"🍲":"🥗";
-            steps=["Подготовь и нарежь ингредиенты.","Приготовь продукты с самым долгим временем готовки первыми.","Добавь остальные ингредиенты и доведи блюдо до готовности."];
+        } else {
+            selected=[...ids].slice(0,7);
+            title=selected.slice(0,3).map(id=>NAMES[id]).join(" · ")||title;
+            description="Простое блюдо RecipePro из твоих продуктов без лишних покупок.";
+            emoji=protein?"🍲":"🥗";
+            time=30;
+            steps=["Подготовь и нарежь продукты.","Начни с ингредиентов, которым требуется больше времени.","Соедини остальные продукты и доведи блюдо до готовности."];
         }
 
-        const ingredients=selected.map(product=>{const a=amountFor(product);return {product,amount:a.amount,unit:a.unit,state:"raw"};});
-        return finalize({id:"ai-draft-"+Date.now(),title,description:"Черновик, собранный RecipePro AI из доступных продуктов.",emoji,time:breakfast?15:30,servings:2,ingredients,steps});
+        const ingredients=selected.map(product=>{const a=amountFor(product);return {product,amount:a.amount,unit:a.unit,state:"raw",required:true};});
+        return finalize({id:"ai-draft-"+Date.now(),title,description,emoji,time,servings:2,ingredients,steps});
     }
 
     function finalize(recipe){
@@ -196,45 +214,100 @@
         return recipe;
     }
 
+    function setAmount(recipe,id,amount,changes){
+        const item=recipe.ingredients.find(x=>x.product===id);
+        if(!item)return;
+        const next=Math.max(20,Math.round(amount/10)*10);
+        if(next!==item.amount){item.amount=next;changes.push(NAMES[id]+": "+item.amount+" г");}
+    }
+
     function adaptRecipe(recipe,constraints){
         const r=JSON.parse(JSON.stringify(recipe));
-        const changes=[]; const warnings=[];
+        const changes=[],warnings=[];
         r.servings=constraints.targetServings||r.servings||2;
 
-        if(constraints.lessCalories||constraints.maxCalories){
-            const max=constraints.maxCalories;
-            const removable=["масло","сливочное-масло","сыр","моцарелла","сметана","мед","сахар"];
-            r.ingredients.forEach(item=>{
-                if(removable.includes(item.product)&&item.amount>5){item.amount=Math.max(5,Math.round(item.amount*.55));changes.push("уменьшены калорийные добавки");}
-                if(CARB_HEAVY.includes(item.product)&&item.amount>50){item.amount=Math.max(40,Math.round(item.amount*.8));}
-            });
-            finalize(r);
-            if(max && r.nutrition.calories>max){
-                const ratio=max/r.nutrition.calories;
-                r.ingredients.forEach(item=>{if(CARB_HEAVY.includes(item.product)&&item.amount>40)item.amount=Math.max(30,Math.round(item.amount*ratio));});
-                finalize(r); changes.push("снижено количество гарнира");
+        const main=r.ingredients.find(item=>PROTEINS.includes(item.product));
+        const carb=r.ingredients.find(item=>CARBS.includes(item.product));
+        const optionalFats=r.ingredients.filter(item=>FATS.includes(item.product)&&!PROTEINS.includes(item.product));
+
+        if(constraints.highProtein||constraints.minProtein){
+            if(main){
+                const before=main.amount;
+                main.amount=Math.round(before*1.45/10)*10;
+                if(main.amount!==before)changes.push("увеличена белковая основа");
             }
+            optionalFats.forEach(item=>{
+                if(["сыр","моцарелла","сметана","масло","сливочное-масло"].includes(item.product)){
+                    const before=item.amount;
+                    item.amount=Math.max(20,Math.round(before*.6/10)*10);
+                    if(item.amount!==before)changes.push("уменьшены калорийные добавки");
+                }
+            });
+        }
+
+        if(constraints.lessCalories||constraints.maxCalories){
+            optionalFats.forEach(item=>{
+                if(!PROTEINS.includes(item.product)){
+                    const before=item.amount;
+                    item.amount=Math.max(10,Math.round(before*.45/10)*10);
+                    if(item.amount!==before)changes.push("снижены калорийные добавки");
+                }
+            });
+            if(carb){
+                const before=carb.amount;
+                carb.amount=Math.max(30,Math.round(before*.7/10)*10);
+                if(carb.amount!==before)changes.push("скорректирован объём гарнира");
+            }
+        }
+
+        finalize(r);
+
+        if(constraints.maxCalories&&r.nutrition.calories>constraints.maxCalories){
+            const target=constraints.maxCalories;
+            const scale=Math.max(.35,target/r.nutrition.calories);
+            if(carb){
+                const before=carb.amount;
+                carb.amount=Math.max(30,Math.round(before*scale/10)*10);
+                if(carb.amount!==before)changes.push("гарнир дополнительно уменьшен под лимит калорий");
+            }
+            finalize(r);
         }
 
         if(constraints.highProtein||constraints.minProtein){
-            const min=constraints.minProtein;
-            const main=r.ingredients.find(item=>PROTEINS.includes(item.product));
-            if(main && (!min || r.nutrition.protein<min)){
-                main.amount=Math.round(main.amount*1.35/10)*10; finalize(r); changes.push("увеличено количество белкового продукта");
+            if(main&&r.nutrition.protein < (constraints.minProtein||0)){
+                const before=main.amount;
+                main.amount=Math.round(before*1.25/10)*10;
+                if(main.amount!==before)changes.push("белковая основа увеличена ещё раз");
+                finalize(r);
             }
-            if(min && r.nutrition.protein<min) warnings.push("Даже после увеличения белкового продукта цель по белку полностью не достигнута.");
+            if(constraints.minProtein&&r.nutrition.protein<constraints.minProtein){
+                warnings.push("Цель по белку не достигнута: "+r.nutrition.protein+" г при цели "+constraints.minProtein+" г на порцию.");
+            }
         }
 
         if(constraints.faster){
-            r.time=Math.max(15,Math.round(r.time*.7)); changes.push("сокращено расчётное время");
+            r.time=Math.max(15,Math.round(r.time*.7));
+            changes.push("выбран более быстрый способ приготовления");
         }
-        if(constraints.maxTime && r.time>constraints.maxTime) warnings.push("Расчётное время всё ещё выше заданного лимита.");
-        if(constraints.minCalories && r.nutrition.calories<constraints.minCalories) warnings.push("Калорийность ниже заданного минимума.");
-        if(constraints.maxProtein && r.nutrition.protein>constraints.maxProtein) warnings.push("Белка получилось больше заданного максимума.");
-        if(constraints.maxCalories && r.nutrition.calories>constraints.maxCalories) warnings.push("Даже после адаптации калорийность выше заданного лимита.");
+        if(constraints.maxTime&&r.time>constraints.maxTime){
+            r.time=constraints.maxTime;
+            changes.push("время адаптировано под заданный лимит");
+        }
 
-        if(constraints.highProtein && r.title.indexOf("Белковый")===-1) r.description="Адаптировано с акцентом на белок по запросу пользователя.";
-        r.aiChanges=changes; r.aiWarnings=warnings; return r;
+        if(constraints.minCalories&&r.nutrition.calories<constraints.minCalories){
+            warnings.push("Калорийность ниже минимума: "+r.nutrition.calories+" ккал при цели от "+constraints.minCalories+" ккал.");
+        }
+        if(constraints.maxProtein&&r.nutrition.protein>constraints.maxProtein){
+            warnings.push("Белка получилось больше максимума: "+r.nutrition.protein+" г при лимите "+constraints.maxProtein+" г.");
+        }
+        if(constraints.maxCalories&&r.nutrition.calories>constraints.maxCalories){
+            warnings.push("Цель по калориям не достигнута: "+r.nutrition.calories+" ккал при лимите "+constraints.maxCalories+" ккал.");
+        }
+
+        if(constraints.highProtein)r.description="Адаптировано под высокий белок: увеличена белковая основа и убраны лишние калорийные добавки.";
+        if(constraints.maxCalories)r.description+=" Калорийность скорректирована под заданный лимит насколько позволили указанные продукты.";
+        r.aiChanges=changes;r.aiWarnings=warnings;
+        return r;
     }
 
     function constraintHtml(c){
@@ -256,7 +329,7 @@
         const stepHtml=recipe.steps.map(step=>`<li>${esc(step)}</li>`).join("");
         const chips=constraintHtml(constraints).map(x=>`<span class="ai-generator-constraint">${esc(x)}</span>`).join("");
         const warnings=(recipe.aiWarnings||[]).map(x=>`<div class="ai-generator-warning">⚠️ ${esc(x)}</div>`).join("");
-        const changes=recipe.aiChanges?.length?`<div class="ai-generator-note"><strong>Что изменено:</strong> ${recipe.aiChanges.map(esc).join(", ")}.</div>`:"";
+        const changes=recipe.aiChanges?.length?`<div class="ai-generator-changes"><strong>RecipePro AI изменил рецепт</strong><ul>${recipe.aiChanges.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:"";
         $("#aiGeneratorResult").innerHTML=`
 <div class="ai-generator-result">
 <div class="ai-generator-result-top"><div class="ai-generator-result-emoji">${recipe.emoji}</div><div><h3>${esc(recipe.title)}</h3><p>${esc(recipe.description)}</p></div></div>
@@ -266,19 +339,17 @@ ${warnings}
 <strong class="ai-generator-label">Ингредиенты</strong><div class="ai-generator-ingredients">${ingredientHtml}</div>
 <strong class="ai-generator-label" style="margin-top:18px">Как приготовить</strong><ol class="ai-generator-steps">${stepHtml}</ol>
 ${changes}
-<div class="ai-generator-note">Распознано: ${detected.map(id=>esc(NAMES[id]||id)).join(", ")}. КБЖУ рассчитано по базе RecipePro и является ориентировочной оценкой.</div>
+<div class="ai-generator-note">Распознано: ${detected.map(id=>esc(NAMES[id]||id)).join(", ")}. Все указанные продукты сохранены в составе; КБЖУ рассчитано по базе RecipePro и является ориентировочной оценкой.</div>
 <div class="ai-generator-save-row"><button class="primary-button large" id="aiGeneratorSave" type="button">Сохранить в мои рецепты →</button></div>
 </div>`;
     }
 
     function saveRecipe(recipe,constraints,input){
-        const key="recipepro_user_recipes"; let saved=[];
+        const key="recipepro_user_recipes";let saved=[];
         try{const raw=localStorage.getItem(key);saved=raw?JSON.parse(raw):[];if(!Array.isArray(saved))saved=[];}catch(error){saved=[];}
         const recipeToSave={
-            ...recipe,
-            id:"ai-"+Date.now()+"-"+Math.random().toString(36).slice(2,8),
-            title:recipe.title+" — AI-рецепт",
-            tags:["Рецепт пользователя","AI Recipe"],filters:["protein"],isAiGenerated:true,
+            ...recipe,id:"ai-"+Date.now()+"-"+Math.random().toString(36).slice(2,8),
+            title:recipe.title+" — AI-рецепт",tags:["Рецепт пользователя","AI Recipe"],filters:["protein"],isAiGenerated:true,
             aiGeneratedAt:new Date().toISOString(),aiSourceProducts:recipe.ingredients.map(item=>item.product),
             aiRequest:input,aiConstraints:constraints,aiChanges:recipe.aiChanges||[],aiWarnings:recipe.aiWarnings||[]
         };
@@ -288,8 +359,7 @@ ${changes}
     function handleSave(recipe,constraints,input){
         try{
             saveRecipe(recipe,constraints,input);
-            $("#aiGeneratorSave").disabled=true;
-            $("#aiGeneratorSave").textContent="✓ Сохранено";
+            $("#aiGeneratorSave").disabled=true;$("#aiGeneratorSave").textContent="✓ Сохранено";
             $("#aiGeneratorResult").insertAdjacentHTML("beforeend",'<div class="ai-generator-saved">Рецепт сохранён в «Мои рецепты»</div>');
             setTimeout(()=>{close();window.location.hash="#my-recipes";window.location.reload();},700);
         }catch(error){console.error("RecipePro AI save error:",error);alert("Не удалось сохранить рецепт. Попробуй ещё раз.");}
@@ -315,7 +385,7 @@ ${changes}
         $("#aiGeneratorCancel")?.addEventListener("click",close);
         $("#aiGeneratorGenerate")?.addEventListener("click",generate);
         $("#aiGeneratorInput")?.addEventListener("keydown",e=>{if((e.ctrlKey||e.metaKey)&&e.key==="Enter")generate();});
-        $$( "#aiRecipeGeneratorModal .ai-generator-example").forEach(btn=>btn.addEventListener("click",()=>{$("#aiGeneratorInput").value=btn.dataset.example||"";$("#aiGeneratorInput").focus();}));
+        $$("#aiRecipeGeneratorModal .ai-generator-example").forEach(btn=>btn.addEventListener("click",()=>{$("#aiGeneratorInput").value=btn.dataset.example||"";$("#aiGeneratorInput").focus();}));
         $("#aiRecipeGeneratorModal")?.addEventListener("click",e=>{if(e.target.id===MODAL_ID)close();});
         document.addEventListener("keydown",e=>{if(e.key==="Escape")close();});
     });
