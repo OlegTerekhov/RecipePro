@@ -325,7 +325,7 @@
     }
 
     function renderResult(recipe,detected,constraints,alternatives=[]){
-        const ingredientHtml=recipe.ingredients.map(item=>`<div class="ai-generator-ingredient"><span>${esc(getProductName(item.product))}</span><span>${item.amount} ${esc(item.unit)}</span></div>`).join("");
+        const ingredientHtml=recipe.ingredients.map(item=>`<div class="ai-generator-ingredient"><span>${esc(getProductName(item.product||item.productId))}</span><span>${item.amount} ${esc(item.unit)}</span></div>`).join("");
         const stepHtml=recipe.steps.map(step=>`<li>${esc(step)}</li>`).join("");
         const chips=constraintHtml(constraints).map(x=>`<span class="ai-generator-constraint">${esc(x)}</span>`).join("");
         const warnings=(recipe.aiWarnings||[]).map(x=>`<div class="ai-generator-warning">⚠️ ${esc(x)}</div>`).join("");
@@ -351,7 +351,7 @@ ${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-gen
         const recipeToSave={
             ...recipe,id:"ai-"+Date.now()+"-"+Math.random().toString(36).slice(2,8),
             title:recipe.title+" — AI-рецепт",tags:["Рецепт пользователя","AI Recipe"],filters:["protein"],isAiGenerated:true,
-            aiGeneratedAt:new Date().toISOString(),aiSourceProducts:recipe.ingredients.map(item=>item.product),
+            aiGeneratedAt:new Date().toISOString(),aiSourceProducts:recipe.ingredients.map(item=>item.product||item.productId),
             aiRequest:input,aiConstraints:constraints,aiChanges:recipe.aiChanges||[],aiWarnings:recipe.aiWarnings||[]
         };
         saved.push(recipeToSave);localStorage.setItem(key,JSON.stringify(saved));return recipeToSave;
