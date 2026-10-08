@@ -373,11 +373,14 @@ ${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-gen
             return;
         }
         const constraints=parseRequest(input);
+        const builder=window.recipeProRecipeBuilder;
+        const built=builder?.build?.(detected,constraints);
         const recommendation=window.recipeProRecommendationEngine?.recommend(detected,constraints);
         const ranked=recommendation?.candidates||[];
-        const primary=ranked[0]?.recipe||buildRecipe(detected,constraints);
+        const primary=ranked[0]?.recipe||built||buildRecipe(detected,constraints);
         const recipe=adaptRecipe(primary,constraints);
-        const alternatives=ranked.slice(1,4).map(item=>({ ...item, recipe:adaptRecipe(item.recipe,constraints) }));
+        const generatedCandidates=ranked.length ? ranked : (built ? [{recipe:built,score:0,reasons:["собрано из ваших продуктов"]}] : []);
+        const alternatives=generatedCandidates.slice(1,4).map(item=>({ ...item, recipe:adaptRecipe(item.recipe,constraints) }));
         renderResult(recipe,detected,constraints,alternatives);
         $("#aiGeneratorSave")?.addEventListener("click",()=>handleSave(recipe,constraints,input));
     }
