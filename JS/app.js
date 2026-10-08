@@ -965,6 +965,124 @@ document.addEventListener("DOMContentLoaded", () => {
      NUTRITION
   ========================================================= */
 
+  function getIngredientStateLabel(state) {
+    if (state === "boiled") {
+      return "варёное";
+    }
+
+    if (state === "fried") {
+      return "жареное";
+    }
+
+    return "сырое";
+  }
+
+
+  function getIngredientNutrition(
+    ingredient
+  ) {
+    const result = {
+      calories: 0,
+      protein: 0,
+      fat: 0,
+      carbs: 0
+    };
+
+    const product =
+      getProduct(
+        ingredient?.product
+      );
+
+    if (
+      !product ||
+      !product.raw
+    ) {
+      return result;
+    }
+
+    let amount =
+      Number(
+        ingredient.amount
+      ) || 0;
+
+    if (
+      ingredient.unit === "шт" &&
+      product.pieceWeight
+    ) {
+      amount *= Number(
+        product.pieceWeight
+      );
+    }
+
+    const state =
+      ingredient.state ||
+      "raw";
+
+    let rawEquivalent =
+      amount;
+
+    const ratio =
+      Number(
+        product.cookedWeightRatio
+      );
+
+    if (
+      state !== "raw" &&
+      Number.isFinite(ratio) &&
+      ratio > 0
+    ) {
+      rawEquivalent =
+        amount / ratio;
+    }
+
+    const multiplier =
+      rawEquivalent / 100;
+
+    result.calories +=
+      Number(
+        product.raw.kcal || 0
+      ) * multiplier;
+
+    result.protein +=
+      Number(
+        product.raw.protein || 0
+      ) * multiplier;
+
+    result.fat +=
+      Number(
+        product.raw.fat || 0
+      ) * multiplier;
+
+    result.carbs +=
+      Number(
+        product.raw.carbs || 0
+      ) * multiplier;
+
+    if (state === "fried") {
+      const oilPer100 =
+        Math.max(
+          0,
+          Number(
+            ingredient.oilPer100 || 0
+          )
+        );
+
+      const oilAmount =
+        amount *
+        oilPer100 /
+        100;
+
+      result.calories +=
+        oilAmount * 8.99;
+
+      result.fat +=
+        oilAmount * 0.999;
+    }
+
+    return result;
+  }
+
+
   function calculateRecipeNutrition(
     recipe
   ) {
@@ -986,54 +1104,22 @@ document.addEventListener("DOMContentLoaded", () => {
 
     recipe.ingredients.forEach(
       (ingredient) => {
-        const product =
-          getProduct(
-            ingredient.product
+        const nutrition =
+          getIngredientNutrition(
+            ingredient
           );
-
-        if (
-          !product ||
-          !product.raw
-        ) {
-          return;
-        }
-
-        let amount =
-          Number(
-            ingredient.amount
-          ) || 0;
-
-        if (
-          ingredient.unit === "шт" &&
-          product.pieceWeight
-        ) {
-          amount *= Number(
-            product.pieceWeight
-          );
-        }
-
-        const multiplier =
-          amount / 100;
 
         result.calories +=
-          Number(
-            product.raw.kcal || 0
-          ) * multiplier;
+          nutrition.calories;
 
         result.protein +=
-          Number(
-            product.raw.protein || 0
-          ) * multiplier;
+          nutrition.protein;
 
         result.fat +=
-          Number(
-            product.raw.fat || 0
-          ) * multiplier;
+          nutrition.fat;
 
         result.carbs +=
-          Number(
-            product.raw.carbs || 0
-          ) * multiplier;
+          nutrition.carbs;
       }
     );
 
@@ -1071,7 +1157,6 @@ document.addEventListener("DOMContentLoaded", () => {
         )
     };
   }
-
 
   /* =========================================================
      SMART QUERY PARSER
@@ -2732,6 +2817,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 ingredient.unit ||
                 "г";
 
+              const state =
+                ingredient.state ||
+                "raw";
+
+              const stateLabel =
+                getIngredientStateLabel(
+                  state
+                );
+
               return `
                 <li>
 
@@ -2739,6 +2833,12 @@ document.addEventListener("DOMContentLoaded", () => {
                     ${escapeHtml(
                       productName
                     )}
+
+                    <small class="recipe-ingredient-state">
+                      ${escapeHtml(
+                        stateLabel
+                      )}
+                    </small>
                   </span>
 
                   <strong>
@@ -2756,7 +2856,6 @@ document.addEventListener("DOMContentLoaded", () => {
           )
           .join("");
     }
-
 
     if (steps) {
       steps.innerHTML =
@@ -5335,10 +5434,8 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-
     const products =
       getProducts();
-
 
     const options =
       Object.keys(products)
@@ -5357,7 +5454,6 @@ document.addEventListener("DOMContentLoaded", () => {
         )
         .join("");
 
-
     const row =
       document.createElement(
         "div"
@@ -5365,7 +5461,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
     row.className =
       "ingredient-row";
-
 
     row.innerHTML = `
       <select class="ingredient-product">
@@ -5382,19 +5477,15 @@ document.addEventListener("DOMContentLoaded", () => {
       />
 
       <select class="ingredient-unit">
+        <option value="г">г</option>
+        <option value="мл">мл</option>
+        <option value="шт">шт</option>
+      </select>
 
-        <option value="г">
-          г
-        </option>
-
-        <option value="мл">
-          мл
-        </option>
-
-        <option value="шт">
-          шт
-        </option>
-
+      <select class="ingredient-state" aria-label="Состояние продукта">
+        <option value="raw">Сырое</option>
+        <option value="boiled">Варёное</option>
+        <option value="fried">Жареное</option>
       </select>
 
       <button
@@ -5406,11 +5497,9 @@ document.addEventListener("DOMContentLoaded", () => {
       </button>
     `;
 
-
     builder.appendChild(
       row
     );
-
 
     const remove =
       row.querySelector(
@@ -5426,7 +5515,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       );
     }
-
 
     row
       .querySelectorAll(
@@ -5446,10 +5534,8 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       );
 
-
     updatePreview();
   }
-
 
   /* =========================================================
      STEP BUILDER
@@ -5674,21 +5760,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   function calculateBuilderNutrition() {
-    const result = {
-      calories: 0,
-      protein: 0,
-      fat: 0,
-      carbs: 0
-    };
-
+    const ingredients = [];
 
     const builder =
       $("#ingredientsBuilder");
 
     if (!builder) {
-      return result;
+      return {
+        calories: 0,
+        protein: 0,
+        fat: 0,
+        carbs: 0
+      };
     }
-
 
     builder
       .querySelectorAll(
@@ -5711,74 +5795,45 @@ document.addEventListener("DOMContentLoaded", () => {
               ".ingredient-unit"
             );
 
+          const stateSelect =
+            row.querySelector(
+              ".ingredient-state"
+            );
 
           if (!productSelect) {
             return;
           }
 
-
           const product =
-            getProduct(
-              productSelect.value
-            );
+            productSelect.value;
 
-
-          if (
-            !product ||
-            !product.raw
-          ) {
-            return;
-          }
-
-
-          let amount =
+          const amount =
             Number(
               amountInput?.value ||
               0
             );
 
-
           const unit =
             unitSelect?.value ||
             "г";
 
+          const state =
+            stateSelect?.value ||
+            "raw";
 
           if (
-            unit === "шт" &&
-            product.pieceWeight
+            product &&
+            amount > 0
           ) {
-            amount *= Number(
-              product.pieceWeight
-            );
+            ingredients.push({
+              product,
+              amount,
+              unit,
+              state
+            });
           }
-
-
-          const multiplier =
-            amount / 100;
-
-
-          result.calories +=
-            Number(
-              product.raw.kcal || 0
-            ) * multiplier;
-
-          result.protein +=
-            Number(
-              product.raw.protein || 0
-            ) * multiplier;
-
-          result.fat +=
-            Number(
-              product.raw.fat || 0
-            ) * multiplier;
-
-          result.carbs +=
-            Number(
-              product.raw.carbs || 0
-            ) * multiplier;
         }
       );
-
 
     const servings =
       Math.max(
@@ -5789,34 +5844,11 @@ document.addEventListener("DOMContentLoaded", () => {
         )
       );
 
-
-    return {
-      calories:
-        Math.round(
-          result.calories /
-          servings
-        ),
-
-      protein:
-        Math.round(
-          result.protein /
-          servings
-        ),
-
-      fat:
-        Math.round(
-          result.fat /
-          servings
-        ),
-
-      carbs:
-        Math.round(
-          result.carbs /
-          servings
-        )
-    };
+    return calculateRecipeNutrition({
+      ingredients,
+      servings
+    });
   }
-
 
   /* =========================================================
      CREATE USER RECIPE
@@ -5870,8 +5902,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const ingredients = [];
 
-
-    $$(".ingredient-row")
+    $(".ingredient-row")
       .forEach(
         (row) => {
           const product =
@@ -5892,6 +5923,11 @@ document.addEventListener("DOMContentLoaded", () => {
             )?.value ||
             "г";
 
+          const state =
+            row.querySelector(
+              ".ingredient-state"
+            )?.value ||
+            "raw";
 
           if (
             product &&
@@ -5900,12 +5936,12 @@ document.addEventListener("DOMContentLoaded", () => {
             ingredients.push({
               product,
               amount,
-              unit
+              unit,
+              state
             });
           }
         }
       );
-
 
     const steps = [];
 
