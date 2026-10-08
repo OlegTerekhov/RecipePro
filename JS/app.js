@@ -11,7 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
     currentRecipeId: null,
     userRecipes: [],
     favorites: [],
-    smartSearchResults: []
+    smartSearchResults: [],
+    heroRecipeId: null
   };
 
 
@@ -64,6 +65,19 @@ document.addEventListener("DOMContentLoaded", () => {
       state.favorites = savedFavorites
         ? JSON.parse(savedFavorites)
         : [];
+
+      const allRecipes = [
+        ...(Array.isArray(window.recipes) ? window.recipes : []),
+        ...state.userRecipes
+      ];
+
+      if (allRecipes.length) {
+        const randomIndex =
+          Math.floor(Math.random() * allRecipes.length);
+
+        state.heroRecipeId =
+          allRecipes[randomIndex].id;
+      }
 
       if (!Array.isArray(state.userRecipes)) {
         state.userRecipes = [];
@@ -2453,9 +2467,18 @@ document.addEventListener("DOMContentLoaded", () => {
         );
     } else {
       recipes =
-        applyActiveFilter(
-          getAllRecipes()
+        getAllRecipes();
+
+      const randomRecipe =
+        recipes.find(
+          (recipe) =>
+            String(recipe.id) ===
+            String(state.heroRecipeId)
         );
+
+      if (randomRecipe) {
+        recipes = [randomRecipe];
+      }
     }
 
 
@@ -2500,13 +2523,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (time) {
       time.textContent =
-        `${recipe.time} мин`;
+        recipe.time + " мин";
     }
 
 
     if (calories) {
       calories.textContent =
-        `${nutrition.calories} ккал`;
+        nutrition.calories + " ккал";
     }
 
 
@@ -2553,7 +2576,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
       } else {
         match.textContent =
-          "Рецепт дня";
+          "Случайный рецепт";
       }
     }
   }
