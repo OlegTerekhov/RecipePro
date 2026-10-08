@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    const VERSION = "1.0.0";
+    const VERSION = "2.0.0";
     const TYPES = ["bowl","stew","salad","omelet","pasta","roast","porridge"];
 
     function role(id) {
@@ -48,6 +48,13 @@
     function score(candidate, ids, intent) {
         let score = 0;
         const reasons = [];
+
+        const intelligence = window.recipeProIntelligence?.compatible?.(candidate.type, ids, intent);
+        if (intelligence) {
+            score += intelligence.score;
+            if (intelligence.compatible) reasons.push("ингредиенты сочетаются");
+            else if (intelligence.missing.length) reasons.push("не хватает: " + intelligence.missing[0]);
+        }
 
         if (candidate.ingredients?.length) score += 15;
 
@@ -143,6 +150,9 @@
         if (hasRole(ids, "protein")) score += 8;
         if (hasRole(ids, "vegetable")) score += 4;
         if (hasRole(ids, "carb")) score += 4;
+
+        if (candidate.requiredProducts?.length) score += Math.min(12, candidate.requiredProducts.filter(id => ids.includes(id)).length * 3);
+        if (candidate.pantryIngredients?.length) score -= Math.min(4, candidate.pantryIngredients.length * 0.5);
 
         return {
             score,
