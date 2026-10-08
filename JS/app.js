@@ -452,6 +452,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         closeRecipeModal();
         closeAddRecipeModal();
+        closeAdaptRecipeDialog();
       }
     );
   }
@@ -2819,116 +2820,342 @@ document.addEventListener("DOMContentLoaded", () => {
      MULTI-CONDITION AI ADAPTATION
   ========================================================= */
 
-  function openAdaptRecipeDialog(
-    recipeId
-  ) {
-    const recipe =
-      getRecipeById(
-        recipeId
-      );
+  let adaptationDraft = null;
+
+  function getNutritionSnapshot(recipe) {
+    const nutrition = calculateRecipeNutrition(recipe);
+
+    return {
+      calories: Math.round(Number(nutrition.calories) || 0),
+      protein: Math.round((Number(nutrition.protein) || 0) * 10) / 10,
+      fat: Math.round((Number(nutrition.fat) || 0) * 10) / 10,
+      carbs: Math.round((Number(nutrition.carbs) || 0) * 10) / 10,
+      time: Math.max(0, Number(recipe.time) || 0),
+      servings: Math.max(1, Number(recipe.servings) || 1)
+    };
+  }
+
+
+  function ensureAdaptationModal() {
+    let modal = $("#adaptationModal");
+
+    if (modal) {
+      return modal;
+    }
+
+    modal = document.createElement("div");
+    modal.id = "adaptationModal";
+    modal.className = "modal-overlay adaptation-modal-overlay";
+
+    modal.innerHTML = `
+      <div class="adaptation-modal" role="dialog" aria-modal="true" aria-labelledby="adaptationModalTitle">
+        <div class="adaptation-modal-header">
+          <div>
+            <span class="adaptation-modal-eyebrow">RecipePro AI</span>
+            <h2 id="adaptationModalTitle">Адаптировать рецепт</h2>
+            <p id="adaptationModalRecipeName"></p>
+          </div>
+
+          <button class="adaptation-modal-close" id="adaptationModalClose" type="button" aria-label="Закрыть">×</button>
+        </div>
+
+        <div class="adaptation-modal-body">
+          <div class="adaptation-original">
+            <div class="adaptation-original-emoji" id="adaptationOriginalEmoji">🍽️</div>
+            <div>
+              <span>Исходный рецепт</span>
+              <strong id="adaptationOriginalTitle">Рецепт</strong>
+            </div>
+          </div>
+
+          <div class="adaptation-section">
+            <div class="adaptation-section-label">Быстрые изменения</div>
+
+            <div class="adaptation-chips">
+              <button type="button" class="adaptation-chip" data-adaptation-preset="lessCalories">🔥 Менее калорийный</button>
+              <button type="button" class="adaptation-chip" data-adaptation-preset="moreProtein">💪 Больше белка</button>
+              <button type="button" class="adaptation-chip" data-adaptation-preset="faster">⏱️ Сделать быстрее</button>
+              <button type="button" class="adaptation-chip" data-adaptation-preset="servings">👥 На 4 порции</button>
+              <button type="button" class="adaptation-chip" data-adaptation-preset="noPotato">🥔 Убрать картофель</button>
+              <button type="button" class="adaptation-chip" data-adaptation-preset="turkey">🦃 Курица → индейка</button>
+            </div>
+          </div>
+
+          <div class="adaptation-section">
+            <div class="adaptation-section-label">Или опишите своими словами</div>
+
+            <textarea
+              id="adaptationRequest"
+              class="adaptation-request"
+              rows="4"
+              placeholder="Например: сделай на 2 порции, до 500 ккал, минимум 40 г белка и максимум 30 минут"
+            ></textarea>
+
+            <div class="adaptation-hint">
+              Можно объединять несколько условий в одном запросе.
+            </div>
+          </div>
+
+          <div class="adaptation-result" id="adaptationResult" hidden>
+            <div class="adaptation-result-head">
+              <div>
+                <span class="adaptation-modal-eyebrow">Результат</span>
+                <h3>Было → Стало</h3>
+              </div>
+              <span class="adaptation-result-status" id="adaptationResultStatus">Готово</span>
+            </div>
+
+            <div class="adaptation-metrics" id="adaptationMetrics"></div>
+
+            <div class="adaptation-changes" id="adaptationChanges"></div>
+
+            <div class="adaptation-warnings" id="adaptationWarnings"></div>
+          </div>
+        </div>
+
+        <div class="adaptation-modal-footer">
+          <button class="adaptation-secondary-button" id="adaptationCancel" type="button">Вернуться к рецепту</button>
+          <button class="adaptation-primary-button" id="adaptationGenerate" type="button">Создать адаптацию <span>→</span></button>
+          <button class="adaptation-primary-button adaptation-save-button" id="adaptationSave" type="button" hidden>Сохранить как мой рецепт <span>→</span></button>
+        </div>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    $("#adaptationModalClose").addEventListener("click", closeAdaptRecipeDialog);
+    $("#adaptationCancel").addEventListener("click", closeAdaptRecipeDialog);
+    $("#adaptationGenerate").addEventListener("click", generateAdaptation);
+    $("#adaptationSave").addEventListener("click", saveAdaptationDraft);
+
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        closeAdaptRecipeDialog();
+      }
+    });
+
+    $$(".adaptation-chip").forEach((chip) => {
+      chip.addEventListener("click", () => {
+        const input = $("#adaptationRequest");
+        if (!input) return;
+
+        const presets = {
+          lessCalories: "Сделай менее калорийным",
+          moreProtein: "Сделай более белковым",
+          faster: "Сделай быстрее",
+          servings: "Сделай на 4 порции",
+          noPotato: "Убери картофель",
+          turkey: "Замени курицу на индейку"
+        };
+
+        input.value = presets[chip.dataset.adaptationPreset] || "";
+        input.focus();
+
+        $$(".adaptation-chip").forEach((item) => item.classList.remove("active"));
+        chip.classList.add("active");
+      });
+    });
+
+    return modal;
+  }
+
+
+  function openAdaptRecipeDialog(recipeId) {
+    const recipe = getRecipeById(recipeId);
 
     if (!recipe) {
-      alert(
-        "Не удалось найти рецепт для адаптации."
-      );
-
+      alert("Не удалось найти рецепт для адаптации.");
       return;
     }
 
+    const modal = ensureAdaptationModal();
+    const requestInput = $("#adaptationRequest");
+    const result = $("#adaptationResult");
+    const generateButton = $("#adaptationGenerate");
+    const saveButton = $("#adaptationSave");
 
-    const request =
-      window.prompt(
-        `Как изменить рецепт «${recipe.title}»?\n\nМожно указать несколько условий сразу:\n\n• На 2 порции\n• До 500 ккал\n• Минимум 40 г белка\n• Максимум 30 минут\n• Больше белка\n• Менее калорийный\n• Без картофеля\n• Замени курицу на индейку\n\nНапример:\n«Сделай на 2 порции, до 500 ккал, больше белка и максимум 30 минут»`,
-        "Сделай рецепт более белковым"
-      );
+    adaptationDraft = {
+      recipe,
+      adapted: null,
+      originalNutrition: getNutritionSnapshot(recipe)
+    };
+
+    $("#adaptationModalRecipeName").textContent = recipe.title;
+    $("#adaptationOriginalTitle").textContent = recipe.title;
+    $("#adaptationOriginalEmoji").textContent = recipe.emoji || "🍽️";
+
+    requestInput.value = "";
+    result.hidden = true;
+    generateButton.hidden = false;
+    saveButton.hidden = true;
+    $$(".adaptation-chip").forEach((item) => item.classList.remove("active"));
+
+    modal.classList.add("active");
+    document.body.classList.add("modal-open");
+
+    setTimeout(() => requestInput.focus(), 50);
+  }
 
 
-    if (
-      request === null
-    ) {
+  function closeAdaptRecipeDialog() {
+    const modal = $("#adaptationModal");
+
+    if (!modal) {
       return;
     }
 
+    modal.classList.remove("active");
+    document.body.classList.remove("modal-open");
+    adaptationDraft = null;
+  }
 
-    if (
-      !normalizeText(
-        request
-      )
-    ) {
-      alert(
-        "Напишите, как нужно изменить рецепт."
-      );
 
+  function formatAdaptationMetric(value, unit) {
+    const number = Number(value) || 0;
+    const formatted = Number.isInteger(number)
+      ? String(number)
+      : number.toFixed(1).replace(/\\.0$/, "");
+
+    return \`
+      <div class="adaptation-metric">
+        <span class="adaptation-metric-label">${unit}</span>
+        <div class="adaptation-metric-values">
+          <span>${formatted}</span>
+        </div>
+      </div>
+    \`;
+  }
+
+
+  function renderAdaptationMetrics(original, adapted) {
+    const metrics = [
+      ["Калории", original.calories, adapted.calories, "ккал"],
+      ["Белки", original.protein, adapted.protein, "г"],
+      ["Жиры", original.fat, adapted.fat, "г"],
+      ["Углеводы", original.carbs, adapted.carbs, "г"],
+      ["Время", original.time, adapted.time, "мин"]
+    ];
+
+    return metrics.map(([label, before, after, unit]) => {
+      const beforeNumber = Number(before) || 0;
+      const afterNumber = Number(after) || 0;
+      const difference = afterNumber - beforeNumber;
+      const direction = difference > 0 ? "up" : difference < 0 ? "down" : "same";
+      const afterFormatted = Number.isInteger(afterNumber)
+        ? String(afterNumber)
+        : afterNumber.toFixed(1).replace(/\\.0$/, "");
+
+      return \`
+        <div class="adaptation-metric">
+          <span class="adaptation-metric-label">${label}</span>
+          <div class="adaptation-metric-main">
+            <span class="adaptation-metric-before">${beforeNumber}${unit}</span>
+            <span class="adaptation-metric-arrow">→</span>
+            <strong class="adaptation-metric-after ${direction}">${afterFormatted}${unit}</strong>
+          </div>
+        </div>
+      \`;
+    }).join("");
+  }
+
+
+  function generateAdaptation() {
+    if (!adaptationDraft) {
       return;
     }
 
+    const input = $("#adaptationRequest");
+    const request = input ? input.value.trim() : "";
 
-    const adapted =
-      adaptRecipe(
-        recipe,
-        request
-      );
-
-
-    if (!adapted) {
-      alert(
-        "Не удалось создать адаптированную версию рецепта."
-      );
-
+    if (!request) {
+      input.classList.add("adaptation-input-error");
+      input.focus();
       return;
     }
 
+    input.classList.remove("adaptation-input-error");
 
-    state.userRecipes.push(
-      adapted
+    const adapted = adaptRecipe(
+      adaptationDraft.recipe,
+      request
     );
 
+    if (!adapted) {
+      alert("Не удалось создать адаптированную версию рецепта.");
+      return;
+    }
+
+    adaptationDraft.adapted = adapted;
+
+    const original = adaptationDraft.originalNutrition;
+    const next = getNutritionSnapshot(adapted);
+
+    $("#adaptationMetrics").innerHTML =
+      renderAdaptationMetrics(original, next);
+
+    const changes = Array.isArray(adapted.adaptationChanges)
+      ? adapted.adaptationChanges
+      : [];
+
+    const warnings = Array.isArray(adapted.adaptationWarnings)
+      ? adapted.adaptationWarnings
+      : [];
+
+    $("#adaptationChanges").innerHTML = changes.length
+      ? \`
+          <div class="adaptation-subheading">Что изменилось</div>
+          <ul>${changes.map((change) => \`<li><span>✓</span>${change}</li>\`).join("")}</ul>
+        \`
+      : \`
+          <div class="adaptation-subheading">Что изменилось</div>
+          <p>Количество ингредиентов и основные параметры рецепта не потребовали изменений.</p>
+        \`;
+
+    $("#adaptationWarnings").innerHTML = warnings.length
+      ? \`
+          <div class="adaptation-subheading">Обрати внимание</div>
+          <ul>${warnings.map((warning) => \`<li><span>!</span>${warning}</li>\`).join("")}</ul>
+        \`
+      : "";
+
+    $("#adaptationResultStatus").textContent =
+      warnings.length ? "Есть ограничения" : "Готово";
+
+    $("#adaptationResult").hidden = false;
+    $("#adaptationGenerate").hidden = true;
+    $("#adaptationSave").hidden = false;
+
+    $("#adaptationResult").scrollIntoView({
+      behavior: "smooth",
+      block: "nearest"
+    });
+  }
+
+
+  function saveAdaptationDraft() {
+    if (!adaptationDraft || !adaptationDraft.adapted) {
+      return;
+    }
+
+    state.userRecipes.push(adaptationDraft.adapted);
     saveUserData();
 
-
+    closeAdaptRecipeDialog();
     closeRecipeModal();
 
     renderRecipes();
     renderMyRecipes();
     renderHero();
 
-
-    let message =
-      "Готово! Адаптированная версия сохранена в «Мои рецепты».";
-
-
-    if (
-      Array.isArray(
-        adapted.adaptationWarnings
-      ) &&
-      adapted.adaptationWarnings.length
-    ) {
-      message +=
-        "\n\nОбрати внимание:\n• " +
-        adapted.adaptationWarnings.join(
-          "\n• "
-        );
-    }
-
-
-    alert(
-      message
-    );
-
-
-    const myRecipesSection =
-      $("#my-recipes");
+    const myRecipesSection = $("#my-recipes");
 
     if (myRecipesSection) {
-      setTimeout(
-        () => {
-          myRecipesSection.scrollIntoView({
-            behavior: "smooth",
-            block: "start"
-          });
-        },
-        100
-      );
+      setTimeout(() => {
+        myRecipesSection.scrollIntoView({
+          behavior: "smooth",
+          block: "start"
+        });
+      }, 100);
     }
   }
 
