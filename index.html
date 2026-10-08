@@ -370,48 +370,174 @@
         </div>
 
 
-        <div class="nutrition-feature">
+        <div class="nutrition-calculator" id="nutritionCalculator">
 
-            <div class="nutrition-feature-content">
+            <div class="nutrition-calculator-head">
+                <div>
+                    <span class="nutrition-feature-label">
+                        Калькулятор КБЖУ
+                    </span>
 
-                <span class="nutrition-feature-label">
-                    Пример расчёта
-                </span>
+                    <h3>
+                        Посчитай питание продукта
+                    </h3>
 
-                <h3>
-                    Куриная грудка
-                </h3>
+                    <p>
+                        Добавь продукты, укажи количество и выбери состояние:
+                        сырое, варёное или жареное.
+                    </p>
+                </div>
 
-                <p>
-                    Значения указаны на 100 г продукта
-                    в сыром виде.
-                </p>
+                <div class="nutrition-calculator-total">
+                    <span>Всего</span>
+                    <strong id="nutritionTotalCalories">0</strong>
+                    <small>ккал</small>
+                </div>
+            </div>
+
+
+            <div class="nutrition-calculator-controls">
+
+                <div class="nutrition-control">
+                    <label for="nutritionProduct">
+                        Продукт
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nutritionProduct"
+                        list="nutritionProductList"
+                        placeholder="Например, курица"
+                        autocomplete="off"
+                    >
+
+                    <datalist id="nutritionProductList"></datalist>
+                </div>
+
+
+                <div class="nutrition-control nutrition-control-small">
+                    <label for="nutritionAmount">
+                        Количество
+                    </label>
+
+                    <input
+                        type="number"
+                        id="nutritionAmount"
+                        min="1"
+                        step="1"
+                        value="100"
+                    >
+                </div>
+
+
+                <div class="nutrition-control nutrition-control-small">
+                    <label for="nutritionState">
+                        Состояние
+                    </label>
+
+                    <select id="nutritionState">
+                        <option value="raw">
+                            Сырое
+                        </option>
+
+                        <option value="boiled">
+                            Варёное
+                        </option>
+
+                        <option value="fried">
+                            Жареное
+                        </option>
+                    </select>
+                </div>
+
+                <button
+                    class="nutrition-add-button"
+                    id="nutritionAddProduct"
+                    type="button"
+                >
+                    Добавить
+                    <span>+</span>
+                </button>
 
             </div>
 
 
-            <div class="nutrition-feature-values">
+            <div
+                class="nutrition-fried-options"
+                id="nutritionFriedOptions"
+                hidden
+            >
+                <label for="nutritionOil">
+                    Масло при жарке
+                </label>
 
-                <div class="nutrition-feature-value">
-                    <strong>120</strong>
-                    <span>ккал</span>
+                <div>
+                    <input
+                        type="number"
+                        id="nutritionOil"
+                        min="0"
+                        step="1"
+                        value="10"
+                    >
+
+                    <span>г на 100 г продукта</span>
                 </div>
 
-                <div class="nutrition-feature-value">
-                    <strong>23</strong>
-                    <span>белки</span>
+                <p>
+                    Для жареного блюда RecipePro учитывает указанное количество
+                    масла. Фактическая калорийность зависит от того, сколько
+                    масла реально впиталось.
+                </p>
+            </div>
+
+
+            <div
+                class="nutrition-calculator-list"
+                id="nutritionCalculatorList"
+            ></div>
+
+
+            <div class="nutrition-calculator-result">
+
+                <div class="nutrition-result-main">
+                    <span>Итого</span>
+
+                    <strong id="nutritionResultCalories">
+                        0
+                    </strong>
+
+                    <small>ккал</small>
                 </div>
 
-                <div class="nutrition-feature-value">
-                    <strong>2.6</strong>
-                    <span>жиры</span>
+                <div class="nutrition-result-item">
+                    <strong id="nutritionResultProtein">
+                        0
+                    </strong>
+                    <span>белки, г</span>
                 </div>
 
-                <div class="nutrition-feature-value">
-                    <strong>0</strong>
-                    <span>углеводы</span>
+                <div class="nutrition-result-item">
+                    <strong id="nutritionResultFat">
+                        0
+                    </strong>
+                    <span>жиры, г</span>
                 </div>
 
+                <div class="nutrition-result-item">
+                    <strong id="nutritionResultCarbs">
+                        0
+                    </strong>
+                    <span>углеводы, г</span>
+                </div>
+            </div>
+
+            <div class="nutrition-calculator-note">
+                <span>i</span>
+                <p>
+                    Расчёт сделан по данным RecipePro. Для варёных продуктов
+                    учитывается изменение веса при приготовлении, для жареных —
+                    ещё и указанное масло. Это расчётная оценка, а не лабораторный анализ.
+                </p>
             </div>
 
         </div>
@@ -1635,6 +1761,7 @@
 
 <script src="JS/products.js"></script>
 <script src="JS/recipes.js"></script>
+<script src="JS/nutrition.js"></script>
 <script src="JS/app.js"></script>
 
 </body>
