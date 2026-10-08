@@ -2907,6 +2907,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
             <div class="adaptation-metrics" id="adaptationMetrics"></div>
 
+            <div id="adaptationGoals"></div>
+
             <div class="adaptation-changes" id="adaptationChanges"></div>
 
             <div class="adaptation-warnings" id="adaptationWarnings"></div>
@@ -3059,6 +3061,95 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
 
+  function renderAdaptationGoals(parsed, nutrition, time) {
+    if (!parsed) {
+      return "";
+    }
+
+    const goals = [];
+
+    if (parsed.maxCalories !== null) {
+      const actual = Number(nutrition.calories) || 0;
+      const target = Number(parsed.maxCalories);
+      goals.push({
+        label: "Калории",
+        target: `до ${target} ккал`,
+        actual: `${actual} ккал`,
+        success: actual <= target
+      });
+    }
+
+    if (parsed.minCalories !== null) {
+      const actual = Number(nutrition.calories) || 0;
+      const target = Number(parsed.minCalories);
+      goals.push({
+        label: "Калории",
+        target: `от ${target} ккал`,
+        actual: `${actual} ккал`,
+        success: actual >= target
+      });
+    }
+
+    if (parsed.minProtein !== null) {
+      const actual = Number(nutrition.protein) || 0;
+      const target = Number(parsed.minProtein);
+      goals.push({
+        label: "Белок",
+        target: `от ${target} г`,
+        actual: `${actual} г`,
+        success: actual >= target
+      });
+    }
+
+    if (parsed.maxProtein !== null) {
+      const actual = Number(nutrition.protein) || 0;
+      const target = Number(parsed.maxProtein);
+      goals.push({
+        label: "Белок",
+        target: `до ${target} г`,
+        actual: `${actual} г`,
+        success: actual <= target
+      });
+    }
+
+    if (parsed.maxTime !== null) {
+      const actual = Number(time) || 0;
+      const target = Number(parsed.maxTime);
+      goals.push({
+        label: "Время",
+        target: `до ${target} мин`,
+        actual: `${actual} мин`,
+        success: actual <= target
+      });
+    }
+
+    if (!goals.length) {
+      return "";
+    }
+
+    return `
+      <div class="adaptation-goals">
+        <div class="adaptation-subheading">Цели запроса</div>
+        <div class="adaptation-goals-list">
+          ${goals.map((goal) => `
+            <div class="adaptation-goal ${goal.success ? "is-success" : "is-failed"}">
+              <div class="adaptation-goal-icon">${goal.success ? "✓" : "!"}</div>
+              <div class="adaptation-goal-content">
+                <strong>${goal.label}</strong>
+                <span>Цель: ${goal.target}</span>
+              </div>
+              <div class="adaptation-goal-value">
+                <small>получилось</small>
+                <strong>${goal.actual}</strong>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    `;
+  }
+
+
   function generateAdaptation() {
     if (!adaptationDraft) {
       return;
@@ -3092,6 +3183,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     $("#adaptationMetrics").innerHTML =
       renderAdaptationMetrics(original, next);
+
+    const goalsContainer = $("#adaptationGoals");
+    if (goalsContainer) {
+      goalsContainer.innerHTML =
+        renderAdaptationGoals(
+          adapted.adaptationConstraints,
+          next,
+          adapted.time
+        );
+    }
 
     const changes = Array.isArray(adapted.adaptationChanges)
       ? adapted.adaptationChanges
