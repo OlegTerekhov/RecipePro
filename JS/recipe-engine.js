@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    const ENGINE_VERSION = "3.0.0";
+    const ENGINE_VERSION = "4.0.0";
 
     const TYPE_RULES = [
         {
@@ -124,23 +124,29 @@
     }
 
     function chooseType(ids, intent = {}) {
+        if (window.recipeProIntelligence?.chooseType) {
+            const intelligent = window.recipeProIntelligence.chooseType(
+                ids,
+                intent,
+                TYPE_RULES.map(rule => rule.id)
+            );
+            const selected = TYPE_RULES.find(rule => rule.id === intelligent?.type);
+            if (selected) return selected;
+        }
+
         const ranked = TYPE_RULES.map(rule => {
             let score = rule.score(ids);
-
             if (intent.type && rule.id === intent.type) score += 100;
             if (intent.faster && rule.baseTime <= 20) score += 25;
             if (intent.maxTime && rule.baseTime <= intent.maxTime) score += 30;
             if (intent.maxTime && rule.baseTime > intent.maxTime) score -= Math.min(24, (rule.baseTime - intent.maxTime) * 0.8);
-
             if (intent.highProtein || intent.minProtein) {
                 if (["omelet","bowl","stew"].includes(rule.id)) score += 8;
             }
-
             if (intent.lessCalories || intent.maxCalories) {
                 if (["salad","bowl","omelet"].includes(rule.id)) score += 7;
                 if (rule.id === "roast") score -= 3;
             }
-
             return { rule, score };
         }).sort((a,b) => b.score - a.score);
 
@@ -148,43 +154,21 @@
     }
 
     function getPantryIngredients(type, ids) {
-        const hasOil = ids.includes("масло") || ids.includes("сливочное-масло");
+        if (window.recipeProIntelligence?.getPantry) {
+            const pantryMap = {
+                water: PANTRY.water,
+                salt: PANTRY.salt,
+                pepper: PANTRY.pepper,
+                cookingOil: PANTRY.cookingOil
+            };
 
-        if (type === "stew") {
-            return [
-                { ...PANTRY.water, required: false, pantry: true },
-                { ...PANTRY.salt, required: false, pantry: true },
-                { ...PANTRY.pepper, required: false, pantry: true }
-            ];
+            return window.recipeProIntelligence.getPantry(type, ids)
+                .map(item => pantryMap[item.key])
+                .filter(Boolean)
+                .map(item => ({ ...item, required: false, pantry: true }));
         }
 
-        if (type === "roast") {
-            return [
-                ...(hasOil ? [] : [{ ...PANTRY.cookingOil, required: false, pantry: true }]),
-                { ...PANTRY.salt, required: false, pantry: true },
-                { ...PANTRY.pepper, required: false, pantry: true }
-            ];
-        }
-
-        if (type === "salad") {
-            return [
-                ...(hasOil ? [] : [{ ...PANTRY.cookingOil, required: false, pantry: true }]),
-                { ...PANTRY.salt, required: false, pantry: true },
-                { ...PANTRY.pepper, required: false, pantry: true }
-            ];
-        }
-
-        if (type === "omelet") {
-            return [
-                ...(hasOil ? [] : [{ ...PANTRY.cookingOil, required: false, pantry: true }]),
-                { ...PANTRY.salt, required: false, pantry: true },
-                { ...PANTRY.pepper, required: false, pantry: true }
-            ];
-        }
-
-        return [
-            { ...PANTRY.salt, required: false, pantry: true }
-        ];
+        return [];
     }
 
     function build(ids, intent = {}) {
@@ -249,6 +233,8 @@
             ...getPantryIngredients(type.id, unique)
         ];
 
+        const intelligence = window.recipeProIntelligence?.explain?.(type.id, unique, ingredients.filter(item => item.pantry)) || null;
+
         const recipe = {
             engineVersion: ENGINE_VERSION,
             type: type.id,
@@ -261,7 +247,9 @@
             steps: stepsByType[type.id] || ["Подготовь продукты.","Приготовь до готовности.","Подавай сразу."],
             aiChanges: ["Recipe Engine выбрал формат: " + type.title],
             aiWarnings: [],
-            pantryIngredients: ingredients.filter(item => item.pantry)
+            pantryIngredients: ingredients.filter(item => item.pantry),
+            requiredProducts: unique,
+            intelligence: intelligence
         };
 
         if (intent.maxTime && type.baseTime > intent.maxTime) {
