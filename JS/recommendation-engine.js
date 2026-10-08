@@ -13,16 +13,22 @@
     }
 
     function nutrition(recipe) {
-        return (recipe.ingredients || []).reduce((sum,item) => {
-            const p = window.products?.[item.product];
-            if (!p?.raw) return sum;
+        if (window.recipeProNutritionEngine?.calculateRecipe) {
+            return window.recipeProNutritionEngine.calculateRecipe(recipe);
+        }
+
+        return (recipe.ingredients || []).reduce((sum, item) => {
+            const product = window.products?.[item.product];
+            if (!product?.raw) return sum;
+
             const factor = Number(item.amount || 0) / 100;
-            sum.calories += p.raw.kcal * factor;
-            sum.protein += p.raw.protein * factor;
-            sum.fat += p.raw.fat * factor;
-            sum.carbs += p.raw.carbs * factor;
+            sum.calories += Number(product.raw.kcal || 0) * factor;
+            sum.protein += Number(product.raw.protein || 0) * factor;
+            sum.fat += Number(product.raw.fat || 0) * factor;
+            sum.carbs += Number(product.raw.carbs || 0) * factor;
+
             return sum;
-        }, { calories:0, protein:0, fat:0, carbs:0 });
+        }, { calories: 0, protein: 0, fat: 0, carbs: 0 });
     }
 
     function finalize(recipe) {
