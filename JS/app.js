@@ -3016,14 +3016,14 @@ document.addEventListener("DOMContentLoaded", () => {
       ? String(number)
       : number.toFixed(1).replace(/\\.0$/, "");
 
-    return \`
+    return `
       <div class="adaptation-metric">
         <span class="adaptation-metric-label">${unit}</span>
         <div class="adaptation-metric-values">
           <span>${formatted}</span>
         </div>
       </div>
-    \`;
+    `;
   }
 
 
@@ -3045,7 +3045,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ? String(afterNumber)
         : afterNumber.toFixed(1).replace(/\\.0$/, "");
 
-      return \`
+      return `
         <div class="adaptation-metric">
           <span class="adaptation-metric-label">${label}</span>
           <div class="adaptation-metric-main">
@@ -3054,7 +3054,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <strong class="adaptation-metric-after ${direction}">${afterFormatted}${unit}</strong>
           </div>
         </div>
-      \`;
+      `;
     }).join("");
   }
 
@@ -3102,20 +3102,20 @@ document.addEventListener("DOMContentLoaded", () => {
       : [];
 
     $("#adaptationChanges").innerHTML = changes.length
-      ? \`
+      ? `
           <div class="adaptation-subheading">Что изменилось</div>
-          <ul>${changes.map((change) => \`<li><span>✓</span>${change}</li>\`).join("")}</ul>
-        \`
-      : \`
+          <ul>${changes.map((change) => `<li><span>✓</span>${change}</li>`).join("")}</ul>
+        `
+      : `
           <div class="adaptation-subheading">Что изменилось</div>
           <p>Количество ингредиентов и основные параметры рецепта не потребовали изменений.</p>
-        \`;
+        `;
 
     $("#adaptationWarnings").innerHTML = warnings.length
-      ? \`
+      ? `
           <div class="adaptation-subheading">Обрати внимание</div>
-          <ul>${warnings.map((warning) => \`<li><span>!</span>${warning}</li>\`).join("")}</ul>
-        \`
+          <ul>${warnings.map((warning) => `<li><span>!</span>${warning}</li>`).join("")}</ul>
+        `
       : "";
 
     $("#adaptationResultStatus").textContent =
