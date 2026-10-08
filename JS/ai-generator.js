@@ -384,6 +384,10 @@ ${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-gen
         const recommendation=window.recipeProRecommendationEngine?.recommend(detected,constraints);
         const ranked=recommendation?.candidates||[];
         const primary=ranked[0]?.recipe||built||buildRecipe(detected,constraints);
+        if(!primary){
+            result.innerHTML='<div class="ai-generator-result"><strong>Не удалось собрать подходящее блюдо</strong><p style="margin-top:7px">RecipePro не будет добавлять отсутствующие обязательные продукты. Попробуй добавить ещё один продукт или попроси другой тип блюда.</p></div>';
+            return;
+        }
         const recipe=adaptRecipe(primary,constraints);
         const generatedCandidates=ranked.length ? ranked : (built ? [{recipe:built,score:0,reasons:["собрано из ваших продуктов"]}] : []);
         const alternatives=generatedCandidates.slice(1,4).map(item=>({ ...item, recipe:adaptRecipe(item.recipe,constraints) }));
