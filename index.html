@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>RecipePro — умный помощник по готовке</title>
+
+    <meta
+        name="description"
+        content="RecipePro помогает приготовить вкусные блюда из продуктов, которые уже есть дома."
+    >
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+
+<header class="site-header">
+    <div class="container header-inner">
+
+        <a href="#" class="logo">
+            <span class="logo-mark">R</span>
+            <span class="logo-text">RecipePro</span>
+        </a>
+
+        <nav class="main-nav">
+            <a href="#recipes">Рецепты</a>
+            <a href="#products">Продукты</a>
+            <a href="#diets">Питание</a>
+        </nav>
+
+        <button
+            class="header-action"
+            id="myRecipesBtn"
+            type="button"
+        >
+            <span>Мои рецепты</span>
+            <span class="header-action-arrow">→</span>
+        </button>
+
+    </div>
+</header>
+
+
+<main>
+
+<section class="hero">
+
+    <div class="container hero-grid">
+
+        <div class="hero-content">
+
+            <div class="eyebrow">
+                <span class="eyebrow-dot"></span>
+                Умный помощник по готовке
+            </div>
+
+            <h1>
+                Что приготовить<br>
+                <em>из того, что есть?</em>
+            </h1>
+
+            <p class="hero-description">
+                Напиши продукты, которые есть дома.
+                RecipePro подберёт блюда, рассчитает КБЖУ
+                и поможет приготовить их шаг за шагом.
+            </p>
+
+            <div class="search-box">
+
+                <div class="search-icon">
+                    <svg
+                        width="21"
+                        height="21"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        aria-hidden="true"
+                    >
+                        <circle
+                            cx="11"
+                            cy="11"
+                            r="7"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                        />
+                        <path
+                            d="M16.5 16.5L21 21"
+                            stroke="currentColor"
+                            stroke-width="1.7"
+                            stroke-linecap="round"
+                        />
+                    </svg>
+                </div>
+
+                <input
+                    type="text"
+                    id="ingredientInput"
+                    placeholder="Например: курица, картофель, сыр..."
+                    autocomplete="off"
+                >
+
+                <button
+                    id="findRecipesBtn"
+                    class="search-button"
+                    type="button"
+                >
+                    Найти
+                    <span>→</span>
+                </button>
+
+            </div>
+
+            <div class="popular-searches">
+
+                <span class="popular-label">
+                    Популярное
+                </span>
+
+                <div class="popular-list">
+
+                    <button
+                        class="popular-item"
+                        data-product="курица"
+                        type="button"
+                    >
+                        Курица
+                    </button>
+
+                    <button
+                        class="popular-item"
+                        data-product="картофель"
+                        type="button"
+                    >
+                        Картофель
+                    </button>
+
+                    <button
+                        class="popular-item"
+                        data-product="яйца"
+                        type="button"
+                    >
+                        Яйца
+                    </button>
+
+                    <button
+                        class="popular-item"
+                        data-product="рис"
+                        type="button"
+                    >
+                        Рис
+                    </button>
+
+                    <button
+                        class="popular-item"
+                        data-product="паста"
+                        type="button"
+                    >
+                        Паста
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="hero-recipe-wrap">
+
+            <div class="hero-recipe-label">
+                <span></span>
+                Рецепт дня
+            </div>
+
+            <article
+                class="hero-recipe-card"
+                id="heroCard"
+            >
+
+                <div class="hero-recipe-image">
+
+                    <div class="hero-recipe-image-glow"></div>
+
+                    <div class="hero-recipe-emoji">
+                        🍗
+                    </div>
+
+                    <div class="hero-recipe-match">
+                        <strong id="heroMatch">96%</strong>
+                        <span>совпадение</span>
+                    </div>
+
+                </div>
+
+                <div class="hero-recipe-content">
+
+                    <div class="hero-recipe-kicker">
+                        Сегодня стоит попробовать
+                    </div>
+
+                    <h2 id="heroRecipeTitle">
+                        Курица с картофелем
+                    </h2>
+
+                    <div class="hero-recipe-meta">
+
+                        <span>
+                            <span class="meta-icon">◷</span>
+                            <span id="heroRecipeTime">50</span> мин
+                        </span>
+
+                        <span class="meta-separator">•</span>
+
+                        <span>
+                            <span id="heroRecipeCalories">410</span> ккал
+                        </span>
+
+                    </div>
+
+                    <button
+                        class="hero-recipe-button"
+                        id="heroRecipeOpen"
+                        type="button"
+                    >
+                        Открыть рецепт
+                        <span>→</span>
+                    </button>
+
+                </div>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section
+    class="recipes-section section"
+    id="recipes"
+>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+                <div class="section-eyebrow">
+                    Коллекция RecipePro
+                </div>
+
+                <h2 id="recipesTitle">
+                    Рецепты на каждый день
+                </h2>
+
+                <p>
+                    Простые блюда с понятными ингредиентами
+                    и рассчитанным питанием.
+                </p>
+            </div>
+
+            <div class="recipes-count" id="recipesCount">
+                8 рецептов
+            </div>
+
+        </div>
+
+
+        <div class="recipe-filters">
+
+            <button
+                class="filter-button active"
+                data-filter="all"
+                type="button"
+            >
+                Все
+            </button>
+
+            <button
+                class="filter-button"
+                data-filter="protein"
+                type="button"
+            >
+                Высокобелковые
+            </button>
+
+            <button
+                class="filter-button"
+                data-filter="calories"
+                type="button"
+            >
+                Низкокалорийные
+            </button>
+
+            <button
+                class="filter-button"
+                data-filter="time"
+                type="button"
+            >
+                Быстрые
+            </button>
+
+            <button
+                class="filter-button"
+                data-filter="vegetarian"
+                type="button"
+            >
+                Вегетарианские
+            </button>
+
+            <button
+                class="filter-button"
+                data-filter="keto"
+                type="button"
+            >
+                Кето
+            </button>
+
+        </div>
+
+
+        <div
+            class="recipes-grid"
+            id="recipesGrid"
+        ></div>
+
+    </div>
+
+</section>
+
+
+<section
+    class="products-section section"
+    id="products"
+>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+                <div class="section-eyebrow">
+                    Умные продукты
+                </div>
+
+                <h2>
+                    Питательная ценность
+                </h2>
+
+                <p>
+                    RecipePro учитывает продукты в сыром
+                    и приготовленном виде.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="nutrition-feature">
+
+            <div class="nutrition-feature-content">
+
+                <span class="nutrition-feature-label">
+                    Пример расчёта
+                </span>
+
+                <h3>
+                    Куриная грудка
+                </h3>
+
+                <p>
+                    Значения указаны на 100 г продукта
+                    в сыром виде.
+                </p>
+
+            </div>
+
+
+            <div class="nutrition-feature-values">
+
+                <div class="nutrition-feature-value">
+                    <strong>120</strong>
+                    <span>ккал</span>
+                </div>
+
+                <div class="nutrition-feature-value">
+                    <strong>23</strong>
+                    <span>белки</span>
+                </div>
+
+                <div class="nutrition-feature-value">
+                    <strong>2.6</strong>
+                    <span>жиры</span>
+                </div>
+
+                <div class="nutrition-feature-value">
+                    <strong>0</strong>
+                    <span>углеводы</span>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section
+    class="diets-section section"
+    id="diets"
+>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+                <div class="section-eyebrow">
+                    Питание под цель
+                </div>
+
+                <h2>
+                    Выбирай свой рацион
+                </h2>
+
+                <p>
+                    В будущем RecipePro сможет учитывать
+                    твои цели автоматически.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="diets-grid">
+
+            <article class="diet-card">
+
+                <div class="diet-number">
+                    01
+                </div>
+
+                <div class="diet-icon">
+                    ◒
+                </div>
+
+                <h3>
+                    Похудение
+                </h3>
+
+                <p>
+                    Контроль калорий и сытные блюда
+                    с хорошим содержанием белка.
+                </p>
+
+                <span class="diet-arrow">
+                    →
+                </span>
+
+            </article>
+
+
+            <article class="diet-card">
+
+                <div class="diet-number">
+                    02
+                </div>
+
+                <div class="diet-icon">
+                    ↗
+                </div>
+
+                <h3>
+                    Набор массы
+                </h3>
+
+                <p>
+                    Более калорийный рацион
+                    с достаточным количеством белка.
+                </p>
+
+                <span class="diet-arrow">
+                    →
+                </span>
+
+            </article>
+
+
+            <article class="diet-card">
+
+                <div class="diet-number">
+                    03
+                </div>
+
+                <div class="diet-icon">
+                    +
+                </div>
+
+                <h3>
+                    Баланс
+                </h3>
+
+                <p>
+                    Разнообразное питание без
+                    жёстких ограничений.
+                </p>
+
+                <span class="diet-arrow">
+                    →
+                </span>
+
+            </article>
+
+
+            <article class="diet-card">
+
+                <div class="diet-number">
+                    04
+                </div>
+
+                <div class="diet-icon">
+                    ◌
+                </div>
+
+                <h3>
+                    Высокий белок
+                </h3>
+
+                <p>
+                    Рецепты с акцентом на белок
+                    и контролируемые калории.
+                </p>
+
+                <span class="diet-arrow">
+                    →
+                </span>
+
+            </article>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<section
+    class="my-recipes-section section"
+    id="my-recipes"
+>
+
+    <div class="container">
+
+        <div class="my-recipes-header">
+
+            <div>
+
+                <div class="section-eyebrow">
+                    Твоя коллекция
+                </div>
+
+                <h2>
+                    Мои рецепты
+                </h2>
+
+                <p>
+                    Сохраняй свои блюда и создавай
+                    собственную кулинарную коллекцию.
+                </p>
+
+            </div>
+
+            <button
+                class="primary-button"
+                id="addRecipeBtn"
+                type="button"
+            >
+                <span>+</span>
+                Создать рецепт
+            </button>
+
+        </div>
+
+
+        <div
+            class="my-recipes-grid"
+            id="myRecipesGrid"
+        ></div>
+
+    </div>
+
+</section>
+
+</main>
+
+
+<footer class="site-footer">
+
+    <div class="container footer-inner">
+
+        <div class="footer-brand">
+
+            <a href="#" class="logo">
+                <span class="logo-mark">R</span>
+                <span class="logo-text">RecipePro</span>
+            </a>
+
+            <p>
+                Готовить проще, когда знаешь,
+                что приготовить.
+            </p>
+
+        </div>
+
+
+        <div class="footer-links">
+
+            <a href="#recipes">
+                Рецепты
+            </a>
+
+            <a href="#products">
+                Продукты
+            </a>
+
+            <a href="#diets">
+                Питание
+            </a>
+
+            <a href="#my-recipes">
+                Мои рецепты
+            </a>
+
+        </div>
+
+
+        <div class="footer-copy">
+            © 2026 RecipePro
+        </div>
+
+    </div>
+
+</footer>
+
+
+<!-- =========================================================
+     RECIPE MODAL
+========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="recipeModal"
+    aria-hidden="true"
+>
+
+    <div
+        class="recipe-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modalTitle"
+    >
+
+        <button
+            class="modal-close"
+            id="modalClose"
+            type="button"
+            aria-label="Закрыть"
+        >
+            ×
+        </button>
+
+
+        <div class="recipe-modal-hero">
+
+            <div
+                class="modal-emoji"
+                id="modalEmoji"
+            >
+                🍗
+            </div>
+
+            <div class="modal-hero-content">
+
+                <div class="modal-kicker">
+                    RECIPEPRO
+                </div>
+
+                <h2 id="modalTitle">
+                    Курица с картофелем
+                </h2>
+
+                <p id="modalDescription">
+                    Сытное домашнее блюдо с нежной
+                    курицей, картофелем и луком.
+                </p>
+
+                <div class="modal-meta">
+
+                    <span>
+                        ◷
+                        <strong id="modalTime">50</strong>
+                        мин
+                    </span>
+
+                    <span>
+                        <strong id="modalCalories">410</strong>
+                        ккал
+                    </span>
+
+                    <span>
+                        <strong id="modalServings">2</strong>
+                        порции
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="recipe-modal-body">
+
+            <section class="modal-section">
+
+                <div class="modal-section-heading">
+
+                    <span class="modal-section-number">
+                        01
+                    </span>
+
+                    <div>
+                        <span class="modal-section-label">
+                            Питательная ценность
+                        </span>
+
+                        <h3>
+                            КБЖУ на порцию
+                        </h3>
+                    </div>
+
+                </div>
+
+
+                <div class="modal-nutrition">
+
+                    <div class="modal-nutrition-item">
+                        <strong id="modalProtein">
+                            38
+                        </strong>
+                        <span>
+                            белки
+                        </span>
+                    </div>
+
+                    <div class="modal-nutrition-item">
+                        <strong id="modalFat">
+                            12
+                        </strong>
+                        <span>
+                            жиры
+                        </span>
+                    </div>
+
+                    <div class="modal-nutrition-item">
+                        <strong id="modalCarbs">
+                            45
+                        </strong>
+                        <span>
+                            углеводы
+                        </span>
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <section class="modal-section">
+
+                <div class="modal-section-heading">
+
+                    <span class="modal-section-number">
+                        02
+                    </span>
+
+                    <div>
+                        <span class="modal-section-label">
+                            Состав
+                        </span>
+
+                        <h3>
+                            Ингредиенты
+                        </h3>
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="modal-ingredients"
+                    id="modalIngredients"
+                ></div>
+
+            </section>
+
+
+            <section class="modal-section">
+
+                <div class="modal-section-heading">
+
+                    <span class="modal-section-number">
+                        03
+                    </span>
+
+                    <div>
+                        <span class="modal-section-label">
+                            Приготовление
+                        </span>
+
+                        <h3>
+                            Шаг за шагом
+                        </h3>
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="recipe-steps"
+                    id="recipeSteps"
+                ></div>
+
+            </section>
+
+
+            <!-- =================================================
+                 AI ADAPTATION
+            ================================================== -->
+
+            <section class="modal-section">
+
+                <div
+                    class="recipe-ai-action"
+                    id="recipeAiAction"
+                >
+
+                    <div class="recipe-ai-action-content">
+
+                        <div class="recipe-ai-badge">
+                            ✨ RECIPEPRO AI
+                        </div>
+
+                        <h3>
+                            Адаптировать этот рецепт
+                        </h3>
+
+                        <p>
+                            Попроси RecipePro изменить блюдо
+                            под твою цель, продукты или количество порций.
+                        </p>
+
+                    </div>
+
+                    <button
+                        class="primary-button"
+                        id="adaptRecipeBtn"
+                        type="button"
+                    >
+                        ✨ Адаптировать
+                        <span>→</span>
+                    </button>
+
+                </div>
+
+            </section>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     AI ADAPTATION MODAL
+========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="aiAdaptModal"
+    aria-hidden="true"
+>
+
+    <div
+        class="ai-adapt-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="aiAdaptTitle"
+    >
+
+        <button
+            class="modal-close"
+            id="aiAdaptModalClose"
+            type="button"
+            aria-label="Закрыть"
+        >
+            ×
+        </button>
+
+
+        <div class="ai-adapt-header">
+
+            <div class="ai-adapt-symbol">
+                ✨
+            </div>
+
+            <div>
+
+                <div class="modal-kicker">
+                    RECIPEPRO AI
+                </div>
+
+                <h2 id="aiAdaptTitle">
+                    Сделаем рецепт твоим
+                </h2>
+
+                <p id="aiAdaptRecipeName">
+                    Адаптация выбранного рецепта
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="ai-adapt-body">
+
+            <div class="ai-adapt-intro">
+
+                <span>
+                    Что хочешь изменить?
+                </span>
+
+                <strong>
+                    Опиши своими словами
+                </strong>
+
+            </div>
+
+
+            <div class="ai-suggestions">
+
+                <button
+                    class="ai-suggestion"
+                    type="button"
+                    data-ai-request="Сделай рецепт менее калорийным"
+                >
+                    <span>↓</span>
+                    Меньше калорий
+                </button>
+
+                <button
+                    class="ai-suggestion"
+                    type="button"
+                    data-ai-request="Увеличь количество белка"
+                >
+                    <span>↑</span>
+                    Больше белка
+                </button>
+
+                <button
+                    class="ai-suggestion"
+                    type="button"
+                    data-ai-request="Сделай рецепт на 2 порции"
+                >
+                    <span>02</span>
+                    На 2 порции
+                </button>
+
+                <button
+                    class="ai-suggestion"
+                    type="button"
+                    data-ai-request="Убери масло из рецепта"
+                >
+                    <span>−</span>
+                    Без масла
+                </button>
+
+                <button
+                    class="ai-suggestion"
+                    type="button"
+                    data-ai-request="Сделай рецепт максимально быстрым"
+                >
+                    <span>◷</span>
+                    Быстрее
+                </button>
+
+                <button
+                    class="ai-suggestion"
+                    type="button"
+                    data-ai-request="Сделай рецепт более сытным"
+                >
+                    <span>+</span>
+                    Более сытно
+                </button>
+
+            </div>
+
+
+            <div class="ai-adapt-input-wrap">
+
+                <label for="aiAdaptInput">
+                    Твоё пожелание
+                </label>
+
+                <textarea
+                    id="aiAdaptInput"
+                    rows="5"
+                    placeholder="Например: сделай на 2 порции, убери масло и постарайся уложиться в 500 ккал..."
+                ></textarea>
+
+                <div class="ai-input-hint">
+                    RecipePro поймёт обычный человеческий запрос
+                </div>
+
+            </div>
+
+
+            <div class="ai-adapt-current">
+
+                <div class="ai-current-label">
+                    Сейчас выбран рецепт
+                </div>
+
+                <strong id="aiAdaptCurrentRecipe">
+                    Курица с картофелем
+                </strong>
+
+            </div>
+
+
+            <div class="ai-adapt-actions">
+
+                <button
+                    class="secondary-button"
+                    id="aiAdaptCancelBtn"
+                    type="button"
+                >
+                    Отмена
+                </button>
+
+                <button
+                    class="primary-button large"
+                    id="aiGenerateBtn"
+                    type="button"
+                >
+                    ✨ Создать версию
+                    <span>→</span>
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     ADD RECIPE MODAL
+========================================================= -->
+
+<div
+    class="modal-overlay"
+    id="addRecipeModal"
+    aria-hidden="true"
+>
+
+    <div
+        class="create-recipe-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="createRecipeTitle"
+    >
+
+        <button
+            class="modal-close"
+            id="addRecipeModalClose"
+            type="button"
+            aria-label="Закрыть"
+        >
+            ×
+        </button>
+
+
+        <div class="create-header">
+
+            <div>
+
+                <div class="modal-kicker">
+                    RECIPEPRO / MY RECIPES
+                </div>
+
+                <h2 id="createRecipeTitle">
+                    Создать свой рецепт
+                </h2>
+
+                <p>
+                    Сохрани любимое блюдо в своей
+                    личной коллекции RecipePro.
+                </p>
+
+            </div>
+
+
+            <div class="create-status">
+
+                <span class="create-status-dot"></span>
+
+                Черновик
+
+            </div>
+
+        </div>
+
+
+        <div class="create-progress">
+
+            <div class="create-progress-item active">
+
+                <span>01</span>
+
+                <strong>
+                    Основное
+                </strong>
+
+            </div>
+
+            <div class="create-progress-line"></div>
+
+            <div class="create-progress-item">
+
+                <span>02</span>
+
+                <strong>
+                    Ингредиенты
+                </strong>
+
+            </div>
+
+            <div class="create-progress-line"></div>
+
+            <div class="create-progress-item">
+
+                <span>03</span>
+
+                <strong>
+                    Приготовление
+                </strong>
+
+            </div>
+
+            <div class="create-progress-line"></div>
+
+            <div class="create-progress-item">
+
+                <span>04</span>
+
+                <strong>
+                    Готово
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <form
+            id="recipeForm"
+            class="recipe-form"
+        >
+
+            <section class="form-section">
+
+                <div class="form-section-heading">
+
+                    <div class="form-section-number">
+                        01
+                    </div>
+
+                    <div>
+                        <span>
+                            Основная информация
+                        </span>
+
+                        <h3>
+                            Расскажи о блюде
+                        </h3>
+                    </div>
+
+                </div>
+
+
+                <div class="form-main-grid">
+
+                    <div class="form-main-fields">
+
+                        <div class="field">
+
+                            <label for="recipeTitle">
+                                Название рецепта
+                            </label>
+
+                            <input
+                                type="text"
+                                id="recipeTitle"
+                                placeholder="Например: Паста с креветками"
+                                required
+                            >
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="recipeDescription">
+                                Короткое описание
+                            </label>
+
+                            <textarea
+                                id="recipeDescription"
+                                rows="4"
+                                placeholder="Пара предложений о блюде..."
+                            ></textarea>
+
+                        </div>
+
+
+                        <div class="form-two-columns">
+
+                            <div class="field">
+
+                                <label for="recipeCategory">
+                                    Категория
+                                </label>
+
+                                <select id="recipeCategory">
+
+                                    <option value="protein">
+                                        Высокобелковое
+                                    </option>
+
+                                    <option value="calories">
+                                        Низкокалорийное
+                                    </option>
+
+                                    <option value="time">
+                                        Быстрое
+                                    </option>
+
+                                    <option value="vegetarian">
+                                        Вегетарианское
+                                    </option>
+
+                                    <option value="keto">
+                                        Кето
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label for="recipeEmoji">
+                                    Визуальный символ
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="recipeEmoji"
+                                    value="🍽️"
+                                    maxlength="4"
+                                >
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="form-two-columns">
+
+                            <div class="field">
+
+                                <label for="recipeTime">
+                                    Время приготовления
+                                </label>
+
+                                <div class="input-with-suffix">
+
+                                    <input
+                                        type="number"
+                                        id="recipeTime"
+                                        min="1"
+                                        value="30"
+                                        required
+                                    >
+
+                                    <span>
+                                        мин
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="field">
+
+                                <label for="recipeServings">
+                                    Количество порций
+                                </label>
+
+                                <div class="input-with-suffix">
+
+                                    <input
+                                        type="number"
+                                        id="recipeServings"
+                                        min="1"
+                                        value="2"
+                                        required
+                                    >
+
+                                    <span>
+                                        порц.
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <aside class="create-preview">
+
+                        <div class="create-preview-label">
+                            Предпросмотр
+                        </div>
+
+                        <div class="create-preview-card">
+
+                            <div class="create-preview-image">
+
+                                <span id="previewEmoji">
+                                    🍽️
+                                </span>
+
+                            </div>
+
+                            <div class="create-preview-body">
+
+                                <span class="create-preview-category">
+                                    МОЙ РЕЦЕПТ
+                                </span>
+
+                                <h4 id="previewTitle">
+                                    Название блюда
+                                </h4>
+
+                                <p id="previewDescription">
+                                    Здесь появится описание
+                                    твоего рецепта.
+                                </p>
+
+                                <div class="create-preview-meta">
+
+                                    <span>
+                                        ◷
+                                        <b id="previewTime">
+                                            30
+                                        </b>
+                                        мин
+                                    </span>
+
+                                    <span>
+                                        <b id="previewServings">
+                                            2
+                                        </b>
+                                        порции
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </aside>
+
+                </div>
+
+            </section>
+
+
+            <section class="form-section">
+
+                <div class="form-section-heading">
+
+                    <div class="form-section-number">
+                        02
+                    </div>
+
+                    <div>
+                        <span>
+                            Состав
+                        </span>
+
+                        <h3>
+                            Ингредиенты
+                        </h3>
+                    </div>
+
+                </div>
+
+
+                <p class="form-section-description">
+                    Добавь продукты и их количество.
+                    RecipePro автоматически рассчитает КБЖУ.
+                </p>
+
+
+                <div
+                    class="ingredients-builder"
+                    id="ingredientsBuilder"
+                ></div>
+
+
+                <button
+                    class="builder-add-button"
+                    id="addIngredientBtn"
+                    type="button"
+                >
+                    <span>+</span>
+                    Добавить ингредиент
+                </button>
+
+            </section>
+
+
+            <section class="form-section">
+
+                <div class="form-section-heading">
+
+                    <div class="form-section-number">
+                        03
+                    </div>
+
+                    <div>
+                        <span>
+                            Процесс
+                        </span>
+
+                        <h3>
+                            Как приготовить
+                        </h3>
+                    </div>
+
+                </div>
+
+
+                <p class="form-section-description">
+                    Распиши приготовление простыми
+                    последовательными шагами.
+                </p>
+
+
+                <div
+                    class="steps-builder"
+                    id="stepsBuilder"
+                ></div>
+
+
+                <button
+                    class="builder-add-button"
+                    id="addStepBtn"
+                    type="button"
+                >
+                    <span>+</span>
+                    Добавить шаг
+                </button>
+
+            </section>
+
+
+            <section class="form-section nutrition-section">
+
+                <div class="form-section-heading">
+
+                    <div class="form-section-number">
+                        04
+                    </div>
+
+                    <div>
+                        <span>
+                            RecipePro nutrition
+                        </span>
+
+                        <h3>
+                            Питательная ценность
+                        </h3>
+                    </div>
+
+                </div>
+
+
+                <p class="form-section-description">
+                    Расчёт выполняется автоматически
+                    на одну порцию.
+                </p>
+
+
+                <div
+                    class="nutrition-preview"
+                    id="nutritionPreview"
+                >
+
+                    <div class="nutrition-grid">
+
+                        <div class="nutrition-preview-main">
+
+                            <strong id="previewCalories">
+                                0
+                            </strong>
+
+                            <span>
+                                ккал
+                            </span>
+
+                        </div>
+
+
+                        <div class="nutrition-preview-item">
+
+                            <strong id="previewProtein">
+                                0
+                            </strong>
+
+                            <span>
+                                белки
+                            </span>
+
+                        </div>
+
+
+                        <div class="nutrition-preview-item">
+
+                            <strong id="previewFat">
+                                0
+                            </strong>
+
+                            <span>
+                                жиры
+                            </span>
+
+                        </div>
+
+
+                        <div class="nutrition-preview-item">
+
+                            <strong id="previewCarbs">
+                                0
+                            </strong>
+
+                            <span>
+                                углеводы
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <div class="form-actions">
+
+                <button
+                    class="secondary-button"
+                    id="cancelRecipeBtn"
+                    type="button"
+                >
+                    Отмена
+                </button>
+
+                <button
+                    class="primary-button large"
+                    type="submit"
+                >
+                    Сохранить рецепт
+                    <span>→</span>
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script src="js/products.js"></script>
+<script src="js/recipes.js"></script>
+<script src="js/app.js"></script>
+
+</body>
+</html>
