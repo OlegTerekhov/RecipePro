@@ -4842,3 +4842,105 @@ p {
         width: 100%;
     }
 }
+
+
+/* =========================================================
+   ADAPTATION GOALS
+========================================================= */
+
+.adaptation-goals {
+  margin-top: 22px;
+}
+
+.adaptation-goals-list {
+  display: grid;
+  gap: 10px;
+}
+
+.adaptation-goal {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 15px;
+  border: 1px solid var(--line-soft);
+  border-radius: 16px;
+  background: var(--surface-soft);
+}
+
+.adaptation-goal-icon {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.adaptation-goal.is-success .adaptation-goal-icon {
+  background: var(--green-100);
+  color: var(--green-800);
+}
+
+.adaptation-goal.is-failed .adaptation-goal-icon {
+  background: #f4e8df;
+  color: #8a5139;
+}
+
+.adaptation-goal-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.adaptation-goal-content strong {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.adaptation-goal-content span {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.adaptation-goal-value {
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.adaptation-goal-value small {
+  color: var(--text-light);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.adaptation-goal-value strong {
+  color: var(--green-900);
+  font-family: var(--serif);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.adaptation-goal.is-failed .adaptation-goal-value strong {
+  color: #8a5139;
+}
+
+@media (max-width: 500px) {
+  .adaptation-goal {
+    grid-template-columns: 30px minmax(0, 1fr);
+  }
+
+  .adaptation-goal-value {
+    grid-column: 2;
+    text-align: left;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 7px;
+  }
+}
