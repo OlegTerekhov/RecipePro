@@ -36,6 +36,8 @@
         if (type === "stew" && protein) return "Тушёное блюдо с " + (window.products?.[protein]?.name || protein);
         if (type === "roast" && protein && carb) return (window.products?.[protein]?.name || protein) + " с " + (window.products?.[carb]?.name || carb) + " в духовке";
         if (type === "salad" && protein) return "Салат с " + (window.products?.[protein]?.name || protein);
+        if (type === "salad" && vegetable) return "Овощная закуска с " + (window.products?.[vegetable]?.name || vegetable);
+        if (type === "salad" && ids.length) return "Закуска из " + names.slice(0,2).join(" и ");
         if (type === "omelet") return "Омлет с " + (vegetable ? (window.products?.[vegetable]?.name || vegetable) : "добавками");
         if (type === "pasta" && protein) return "Паста с " + (window.products?.[protein]?.name || protein);
         if (type === "porridge") return "Каша с " + (names[1] || names[0]);
@@ -80,6 +82,7 @@
 
         const ingredients = selected.map(id => ({
             productId:id,
+            product:id,
             name:window.products?.[id]?.name || id,
             amount: roleAmount(classify(id)),
             unit:"г",
@@ -90,6 +93,7 @@
 
         const pantryIngredients = pantry(type, ids).map(item => ({
             productId:item.key,
+            product:item.key,
             name:item.key === "cookingOil" ? "Растительное масло" : item.key === "salt" ? "Соль" : item.key === "pepper" ? "Чёрный перец" : "Вода",
             amount:item.key === "cookingOil" ? 10 : item.key === "water" ? 250 : 2,
             unit:item.key === "water" ? "мл" : "г",
