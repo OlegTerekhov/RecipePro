@@ -115,9 +115,14 @@
         document.body.appendChild(overlay);
     }
 
-    function detectProducts(input) {
+    async function detectProducts(input) {
         const text=input.toLowerCase().replace(/ё/g,"е");
-        return PRODUCT_ORDER.filter(id => (ALIASES[id]||[id]).some(alias => text.includes(alias.replace(/ё/g,"е")))).slice(0,8);
+        const local=PRODUCT_ORDER.filter(id => (ALIASES[id]||[id]).some(alias => text.includes(alias.replace(/ё/g,"е"))));
+        if(window.recipeProProductResolver){
+            const resolved=await window.recipeProProductResolver.resolve(input);
+            return [...new Set([...local,...resolved])].slice(0,10);
+        }
+        return local.slice(0,8);
     }
 
     function parseRequest(input) {
@@ -135,6 +140,20 @@
             lessCalories:/менее\s+калори|низк\w*\s+калори/i.test(text),
             faster:/быстр\w*|за\s+полчаса|быстро\s+приготов/i.test(text)
         };
+    }
+
+    function getRole(id) {
+        const p=window.products?.[id];
+        if(PROTEINS.includes(id)||p?.role==="protein") return "protein";
+        if(CARBS.includes(id)||p?.role==="carb") return "carb";
+        if(VEGETABLES.includes(id)||p?.role==="vegetable") return "vegetable";
+        if(p?.role==="fruit") return "fruit";
+        if(FATS.includes(id)||p?.role==="fat") return "fat";
+        return "other";
+    }
+
+    function getProductName(id) {
+        return getProductName(id) || window.products?.[id]?.name || id;
     }
 
     function amountFor(id) {
@@ -158,16 +177,16 @@
 
     function buildRecipe(ids) {
         const has=id=>ids.includes(id);
-        const protein=ids.find(id=>PROTEINS.includes(id));
-        const carb=ids.find(id=>CARBS.includes(id));
-        const vegetables=ids.filter(id=>VEGETABLES.includes(id));
-        const extras=ids.filter(id=>!PROTEINS.includes(id)&&!CARBS.includes(id)&&!VEGETABLES.includes(id));
+        const protein=ids.find(id=>getRole(id)==="protein");
+        const carb=ids.find(id=>getRole(id)==="carb");
+        const vegetables=ids.filter(id=>getRole(id)==="vegetable");
+        const extras=ids.filter(id=>!["protein","carb","vegetable"].includes(getRole(id)));
         let title="Домашнее блюдо RecipePro",description="RecipePro AI собрал блюдо из продуктов, которые ты указал.",emoji="🍽️";
         let selected=[],steps=[],time=30;
 
         if(protein&&has("картофель")){
             selected=[protein,"картофель",...vegetables.filter(id=>["лук","морковь","чеснок"].includes(id)),...extras.filter(id=>FATS.includes(id))];
-            title=NAMES[protein]+" с картофелем";
+            title=getProductName(protein)+" с картофелем";
             description="Сытное горячее блюдо с акцентом на белок и запечённый гарнир.";
             emoji="🍗";
             time=30;
@@ -178,7 +197,7 @@
             ];
         } else if(protein&&carb){
             selected=[protein,carb,...vegetables,...extras.filter(id=>FATS.includes(id))].slice(0,7);
-            title=NAMES[protein]+" с "+NAMES[carb];
+            title=getProductName(protein)+" с "+getProductName(carb);
             description="Сбалансированное горячее блюдо из белковой основы, гарнира и указанных овощей.";
             emoji="🍲";
             time=30;
@@ -197,7 +216,7 @@
             steps=["Залей овсянку молоком или водой.","Готовь до мягкости 5–7 минут.","Добавь банан перед подачей."];
         } else {
             selected=[...ids].slice(0,7);
-            title=selected.slice(0,3).map(id=>NAMES[id]).join(" · ")||title;
+            title=selected.slice(0,3).map(id=>getProductName(id)).join(" · ")||title;
             description="Простое блюдо RecipePro из твоих продуктов без лишних покупок.";
             emoji=protein?"🍲":"🥗";
             time=30;
@@ -218,7 +237,7 @@
         const item=recipe.ingredients.find(x=>x.product===id);
         if(!item)return;
         const next=Math.max(20,Math.round(amount/10)*10);
-        if(next!==item.amount){item.amount=next;changes.push(NAMES[id]+": "+item.amount+" г");}
+        if(next!==item.amount){item.amount=next;changes.push(getProductName(id)+": "+item.amount+" г");}
     }
 
     function adaptRecipe(recipe,constraints){
@@ -226,9 +245,9 @@
         const changes=[],warnings=[];
         r.servings=constraints.targetServings||r.servings||2;
 
-        const main=r.ingredients.find(item=>PROTEINS.includes(item.product));
-        const carb=r.ingredients.find(item=>CARBS.includes(item.product));
-        const optionalFats=r.ingredients.filter(item=>FATS.includes(item.product)&&!PROTEINS.includes(item.product));
+        const main=r.ingredients.find(item=>getRole(item.product)==="protein");
+        const carb=r.ingredients.find(item=>getRole(item.product)==="carb");
+        const optionalFats=r.ingredients.filter(item=>getRole(item.product)==="fat"&&getRole(item.product)!=="protein");
 
         if(constraints.highProtein||constraints.minProtein){
             if(main){
@@ -339,7 +358,7 @@ ${warnings}
 <strong class="ai-generator-label">Ингредиенты</strong><div class="ai-generator-ingredients">${ingredientHtml}</div>
 <strong class="ai-generator-label" style="margin-top:18px">Как приготовить</strong><ol class="ai-generator-steps">${stepHtml}</ol>
 ${changes}
-<div class="ai-generator-note">Распознано: ${detected.map(id=>esc(NAMES[id]||id)).join(", ")}. Все указанные продукты сохранены в составе; КБЖУ рассчитано по базе RecipePro и является ориентировочной оценкой.</div>
+<div class="ai-generator-note">Распознано: ${detected.map(id=>esc(getProductName(id)||id)).join(", ")}. Все указанные продукты сохранены в составе; КБЖУ рассчитано по базе RecipePro и является ориентировочной оценкой.</div>
 <div class="ai-generator-save-row"><button class="primary-button large" id="aiGeneratorSave" type="button">Сохранить в мои рецепты →</button></div>
 </div>`;
     }
@@ -365,10 +384,18 @@ ${changes}
         }catch(error){console.error("RecipePro AI save error:",error);alert("Не удалось сохранить рецепт. Попробуй ещё раз.");}
     }
 
-    function generate(){
+    async function generate(){
         const input=$("#aiGeneratorInput").value.trim(),result=$("#aiGeneratorResult");
-        const detected=detectProducts(input);
-        if(!detected.length){result.innerHTML='<div class="ai-generator-result"><strong>Не нашёл продукты</strong><p style="margin-top:7px">Напиши, например: «у меня курица и картошка, хочу белковое до 600 ккал».</p></div>';return;}
+        if(!input){
+            result.innerHTML='<div class="ai-generator-result"><strong>Опиши продукты</strong><p style="margin-top:7px">Напиши, что есть дома и, если хочешь, добавь ограничения по калориям, белку, времени или порциям.</p></div>';
+            return;
+        }
+        result.innerHTML='<div class="ai-generator-result"><strong>RecipePro ищет продукты…</strong><p style="margin-top:7px">Проверяю локальную базу и открытую базу продуктов.</p></div>';
+        const detected=await detectProducts(input);
+        if(!detected.length){
+            result.innerHTML='<div class="ai-generator-result"><strong>Не удалось распознать продукты</strong><p style="margin-top:7px">Попробуй написать названия продуктов через запятую. Если продукта нет в локальной базе, RecipePro попробует найти его во внешней базе.</p></div>';
+            return;
+        }
         const constraints=parseRequest(input);
         const recipe=adaptRecipe(buildRecipe(detected),constraints);
         renderResult(recipe,detected,constraints);
