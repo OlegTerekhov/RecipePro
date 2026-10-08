@@ -81,25 +81,26 @@
     function chooseType(ids, intent = {}) {
         const ranked = TYPE_RULES.map(rule => {
             let score = rule.score(ids);
+
             if (intent.type && rule.id === intent.type) score += 100;
-            if (intent.faster && rule.baseTime <= 20) score += 15;
+
+            if (intent.faster && rule.baseTime <= 20) score += 25;
+            if (intent.maxTime && rule.baseTime <= intent.maxTime) score += 30;
+            if (intent.maxTime && rule.baseTime > intent.maxTime) score -= Math.min(24, (rule.baseTime - intent.maxTime) * 0.8);
+
+            if (intent.highProtein || intent.minProtein) {
+                if (["omelet","bowl","stew"].includes(rule.id)) score += 8;
+            }
+
+            if (intent.lessCalories || intent.maxCalories) {
+                if (["salad","bowl","omelet"].includes(rule.id)) score += 7;
+                if (rule.id === "roast") score -= 3;
+            }
+
             return { rule, score };
         }).sort((a,b) => b.score - a.score);
+
         return ranked[0]?.score > 0 ? ranked[0].rule : TYPE_RULES[1];
-    }
-
-    function name(id) {
-        return window.products?.[id]?.name || id;
-    }
-
-    function amount(id) {
-        const p = window.products?.[id];
-        if (p?.pieceWeight && ["яйца","банан","яблоко","апельсин"].includes(id)) return { amount:p.pieceWeight, unit:"г" };
-        if (["масло","сливочное-масло"].includes(id)) return { amount:10, unit:"г" };
-        if (role(id) === "vegetable") return { amount:80, unit:"г" };
-        if (role(id) === "carb") return { amount:70, unit:"г" };
-        if (["творог","йогурт","сметана","молоко","сыр","моцарелла"].includes(id)) return { amount:120, unit:"г" };
-        return { amount:180, unit:"г" };
     }
 
     function build(ids, intent = {}) {
@@ -117,9 +118,13 @@
         else if (type.id === "omelet") selected = ["яйца", ...vegetables, ...unique.filter(id => ["творог","сыр"].includes(id)), ...fats];
         else if (type.id === "salad") selected = [...vegetables, protein, ...fats];
         else if (type.id === "stew") selected = [protein, ...vegetables, carb, ...fats];
+        else if (type.id === "roast") selected = [protein, carb, ...vegetables, ...fats];
         else selected = [protein, carb, ...vegetables, ...fats];
 
-        selected = selected.filter(Boolean).filter((id,i,arr) => arr.indexOf(id) === i).filter(id => unique.includes(id));
+        selected = selected
+            .filter(Boolean)
+            .filter((id,i,arr) => arr.indexOf(id) === i)
+            .filter(id => unique.includes(id));
 
         if (!selected.length) selected = unique.slice(0, 7);
 
@@ -143,20 +148,37 @@
             bowl: ["Приготовь белковую основу и гарнир.","Нарежь свежие овощи.","Собери всё в одной миске."]
         };
 
-        return {
+        let time = type.baseTime;
+        if (intent.faster) time = Math.min(time, 20);
+        if (intent.maxTime) time = Math.min(time, intent.maxTime);
+
+        const recipe = {
             engineVersion: ENGINE_VERSION,
             type: type.id,
             title: titleMap[type.id] || "Блюдо RecipePro",
             emoji: type.emoji,
-            description: "Recipe Engine выбрал тип блюда по сочетанию продуктов и собрал основу рецепта.",
-            time: type.baseTime,
+            description: "Recipe Engine выбрал тип блюда по продуктам и пожеланиям пользователя.",
+            time: Math.max(5, time),
             servings: 1,
             ingredients: selected.map(id => ({ product:id, ...amount(id), required:true })),
             steps: stepsByType[type.id] || ["Подготовь продукты.","Приготовь до готовности.","Подавай сразу."],
-            aiChanges: ["Recipe Engine определил тип блюда: " + type.title],
+            aiChanges: ["Recipe Engine выбрал формат: " + type.title],
             aiWarnings: []
         };
-    }
 
+        if (intent.maxTime && type.baseTime > intent.maxTime) {
+            recipe.aiWarnings.push("Оценочное время исходного формата выше заданного лимита, поэтому RecipePro выбрал максимально быстрый вариант.");
+        }
+
+        if ((intent.highProtein || intent.minProtein) && !protein) {
+            recipe.aiWarnings.push("В запросе нужна высокая доля белка, но среди указанных продуктов не найден явный белковый продукт.");
+        }
+
+        if (intent.maxCalories) {
+            recipe.aiWarnings.push("Лимит калорий будет дополнительно проверен Nutrition Engine после расчёта порции.");
+        }
+
+        return recipe;
+    }
     window.recipeProRecipeEngine = { version: ENGINE_VERSION, build, chooseType, role };
 })();
