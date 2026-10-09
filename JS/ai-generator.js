@@ -322,12 +322,10 @@
         }
 
         if(constraints.faster){
-            r.time=Math.max(10,Math.round(r.time*.7));
-            changes.push("выбран более быстрый способ приготовления");
+            warnings.push("Запрос на более быстрое приготовление учтён, но время не уменьшено автоматически: RecipePro не должен обещать ускорение без подтверждённого изменения способа приготовления.");
         }
         if(constraints.maxTime&&r.time>constraints.maxTime){
-            r.time=constraints.maxTime;
-            changes.push("время адаптировано под заданный лимит");
+            warnings.push("Оценочное время рецепта — "+r.time+" мин, это больше заданного лимита "+constraints.maxTime+" мин. Лимит времени не выполнен; время не было искусственно уменьшено.");
         }
 
         if(constraints.minCalories&&r.nutrition.calories<constraints.minCalories){
@@ -340,6 +338,9 @@
 
         if(constraints.minProtein&&r.nutrition.protein<constraints.minProtein){
             warnings.push("Цель по белку не достигнута: "+r.nutrition.protein+" г при цели "+constraints.minProtein+" г на порцию.");
+        }
+        if(constraints.minCalories&&r.nutrition.calories<constraints.minCalories){
+            warnings.push("Минимальная калорийность не достигнута: "+r.nutrition.calories+" ккал при цели не менее "+constraints.minCalories+" ккал на порцию.");
         }
         if(constraints.maxProtein&&r.nutrition.protein>constraints.maxProtein){
             warnings.push("Белка получилось больше максимума: "+r.nutrition.protein+" г при лимите "+constraints.maxProtein+" г.");
