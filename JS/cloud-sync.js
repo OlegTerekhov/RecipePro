@@ -323,6 +323,9 @@
         if (this === window.localStorage && (key === STORAGE_KEYS.recipes || key === STORAGE_KEYS.favorites)) scheduleSave();
     };
 
+    // Explicit save notification is a fallback for browser Storage differences.
+    window.addEventListener("recipepro:data-changed", scheduleSave);
+
     function init() {
         createDialog();
         if (client) {
