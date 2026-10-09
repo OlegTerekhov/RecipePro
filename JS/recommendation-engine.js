@@ -38,8 +38,10 @@
                 calories: Math.round(total.calories / servings),
                 protein: Math.round(total.protein / servings * 10) / 10,
                 fat: Math.round(total.fat / servings * 10) / 10,
-                carbs: Math.round(total.carbs / servings * 10) / 10
-            }
+                carbs: Math.round(total.carbs / servings * 10) / 10,
+                unknownCount: Number(total.unknownCount || 0)
+            },
+            nutritionUnknownCount: Number(total.unknownCount || 0)
         };
     }
 
@@ -200,6 +202,13 @@
         function satisfiesHardConstraints(candidate) {
             const recipe = candidate.recipe;
             const n = recipe.nutrition || {};
+            const hasNutritionConstraints = Boolean(
+                intent.maxCalories || intent.minCalories ||
+                intent.minProtein || intent.maxProtein
+            );
+
+            // Incomplete nutrition data cannot prove that a recipe meets a nutrition limit.
+            if (hasNutritionConstraints && Number(recipe.nutritionUnknownCount || 0) > 0) return false;
 
             if (intent.maxTime && Number(recipe.time) > intent.maxTime) return false;
             if (intent.minTime && Number(recipe.time) < intent.minTime) return false;
@@ -219,8 +228,13 @@
         );
         const hasFullMatch = !hasHardConstraints || matchingCandidates.length > 0;
         const finalCandidates = hasFullMatch ? matchingCandidates : uniqueCandidates;
+        const hasUnknownNutrition = uniqueCandidates.some(
+            candidate => Number(candidate.recipe.nutritionUnknownCount || 0) > 0
+        );
         const warnings = hasFullMatch ? [] : [
-            "Не удалось найти рецепт, который одновременно выполняет все числовые ограничения. Показаны лучшие доступные варианты; проверь их фактические параметры."
+            hasUnknownNutrition
+                ? "Не удалось подтвердить, что рецепт выполняет все ограничения: у части вариантов не хватает данных о пищевой ценности. Проверь ингредиенты и КБЖУ."
+                : "Не удалось найти рецепт, который одновременно выполняет все числовые ограничения. Показаны лучшие доступные варианты; проверь их фактические параметры."
         ];
 
         return {
