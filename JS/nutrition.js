@@ -122,8 +122,18 @@ document.addEventListener("DOMContentLoaded", () => {
         return rounded.toFixed(1).replace(".", ",");
     }
 
+    function hasExplicitCookingFat() {
+        return rows.some(row =>
+            row.product?.category === "oil" ||
+            ["масло", "сливочное-масло"].includes(String(row.productId || "").toLowerCase())
+        );
+    }
+
     function getNutrition(row) {
         const engine = window.recipeProNutritionEngine;
+        const explicitCookingFat = hasExplicitCookingFat();
+        const configuredOilPer100 = Math.max(0, Number(oilInput ? oilInput.value : 0));
+        const oilPer100 = explicitCookingFat ? 0 : configuredOilPer100;
 
         if (engine?.calculateIngredient) {
             return engine.calculateIngredient({
@@ -131,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 productId: row.productId,
                 amount: row.amount,
                 state: row.state,
-                oilPer100: Math.max(0, Number(oilInput ? oilInput.value : 0))
+                oilPer100
             });
         }
 
@@ -150,11 +160,12 @@ document.addEventListener("DOMContentLoaded", () => {
             carbs: Number(product.raw.carbs || 0) * multiplier
         };
 
-        if (row.state === "fried") {
-            const oilAmount = amount * Math.max(0, Number(oilInput ? oilInput.value : 0)) / 100;
+        if (row.state === "fried" && product.category !== "oil" && !explicitCookingFat) {
+            const oilAmount = amount * configuredOilPer100 / 100;
             result.calories += oilAmount * 8.99;
             result.fat += oilAmount * 0.999;
         }
+
         return result;
     }
 
