@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    const VERSION = "2.0.0";
+    const VERSION = "2.1.0";
     const DEFAULTS = {
         cookedWeightRatio: 1,
         friedOilPer100g: 0
@@ -21,12 +21,35 @@
         return "raw";
     }
 
+    const NON_NUTRITIONAL_PANTRY = new Set([
+        "salt", "соль", "pepper", "чёрный перец", "черный перец",
+        "water", "вода"
+    ]);
+
+    function normalizeProductId(value) {
+        return String(value || "")
+            .toLowerCase()
+            .replace(/ё/g, "е")
+            .trim();
+    }
+
     function getProduct(productOrId) {
         if (typeof productOrId === "object" && productOrId) {
             return productOrId;
         }
 
-        return window.products?.[productOrId] || null;
+        const id = normalizeProductId(productOrId);
+        if (id === "cookingoil" || id === "растительное масло" || id === "раст масла") {
+            return window.products?.["масло"] || null;
+        }
+
+        return window.products?.[id] || null;
+    }
+
+    function isNegligiblePantry(row) {
+        if (row?.pantry !== true && row?.required !== false) return false;
+        const id = normalizeProductId(row?.product || row?.productId || row?.key);
+        return NON_NUTRITIONAL_PANTRY.has(id);
     }
 
     function getRawEquivalent(amount, product, state) {
@@ -56,6 +79,22 @@
     }
 
     function calculateIngredient(row) {
+        const state = normalizeState(row?.state);
+
+        if (isNegligiblePantry(row)) {
+            return {
+                calories: 0,
+                protein: 0,
+                fat: 0,
+                carbs: 0,
+                rawEquivalent: 0,
+                oilAmount: 0,
+                state,
+                known: true,
+                excluded: true
+            };
+        }
+
         const product = getProduct(row?.product || row?.productId);
 
         if (!product?.raw) {
@@ -66,12 +105,11 @@
                 carbs: 0,
                 rawEquivalent: 0,
                 oilAmount: 0,
-                state: normalizeState(row?.state),
+                state,
                 known: false
             };
         }
 
-        const state = normalizeState(row?.state);
         const amount = Math.max(0, number(row?.amount));
         const rawEquivalent = getRawEquivalent(amount, product, state);
         const multiplier = rawEquivalent / 100;
@@ -132,7 +170,7 @@
             total.fat += result.fat;
             total.carbs += result.carbs;
 
-            if (!result.known) unknownCount += 1;
+            if (!result.known && !row?.pantry) unknownCount += 1;
 
             details.push({
                 product: row.product || row.productId,
@@ -144,7 +182,8 @@
                 protein: result.protein,
                 fat: result.fat,
                 carbs: result.carbs,
-                known: result.known
+                known: result.known,
+                excluded: Boolean(result.excluded)
             });
         });
 
