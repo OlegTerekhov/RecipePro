@@ -447,6 +447,12 @@ ${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-gen
             return;
         }
         const recipe=adaptRecipe(primary,constraints);
+        const inheritedWarnings = [
+            ...(Array.isArray(built?.warnings) ? built.warnings : []),
+            ...(Array.isArray(recommendation?.warnings) ? recommendation.warnings : [])
+        ];
+        recipe.aiWarnings = [...new Set([...(recipe.aiWarnings || []), ...inheritedWarnings])];
+
         const generatedCandidates=ranked.length ? ranked : (built ? [{recipe:built,score:0,reasons:["собрано из ваших продуктов"]}] : []);
         const alternatives=generatedCandidates.slice(1,4).map(item=>({ ...item, recipe:adaptRecipe(item.recipe,constraints) }));
         renderResult(recipe,detected,constraints,alternatives);
