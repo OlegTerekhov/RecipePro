@@ -8,6 +8,11 @@
     >
 
     <title>RecipePro — умный помощник по готовке</title>
+    <meta name="theme-color" content="#20372f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="./icon.svg">
 
     <meta
         name="description"
@@ -1780,6 +1785,17 @@
 <script src="JS/nutrition.js?v=20261009-r2"></script>
 <script src="JS/app.js?v=20261008-r3"></script>
 <script src="JS/ai-generator.js?v=20261009-r6"></script>
+
+
+<script>
+if ("serviceWorker" in navigator && location.protocol !== "file:") {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js").catch(error => {
+            console.warn("RecipePro offline mode:", error);
+        });
+    });
+}
+</script>
 
 </body>
 </html>
