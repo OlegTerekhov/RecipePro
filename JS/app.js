@@ -109,6 +109,10 @@ document.addEventListener("DOMContentLoaded", () => {
         "recipepro_favorites",
         JSON.stringify(state.favorites)
       );
+
+      window.dispatchEvent(
+        new CustomEvent("recipepro:data-changed")
+      );
     } catch (error) {
       console.error(
         "Ошибка сохранения данных:",
