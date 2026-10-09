@@ -55,13 +55,15 @@ test("frying oil is included when an ingredient is marked as raw-weight based", 
 });
 
 test("explicit oil is counted once and not added again as frying oil", () => {
-  const result = engine.calculateRecipe({
+  const recipe = {
     servings: 2,
     ingredients: [
       { product: "курица", amount: 100, state: "raw", amountBasis: "raw" },
       { product: "масло", amount: 10, state: "raw", pantry: true, required: false }
     ]
-  });
+  };
+  const friedRecipe = engine.setCookingState(recipe, "fried");
+  const result = engine.calculateRecipe(friedRecipe);
 
   assert.ok(Math.abs(result.calories - 209.9) < 0.01);
   assert.equal(result.unknownCount, 0);
