@@ -241,22 +241,44 @@
 
     function setCookingState(recipe, state, options = {}) {
         const normalizedState = normalizeState(state);
+        const ingredients = Array.isArray(recipe?.ingredients) ? recipe.ingredients : [];
+        const hasExplicitOil = ingredients.some(row => {
+            const id = normalizeProductId(row?.product || row?.productId || row?.key);
+            return id === "масло" || id === "cookingoil" || id === "растительное масло";
+        });
+
+        const eligible = ingredients.filter(row => {
+            const id = normalizeProductId(row?.product || row?.productId || row?.key);
+            const isPantry = row?.pantry === true;
+            const isOil = id === "масло" || id === "cookingoil" || id === "растительное масло";
+            return !isPantry && !isOil && number(row?.amount) > 0;
+        });
+
+        const totalFoodWeight = eligible.reduce((sum, row) => sum + Math.max(0, number(row?.amount)), 0);
+        const oilPer100 = hasExplicitOil
+            ? 0
+            : Math.max(0, number(options.oilPer100, 5));
+        const totalOilAmount = normalizedState === "fried"
+            ? totalFoodWeight * oilPer100 / 100
+            : 0;
+        const oilAnchor = eligible[0];
 
         return {
             ...recipe,
-            ingredients: (recipe.ingredients || []).map(row => {
-                const id = normalizeProductId(row?.product || row?.productId);
+            ingredients: ingredients.map(row => {
+                const id = normalizeProductId(row?.product || row?.productId || row?.key);
                 const isPantry = row?.pantry === true;
                 const isOil = id === "масло" || id === "cookingoil" || id === "растительное масло";
 
                 if (isPantry || isOil) return { ...row };
 
+                const shouldAddOil = row === oilAnchor && !hasExplicitOil && normalizedState === "fried";
+
                 return {
                     ...row,
                     state: normalizedState,
-                    oilPer100: normalizedState === "fried"
-                        ? Math.max(0, number(options.oilPer100, 5))
-                        : 0
+                    oilAmount: shouldAddOil ? totalOilAmount : 0,
+                    oilPer100: 0
                 };
             })
         };
