@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    const VERSION = "2.1.0";
+    const VERSION = "2.2.0";
     const TYPES = ["bowl","stew","salad","omelet","pasta","roast","porridge"];
 
     function role(id) {
@@ -197,10 +197,37 @@
             uniqueCandidates.push(candidate);
         }
 
+        function satisfiesHardConstraints(candidate) {
+            const recipe = candidate.recipe;
+            const n = recipe.nutrition || {};
+
+            if (intent.maxTime && Number(recipe.time) > intent.maxTime) return false;
+            if (intent.minTime && Number(recipe.time) < intent.minTime) return false;
+            if (intent.maxCalories && Number(n.calories) > intent.maxCalories) return false;
+            if (intent.minCalories && Number(n.calories) < intent.minCalories) return false;
+            if (intent.minProtein && Number(n.protein) < intent.minProtein) return false;
+            if (intent.maxProtein && Number(n.protein) > intent.maxProtein) return false;
+
+            return true;
+        }
+
+        const matchingCandidates = uniqueCandidates.filter(satisfiesHardConstraints);
+        const hasHardConstraints = Boolean(
+            intent.maxTime || intent.minTime ||
+            intent.maxCalories || intent.minCalories ||
+            intent.minProtein || intent.maxProtein
+        );
+        const hasFullMatch = !hasHardConstraints || matchingCandidates.length > 0;
+        const finalCandidates = hasFullMatch ? matchingCandidates : uniqueCandidates;
+        const warnings = hasFullMatch ? [] : [
+            "Не удалось найти рецепт, который одновременно выполняет все числовые ограничения. Показаны лучшие доступные варианты; проверь их фактические параметры."
+        ];
+
         return {
             version: VERSION,
-            candidates: uniqueCandidates.slice(0, 5),
-            best: uniqueCandidates[0] || null
+            candidates: finalCandidates.slice(0, 5),
+            best: finalCandidates[0] || null,
+            warnings
         };
     }
 
