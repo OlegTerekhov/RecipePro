@@ -129,7 +129,10 @@
         const type = chooseSafeFallbackType(ids, intent, compatibleDish);
         if (!type) return null;
 
-        const template=TYPES[type] || TYPES.bowl;
+        const template = TYPES[type] || TYPES.bowl;
+        const targetServings = Math.max(1, Number(intent.targetServings) || 2);
+        const servingMultiplier = targetServings / 2;
+        const scaledAmount = amount => Math.max(1, Math.round(amount * servingMultiplier / 5) * 5);
         const selected=ids.filter(id=>{
             const r=classify(id);
             return ["protein","carb","vegetable","fruit","dairy","fat","aromatic","eggs"].includes(r);
@@ -139,7 +142,7 @@
             productId:id,
             product:id,
             name:window.products?.[id]?.name||id,
-            amount:roleAmount(classify(id)),
+            amount:scaledAmount(roleAmount(id, classify(id))),
             unit:"г",
             state:"raw",
             required:true,
@@ -150,7 +153,7 @@
             productId:item.key,
             product:item.key==="cookingOil"?"масло":item.key,
             name:item.key==="cookingOil"?"Растительное масло":item.key==="salt"?"Соль":item.key==="pepper"?"Чёрный перец":"Вода",
-            amount:item.key==="cookingOil"?10:item.key==="water"?250:2,
+            amount:scaledAmount(item.key==="cookingOil"?10:item.key==="water"?250:item.key==="salt"?2:1),
             unit:item.key==="water"?"мл":"г",
             state:"raw",
             required:false,
@@ -177,7 +180,7 @@
             emoji:compatibleDish?.dish?.emoji||template.emoji,
             description:"Рецепт собран RecipePro из продуктов, которые указал пользователь.",
             time:compatibleDish?.dish?.time||template.time,
-            servings:intent.targetServings||2,
+            servings:targetServings,
             tags:["AI Recipe","Из ваших продуктов"],
             filters:["protein"],
             type,
@@ -200,9 +203,30 @@
         };
     }
 
-    function roleAmount(role) {
-        const amounts = { protein:250, carb:300, vegetable:150, fruit:120, dairy:150, fat:10, aromatic:60, eggs:180, other:100 };
-        return amounts[role] || 100;
+    function roleAmount(id, role) {
+        const productId = String(id || "").toLowerCase();
+
+        if (role === "protein") return 250;
+        if (role === "eggs") return 150;
+        if (role === "fruit") return 120;
+        if (role === "fat") return 10;
+        if (role === "aromatic") {
+            if (productId === "чеснок") return 10;
+            if (productId === "лук") return 60;
+            return 10;
+        }
+        if (role === "carb") {
+            if (productId === "картофель") return 300;
+            if (productId === "хлеб") return 100;
+            if (["рис", "гречка", "овсянка", "паста", "чечевица", "фасоль"].includes(productId)) return 150;
+            return 150;
+        }
+        if (role === "vegetable") return 150;
+        if (role === "dairy") {
+            if (["молоко", "йогурт", "сметана"].includes(productId)) return 100;
+            return 100;
+        }
+        return 100;
     }
 
     function buildFromText(text, intent = {}) {
