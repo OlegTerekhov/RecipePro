@@ -169,8 +169,12 @@
         const candidates = [];
 
         TYPES.forEach(type => {
+            const builder = window.recipeProRecipeBuilder;
+            if (builder?.canBuildType && !builder.canBuildType(unique, type, intent)) return;
+
             const recipe = window.recipeProRecipeEngine?.build(unique, { ...intent, type });
             if (!recipe) return;
+
             const finalized = finalize(recipe);
             const scored = score(finalized, unique, intent);
             candidates.push({
