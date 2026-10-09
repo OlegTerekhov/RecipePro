@@ -251,7 +251,19 @@
     function adaptRecipe(recipe,constraints){
         const r=JSON.parse(JSON.stringify(recipe));
         const changes=[],warnings=[];
-        r.servings=constraints.targetServings||r.servings||2;
+        const sourceServings=Math.max(1,Number(r.servings)||1);
+        const targetServings=Math.max(1,Number(constraints.targetServings)||sourceServings);
+        const servingMultiplier=targetServings/sourceServings;
+
+        if(servingMultiplier!==1){
+            r.ingredients=(r.ingredients||[]).map(item=>({
+                ...item,
+                amount:Math.round((Math.max(0,Number(item.amount)||0)*servingMultiplier)*10)/10,
+                ...(item.oilAmount!==undefined?{oilAmount:Math.round((Math.max(0,Number(item.oilAmount)||0)*servingMultiplier)*10)/10}:{})
+            }));
+            changes.push("количество ингредиентов пересчитано на "+targetServings+" порц.");
+        }
+        r.servings=targetServings;
 
         const getItemId=item=>item.product||item.productId;
         const main=r.ingredients.find(item=>getRole(getItemId(item))==="protein");
