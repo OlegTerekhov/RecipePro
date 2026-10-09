@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    const VERSION = "2.2.0";
+    const VERSION = "2.3.0";
     const DEFAULTS = {
         cookedWeightRatio: 1,
         friedOilPer100g: 0
@@ -234,7 +234,10 @@
             servings: target,
             ingredients: (recipe.ingredients || []).map(row => ({
                 ...row,
-                amount: Math.round(number(row.amount) * multiplier * 10) / 10
+                amount: Math.round(number(row.amount) * multiplier * 10) / 10,
+                ...(row.oilAmount !== undefined
+                    ? { oilAmount: Math.round(number(row.oilAmount) * multiplier * 10) / 10 }
+                    : {})
             }))
         };
     }
