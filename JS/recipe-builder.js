@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    const VERSION = "1.0.0";
+    const VERSION = "1.0.1";
 
     const TYPES = {
         bowl: { label:"Боул", emoji:"🥗", time:20, steps:["Подготовьте основные ингредиенты.","Приготовьте основу до готовности.","Соедините ингредиенты в одной миске и подавайте."] },
@@ -295,12 +295,17 @@
         }
         if (!selected.length) warnings.push("RecipePro не нашёл продуктов с известной пищевой ролью. Рецепт собран как базовая закуска.");
 
+        const hasSubstitutions = Boolean(compatibleDish?.replacements?.length);
+        const useCanonicalDish = Boolean(compatibleDish && !hasSubstitutions);
+
         return {
             id:"generated-"+Date.now(),
-            title:compatibleDish?.dish?.title || titleFor(type,selected),
+            title:useCanonicalDish ? compatibleDish.dish.title : titleFor(type,selected),
             emoji:compatibleDish?.dish?.emoji||template.emoji,
-            description:"Рецепт собран RecipePro из продуктов, которые указал пользователь.",
-            time:compatibleDish?.dish?.time||template.time,
+            description:hasSubstitutions
+                ? "Адаптированный рецепт: название и шаги учитывают фактически выбранные продукты."
+                : "Рецепт собран RecipePro из продуктов, которые указал пользователь.",
+            time:useCanonicalDish ? compatibleDish.dish.time : template.time,
             servings:targetServings,
             tags:["AI Recipe","Из ваших продуктов"],
             filters:["protein"],
@@ -308,7 +313,7 @@
             ingredients:allIngredients,
             pantryIngredients,
             requiredProducts:ingredients.map(item=>item.productId),
-            steps:compatibleDish?.dish?.steps||buildSteps(type,selected,template),
+            steps:useCanonicalDish ? compatibleDish.dish.steps : buildSteps(type,selected,template),
             aiGenerated:true,
             generatedBy:"RecipePro Recipe Builder",
             intelligence:{
