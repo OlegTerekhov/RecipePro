@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    const VERSION = "2.3.0";
+    const VERSION = "2.4.0";
     const DEFAULTS = {
         cookedWeightRatio: 1,
         friedOilPer100g: 0
@@ -115,7 +115,9 @@
         }
 
         const amount = Math.max(0, number(row?.amount));
-        const rawEquivalent = getRawEquivalent(amount, product, state);
+        const rawEquivalent = row?.amountBasis === "raw"
+            ? amount
+            : getRawEquivalent(amount, product, state);
         const multiplier = rawEquivalent / 100;
 
         const result = {
@@ -280,6 +282,7 @@
                 return {
                     ...row,
                     state: normalizedState,
+                    amountBasis: "raw",
                     oilAmount: shouldAddOil ? totalOilAmount : 0,
                     oilPer100: 0
                 };
