@@ -273,10 +273,16 @@
 
     function compareStates(recipe) {
         const states = ["raw", "boiled", "fried"];
+        const ingredients = Array.isArray(recipe?.ingredients) ? recipe.ingredients : [];
+        const alreadyContainsOil = ingredients.some(row => {
+            const id = normalizeProductId(row?.product || row?.productId);
+            return id === "масло" || id === "cookingoil" || id === "растительное масло";
+        });
+        const defaultOilPer100 = alreadyContainsOil ? 0 : 5;
 
         return states.map(state => {
             const prepared = setCookingState(recipe, state, {
-                oilPer100: 5
+                oilPer100: defaultOilPer100
             });
 
             const result = calculateRecipe(prepared);
