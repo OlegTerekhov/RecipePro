@@ -116,13 +116,50 @@
     function buildSteps(type, ids, template) {
         const has = id => ids.includes(id);
         const name = id => window.products?.[id]?.name || id;
-        const foodNames = ids.map(name);
+        const objectForms = {
+            "курица":"куриную грудку",
+            "куриное-бедро":"куриное бедро",
+            "индейка":"индейку",
+            "говядина":"говядину",
+            "свинина":"свинину",
+            "лосось":"лосось",
+            "тунец":"тунца",
+            "креветки":"креветки",
+            "яйца":"яйца",
+            "картофель":"картофель",
+            "морковь":"морковь",
+            "помидоры":"помидоры",
+            "огурец":"огурец",
+            "перец":"болгарский перец",
+            "брокколи":"брокколи",
+            "капуста":"капусту",
+            "кабачок":"кабачок",
+            "лук":"лук",
+            "чеснок":"чеснок",
+            "сыр":"сыр",
+            "моцарелла":"моцареллу",
+            "рис":"рис",
+            "гречка":"гречку",
+            "паста":"пасту",
+            "овсянка":"овсянку",
+            "чечевица":"чечевицу",
+            "фасоль":"фасоль",
+            "банан":"банан",
+            "яблоко":"яблоко",
+            "апельсин":"апельсин"
+        };
+        const objectName = id => objectForms[id] || name(id).toLowerCase();
+        const joinNames = list => list.length < 2
+            ? (list[0] || "")
+            : list.length === 2
+                ? list[0] + " и " + list[1]
+                : list.slice(0, -1).join(", ") + " и " + list[list.length - 1];
         const proteinIds = ids.filter(id => ["protein", "eggs"].includes(classify(id)));
         const vegetableIds = ids.filter(id => ["vegetable", "aromatic"].includes(classify(id)));
         const grainIds = ids.filter(id => ["рис", "гречка", "паста", "овсянка", "чечевица", "фасоль"].includes(id));
-        const proteinName = proteinIds.length ? name(proteinIds[0]) : "";
-        const vegetableNames = vegetableIds.map(name);
-        const grainNames = grainIds.map(name);
+        const proteinName = proteinIds.length ? objectName(proteinIds[0]) : "";
+        const vegetableNames = vegetableIds.map(objectName);
+        const grainNames = grainIds.map(objectName);
         const hasChicken = has("курица") || has("куриное-бедро") || has("индейка");
         const hasOil = has("масло") || has("сливочное-масло");
         const hasDairy = ids.some(id => classify(id) === "dairy" || ["сыр", "моцарелла", "сливочное-масло"].includes(id));
@@ -130,7 +167,7 @@
 
         if (type === "omelet") {
             steps.push("Подготовьте ингредиенты: вымойте овощи, очистите их при необходимости и нарежьте небольшими кусочками.");
-            if (vegetableNames.length) steps.push("Обжарьте " + vegetableNames.join(", ").toLowerCase() + " на среднем огне " + (hasOil ? "с небольшим количеством масла " : "") + "3–5 минут, пока овощи не начнут размягчаться.");
+            if (vegetableNames.length) steps.push("Обжарьте " + joinNames(vegetableNames) + " на среднем огне " + (hasOil ? "с небольшим количеством масла " : "") + "3–5 минут, пока овощи не начнут размягчаться.");
             steps.push("Взбейте яйца вилкой до однородности. Если в составе есть сыр, натрите или нарежьте его и добавьте к яйцам либо оставьте для посыпки.");
             steps.push("Вылейте яйца на сковороду, убавьте огонь и готовьте под крышкой 5–8 минут, пока омлет полностью не схватится.");
             return steps;
@@ -150,22 +187,22 @@
             if (proteinName) {
                 steps.push("Пока варится паста, нарежьте " + proteinName.toLowerCase() + " небольшими кусочками и приготовьте на сковороде до полной готовности. Птицу доведите до 74 °C внутри.");
             }
-            if (vegetableNames.length) steps.push("Добавьте " + vegetableNames.join(", ").toLowerCase() + " к основной части блюда и готовьте до мягкости, не допуская подгорания.");
+            if (vegetableNames.length) steps.push("Добавьте " + joinNames(vegetableNames) + " к основной части блюда и готовьте до мягкости, не допуская подгорания.");
             steps.push("Соедините пасту с приготовленными ингредиентами. При необходимости добавьте 1–2 ложки воды от варки, чтобы объединить всё в соус.");
             return steps;
         }
 
         if (type === "bowl") {
-            if (grainNames.length) steps.push("Приготовьте " + grainNames.join(", ").toLowerCase() + " по инструкции на упаковке. Сухую крупу или пасту отмеряйте до варки.");
+            if (grainNames.length) steps.push("Приготовьте " + joinNames(grainNames) + " по инструкции на упаковке. Сухую крупу или пасту отмеряйте до варки.");
             else if (has("картофель")) steps.push("Нарежьте картофель равными кусочками и отварите или запеките до мягкости.");
             if (proteinName) steps.push("Приготовьте " + proteinName.toLowerCase() + " отдельно до полной готовности. Если это птица, температура внутри самого толстого куска должна достигнуть 74 °C.");
-            if (vegetableNames.length) steps.push("Подготовьте " + vegetableNames.join(", ").toLowerCase() + ": овощи можно оставить свежими, если они подходят для подачи сырыми, или быстро обжарить до мягкости.");
+            if (vegetableNames.length) steps.push("Подготовьте " + joinNames(vegetableNames) + ": овощи можно оставить свежими, если они подходят для подачи сырыми, или быстро обжарить до мягкости.");
             steps.push("Разложите готовые ингредиенты по мискам, добавьте приправы и заправку только из продуктов, указанных в рецепте.");
             return steps;
         }
 
         if (type === "roast") {
-            if (grainNames.length) steps.push("Приготовьте " + grainNames.join(", ").toLowerCase() + " отдельно по инструкции на упаковке: эти продукты не следует отправлять в духовку сухими без нужного количества жидкости.");
+            if (grainNames.length) steps.push("Приготовьте " + joinNames(grainNames) + " отдельно по инструкции на упаковке: эти продукты не следует отправлять в духовку сухими без нужного количества жидкости.");
             steps.push("Разогрейте духовку до 200 °C. Нарежьте ингредиенты для запекания кусочками примерно одинакового размера.");
             steps.push("Перемешайте подготовленные продукты с небольшим количеством масла, если оно есть в составе, и добавьте соль и перец по вкусу.");
             steps.push("Разложите продукты одним слоем в форме. Запекайте до мягкости овощей и полной готовности белковых продуктов; для курицы и индейки проверьте температуру внутри — не менее 74 °C.");
@@ -176,16 +213,16 @@
         if (type === "stew") {
             steps.push("Нарежьте ингредиенты небольшими кусочками. Овощи, которые готовятся дольше, нарежьте немного мельче.");
             if (proteinName) steps.push("В глубокой сковороде или кастрюле слегка обжарьте " + proteinName.toLowerCase() + (hasOil ? " на небольшом количестве масла" : "") + ", часто помешивая.");
-            if (vegetableNames.length) steps.push("Добавьте " + vegetableNames.join(", ").toLowerCase() + " и готовьте ещё 3–5 минут.");
+            if (vegetableNames.length) steps.push("Добавьте " + joinNames(vegetableNames) + " и готовьте ещё 3–5 минут.");
             steps.push("Влейте воду из списка ингредиентов или столько, чтобы продукты не пригорали. Накройте крышкой и тушите до мягкости и полной готовности; птицу доведите до 74 °C внутри.");
-            if (grainNames.length) steps.push("Приготовьте " + grainNames.join(", ").toLowerCase() + " отдельно по инструкции на упаковке и подавайте вместе с тушёной частью.");
+            if (grainNames.length) steps.push("Приготовьте " + joinNames(grainNames) + " отдельно по инструкции на упаковке и подавайте вместе с тушёной частью.");
             return steps;
         }
 
         if (type === "salad") {
             steps.push("Тщательно вымойте овощи и зелень, если она есть в составе, затем обсушите продукты.");
             if (proteinName) steps.push("Если в салате есть " + proteinName.toLowerCase() + ", приготовьте его отдельно до полной готовности и дайте немного остыть. Для птицы температура внутри должна достигнуть 74 °C.");
-            if (vegetableNames.length) steps.push("Натрите или нарежьте " + vegetableNames.join(", ").toLowerCase() + " небольшими кусочками. Твёрдые овощи и сыр удобнее натереть.");
+            if (vegetableNames.length) steps.push("Натрите или нарежьте " + joinNames(vegetableNames) + " небольшими кусочками. Твёрдые овощи и сыр удобнее натереть.");
             steps.push("Соедините ингредиенты, добавьте только предусмотренную рецептом заправку и специи, затем аккуратно перемешайте.");
             return steps;
         }
