@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "recipepro-shell-v4";
+const CACHE_NAME = "recipepro-shell-v5";
 const APP_SHELL = [
     "./",
     "./index.html",
