@@ -34,11 +34,28 @@
         const protein = pick(ids,"protein");
         const carb = pick(ids,"carb");
         const vegetable = pick(ids,"vegetable");
-        if (type === "bowl" && protein && carb) return (window.products?.[protein]?.name || protein) + " с " + (window.products?.[carb]?.name || carb);
+        const instrumental = {
+            "курица":"курицей", "куриное-бедро":"куриным бедром", "индейка":"индейкой",
+            "говядина":"говядиной", "свинина":"свининой", "лосось":"лососем",
+            "тунец":"тунцом", "креветки":"креветками", "яйца":"яйцами",
+            "сыр":"сыром", "моцарелла":"моцареллой", "творог":"творогом",
+            "картофель":"картофелем", "рис":"рисом", "гречка":"гречкой",
+            "паста":"пастой", "хлеб":"хлебом", "овсянка":"овсянкой",
+            "чечевица":"чечевицей", "фасоль":"фасолью"
+        };
+        if (type === "bowl" && protein && carb) {
+            return vegetable
+                ? "Боул с " + (instrumental[protein] || (window.products?.[protein]?.name || protein).toLowerCase()) + ", " + (instrumental[carb] || (window.products?.[carb]?.name || carb).toLowerCase()) + " и овощами"
+                : "Боул с " + (instrumental[protein] || (window.products?.[protein]?.name || protein).toLowerCase()) + " и " + (instrumental[carb] || (window.products?.[carb]?.name || carb).toLowerCase());
+        }
         if (type === "stew" && protein) return "Тушёное блюдо с " + (window.products?.[protein]?.name || protein);
         if (type === "roast" && ids.includes("яйца") && ids.includes("сыр") && ids.includes("морковь")) return "Запеканка с яйцом, сыром и морковью";
         if (type === "roast" && ids.includes("сыр") && ids.includes("морковь")) return "Запечённая морковь с сыром" + (ids.includes("чеснок") ? " и чесноком" : "");
-        if (type === "roast" && protein && carb) return (window.products?.[protein]?.name || protein) + " с " + (window.products?.[carb]?.name || carb) + " в духовке";
+        if (type === "roast" && protein && carb) {
+            return vegetable
+                ? "Запечённое блюдо с " + (instrumental[protein] || (window.products?.[protein]?.name || protein).toLowerCase()) + ", " + (instrumental[carb] || (window.products?.[carb]?.name || carb).toLowerCase()) + " и овощами"
+                : "Запечённое блюдо с " + (instrumental[protein] || (window.products?.[protein]?.name || protein).toLowerCase()) + " и " + (instrumental[carb] || (window.products?.[carb]?.name || carb).toLowerCase());
+        }
         if (type === "salad" && ids.includes("яйца") && ids.includes("сыр") && ids.includes("морковь")) return "Салат с яйцом, сыром и морковью";
         if (type === "salad" && protein) return "Салат с " + (window.products?.[protein]?.name || protein);
         if (type === "salad" && ids.includes("сыр") && ids.includes("морковь") && ids.includes("чеснок")) return "Сырная закуска с морковью и чесноком";
