@@ -178,12 +178,36 @@
     }
 
     function nutrition(ingredients) {
-        return ingredients.reduce((sum,item)=>{
-            const p=window.products?.[item.product]; if(!p?.raw)return sum;
-            const f=item.amount/100;
-            sum.calories+=p.raw.kcal*f; sum.protein+=p.raw.protein*f; sum.fat+=p.raw.fat*f; sum.carbs+=p.raw.carbs*f;
+        const engine = window.recipeProNutritionEngine;
+
+        if (engine?.calculateRecipe) {
+            const result = engine.calculateRecipe({
+                ingredients: Array.isArray(ingredients) ? ingredients : [],
+                servings: 1
+            }, { servings: 1 });
+
+            return {
+                calories: result.calories,
+                protein: result.protein,
+                fat: result.fat,
+                carbs: result.carbs,
+                unknownCount: result.unknownCount
+            };
+        }
+
+        return (Array.isArray(ingredients) ? ingredients : []).reduce((sum, item) => {
+            const id = item.product || item.productId;
+            const product = typeof id === "object" ? id : window.products?.[id];
+            if (!product?.raw || (item.pantry && ["salt", "pepper", "water", "соль", "перец", "вода"].includes(String(id).toLowerCase()))) return sum;
+
+            const amount = Math.max(0, Number(item.amount) || 0);
+            const factor = amount / 100;
+            sum.calories += Number(product.raw.kcal || 0) * factor;
+            sum.protein += Number(product.raw.protein || 0) * factor;
+            sum.fat += Number(product.raw.fat || 0) * factor;
+            sum.carbs += Number(product.raw.carbs || 0) * factor;
             return sum;
-        },{calories:0,protein:0,fat:0,carbs:0});
+        }, { calories: 0, protein: 0, fat: 0, carbs: 0, unknownCount: 0 });
     }
 
     function buildRecipe(ids, intent = {}) {
@@ -202,9 +226,18 @@
             aiWarnings: ["Recipe Engine недоступен."]
         };
     }
-    function finalize(recipe){
-        const n=nutrition(recipe.ingredients), servings=recipe.servings||2;
-        recipe.nutrition={calories:Math.round(n.calories/servings),protein:Math.round(n.protein/servings*10)/10,fat:Math.round(n.fat/servings*10)/10,carbs:Math.round(n.carbs/servings*10)/10};
+    function finalize(recipe) {
+        const n = nutrition(recipe.ingredients);
+        const servings = Math.max(1, Number(recipe.servings) || 2);
+
+        recipe.nutrition = {
+            calories: Math.round(n.calories / servings),
+            protein: Math.round(n.protein / servings * 10) / 10,
+            fat: Math.round(n.fat / servings * 10) / 10,
+            carbs: Math.round(n.carbs / servings * 10) / 10
+        };
+
+        recipe.nutritionUnknownCount = Math.max(0, Number(n.unknownCount) || 0);
         return recipe;
     }
 
@@ -329,6 +362,7 @@
         const stepHtml=recipe.steps.map(step=>`<li>${esc(step)}</li>`).join("");
         const chips=constraintHtml(constraints).map(x=>`<span class="ai-generator-constraint">${esc(x)}</span>`).join("");
         const warnings=(recipe.aiWarnings||[]).map(x=>`<div class="ai-generator-warning">⚠️ ${esc(x)}</div>`).join("");
+        const nutritionWarning=recipe.nutritionUnknownCount>0?`<div class="ai-generator-warning">⚠️ КБЖУ рассчитано не полностью: для ${recipe.nutritionUnknownCount} ингредиент(а/ов) нет данных о пищевой ценности. Значения не включают эти продукты.</div>`:"";
         const changes=recipe.aiChanges?.length?`<div class="ai-generator-changes"><strong>RecipePro AI изменил рецепт</strong><ul>${recipe.aiChanges.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:"";
         $("#aiGeneratorResult").innerHTML=`
 <div class="ai-generator-result">
@@ -336,6 +370,7 @@
 <div class="ai-generator-tags"><span class="ai-generator-tag">${recipe.time} мин</span><span class="ai-generator-tag">${recipe.nutrition.calories} ккал / порция</span><span class="ai-generator-tag">${recipe.nutrition.protein} г белка</span><span class="ai-generator-tag">${recipe.servings} порции</span></div>
 ${chips?`<div class="ai-generator-constraints">${chips}</div>`:""}
 ${warnings}
+${nutritionWarning}
 <strong class="ai-generator-label">Ингредиенты</strong><div class="ai-generator-ingredients">${ingredientHtml}</div>
 <strong class="ai-generator-label" style="margin-top:18px">Как приготовить</strong><ol class="ai-generator-steps">${stepHtml}</ol>
 ${changes}
