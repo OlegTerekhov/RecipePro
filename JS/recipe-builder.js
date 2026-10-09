@@ -36,8 +36,7 @@
         if (type === "stew" && protein) return "Тушёное блюдо с " + (window.products?.[protein]?.name || protein);
         if (type === "roast" && protein && carb) return (window.products?.[protein]?.name || protein) + " с " + (window.products?.[carb]?.name || carb) + " в духовке";
         if (type === "salad" && protein) return "Салат с " + (window.products?.[protein]?.name || protein);
-        if (type === "salad" && vegetable) return "Овощная закуска с " + (window.products?.[vegetable]?.name || vegetable);
-        if (type === "salad" && ids.length) return "Закуска из " + names.slice(0,2).join(" и ");
+        if (type === "salad" && ids.includes("сыр") && ids.includes("морковь") && ids.includes("чеснок")) return "Сырная закуска с морковью и чесноком";
         if (type === "salad" && vegetable) return "Овощная закуска с " + (window.products?.[vegetable]?.name || vegetable);
         if (type === "salad" && ids.length) return "Закуска из " + names.slice(0,2).join(" и ");
         if (type === "omelet") return "Омлет с " + (vegetable ? (window.products?.[vegetable]?.name || vegetable) : "добавками");
@@ -111,7 +110,9 @@
 
         const intelligence = window.recipeProIntelligence;
         const dishChoice = intelligence?.getBestDish?.(ids, intent);
+        const requestedTypeIsValid = intent.type && canBuildType(ids, intent.type, intent);
         const compatibleDish = dishChoice?.compatible
+            && (!requestedTypeIsValid || dishChoice.dish?.type === intent.type)
             && canBuildType(ids, dishChoice.dish?.type, intent)
             ? dishChoice
             : null;
