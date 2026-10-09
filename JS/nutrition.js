@@ -123,21 +123,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function getNutrition(row) {
-        const product = row.product;
+        const engine = window.recipeProNutritionEngine;
 
+        if (engine?.calculateIngredient) {
+            return engine.calculateIngredient({
+                product: row.product,
+                productId: row.productId,
+                amount: row.amount,
+                state: row.state,
+                oilPer100: Math.max(0, Number(oilInput ? oilInput.value : 0))
+            });
+        }
+
+        const product = row.product;
         if (!product || !product.raw) {
-            return {
-                calories: 0,
-                protein: 0,
-                fat: 0,
-                carbs: 0
-            };
+            return { calories: 0, protein: 0, fat: 0, carbs: 0 };
         }
 
         const amount = Math.max(0, Number(row.amount || 0));
         const rawEquivalent = getRawEquivalent(row);
         const multiplier = rawEquivalent / 100;
-
         const result = {
             calories: Number(product.raw.kcal || 0) * multiplier,
             protein: Number(product.raw.protein || 0) * multiplier,
@@ -146,17 +151,10 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         if (row.state === "fried") {
-            const oilPer100 = Math.max(
-                0,
-                Number(oilInput ? oilInput.value : 0)
-            );
-
-            const oilAmount = amount * oilPer100 / 100;
-
+            const oilAmount = amount * Math.max(0, Number(oilInput ? oilInput.value : 0)) / 100;
             result.calories += oilAmount * 8.99;
             result.fat += oilAmount * 0.999;
         }
-
         return result;
     }
 
