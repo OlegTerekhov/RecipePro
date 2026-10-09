@@ -264,6 +264,7 @@
             changes.push("количество ингредиентов пересчитано на "+targetServings+" порц.");
         }
         r.servings=targetServings;
+        finalize(r);
 
         const getItemId=item=>item.product||item.productId;
         const main=r.ingredients.find(item=>getRole(getItemId(item))==="protein");
