@@ -36,13 +36,18 @@
         const vegetable = pick(ids,"vegetable");
         if (type === "bowl" && protein && carb) return (window.products?.[protein]?.name || protein) + " с " + (window.products?.[carb]?.name || carb);
         if (type === "stew" && protein) return "Тушёное блюдо с " + (window.products?.[protein]?.name || protein);
+        if (type === "roast" && ids.includes("яйца") && ids.includes("сыр") && ids.includes("морковь")) return "Запеканка с яйцом, сыром и морковью";
         if (type === "roast" && ids.includes("сыр") && ids.includes("морковь")) return "Запечённая морковь с сыром" + (ids.includes("чеснок") ? " и чесноком" : "");
         if (type === "roast" && protein && carb) return (window.products?.[protein]?.name || protein) + " с " + (window.products?.[carb]?.name || carb) + " в духовке";
+        if (type === "salad" && ids.includes("яйца") && ids.includes("сыр") && ids.includes("морковь")) return "Салат с яйцом, сыром и морковью";
         if (type === "salad" && protein) return "Салат с " + (window.products?.[protein]?.name || protein);
         if (type === "salad" && ids.includes("сыр") && ids.includes("морковь") && ids.includes("чеснок")) return "Сырная закуска с морковью и чесноком";
         if (type === "salad" && ids.includes("сыр") && ids.includes("чеснок")) return "Сырная закуска с чесноком";
-        if (type === "salad" && vegetable) return "Овощная закуска с " + (window.products?.[vegetable]?.name || vegetable);
-        if (type === "salad" && ids.length) return "Домашняя закуска из " + names.slice(0,2).join(" и ");
+        if (type === "salad" && vegetable) {
+            const instrumental = { "морковь":"морковью", "чеснок":"чесноком", "лук":"луком", "огурец":"огурцом", "помидоры":"помидорами", "перец":"перцем", "брокколи":"брокколи", "капуста":"капустой", "кабачок":"кабачком" };
+            return "Овощная закуска с " + (instrumental[vegetable] || (window.products?.[vegetable]?.name || vegetable).toLowerCase());
+        }
+        if (type === "salad" && ids.length) return "Домашняя закуска из " + names.slice(0,2).map(name => name.toLowerCase()).join(" и ");
         if (type === "omelet") return "Омлет с " + (vegetable ? (window.products?.[vegetable]?.name || vegetable) : "добавками");
         if (type === "pasta" && protein) return "Паста с " + (window.products?.[protein]?.name || protein);
         if (type === "porridge") return "Каша с " + (names[1] || names[0]);
