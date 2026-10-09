@@ -1,0 +1,21 @@
+{
+  "id": "./",
+  "name": "RecipePro — умный помощник по готовке",
+  "short_name": "RecipePro",
+  "description": "Подбирай рецепты из доступных продуктов и рассчитывай КБЖУ.",
+  "lang": "ru",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f7f3ed",
+  "theme_color": "#20372f",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
