@@ -62,6 +62,45 @@
         return "salad";
     }
 
+    function canBuildType(ids, type, intent = {}) {
+        ids = unique(ids);
+        const roles = ids.map(classify);
+        const has = role => roles.includes(role);
+        const hasId = id => ids.includes(id);
+
+        if (type === "omelet") return has("eggs") || hasId("яйца");
+        if (type === "pasta") return hasId("паста");
+        if (type === "porridge") return hasId("овсянка") && (has("fruit") || hasId("молоко") || hasId("йогурт") || ids.length > 1);
+        if (type === "bowl") {
+            return (has("protein") && (has("carb") || has("vegetable")))
+                || (has("carb") && has("vegetable"))
+                || (has("dairy") && has("fruit"));
+        }
+        if (type === "roast") return (has("protein") || has("dairy")) && (has("carb") || has("vegetable"));
+        if (type === "stew") return (has("protein") || has("carb")) && has("vegetable");
+        if (type === "salad") return has("vegetable") || (has("dairy") && has("aromatic")) || (has("fruit") && has("dairy"));
+        return false;
+    }
+
+    function chooseSafeFallbackType(ids, intent = {}, compatibleDish = null) {
+        if (intent.type && canBuildType(ids, intent.type, intent)) return intent.type;
+        if (compatibleDish?.dish?.type && canBuildType(ids, compatibleDish.dish.type, intent)) return compatibleDish.dish.type;
+
+        const roles = ids.map(classify);
+        const has = role => roles.includes(role);
+        const hasId = id => ids.includes(id);
+
+        if (has("eggs") || hasId("яйца")) return "omelet";
+        if (hasId("паста")) return "pasta";
+        if (hasId("овсянка") && (has("fruit") || hasId("молоко") || hasId("йогурт"))) return "porridge";
+        if ((has("protein") && (has("carb") || has("vegetable"))) || (has("carb") && has("vegetable"))) {
+            return has("carb") && has("vegetable") && !has("protein") ? "bowl" : "bowl";
+        }
+        if ((has("protein") || has("carb")) && has("vegetable")) return "stew";
+        if (has("vegetable") || (has("dairy") && has("aromatic")) || (has("fruit") && has("dairy"))) return "salad";
+        return null;
+    }
+
     function pantry(type, ids) {
         return window.recipeProIntelligence?.getPantry?.(type, ids) || [];
     }
@@ -70,18 +109,15 @@
         ids = unique(ids);
         if (!ids.length) return null;
 
-        const intelligence=window.recipeProIntelligence;
-        const dishChoice=intelligence?.getBestDish?.(ids,intent);
-        const compatibleDish=dishChoice?.compatible ? dishChoice : null;
-        const selectedType=intent.type || compatibleDish?.dish?.type || chooseType(ids,intent);
+        const intelligence = window.recipeProIntelligence;
+        const dishChoice = intelligence?.getBestDish?.(ids, intent);
+        const compatibleDish = dishChoice?.compatible
+            && canBuildType(ids, dishChoice.dish?.type, intent)
+            ? dishChoice
+            : null;
 
-        if(!selectedType) {
-            const fallbackType=chooseType(ids,{...intent,type:null});
-            if(!fallbackType) return null;
-        }
-
-        const type=intent.type || compatibleDish?.dish?.type || chooseType(ids,intent);
-        if(!type) return null;
+        const type = chooseSafeFallbackType(ids, intent, compatibleDish);
+        if (!type) return null;
 
         const template=TYPES[type] || TYPES.bowl;
         const selected=ids.filter(id=>{
@@ -113,14 +149,21 @@
         }));
 
         const allIngredients=ingredients.concat(pantryIngredients);
-        const warnings=[];
-        if(dishChoice?.missing?.length) warnings.push("Для классической версии блюда не хватает: "+dishChoice.missing.join(", ")+".");
-        if(dishChoice?.replacements?.length) warnings.push("Использованы допустимые замены: "+dishChoice.replacements.join(", ")+".");
-        if(!selected.length) warnings.push("RecipePro не нашёл продуктов с известной пищевой ролью. Рецепт собран как базовая закуска.");
+        const warnings = [];
+        if (intent.type && intent.type !== type) {
+            warnings.push("Запрошенный тип блюда («" + intent.type + "») не подходит к указанным продуктам. RecipePro выбрал безопасный вариант без отсутствующих обязательных ингредиентов.");
+        }
+        if (dishChoice?.missing?.length && !compatibleDish) {
+            warnings.push("Для ближайшего классического рецепта не хватает: " + dishChoice.missing.join(", ") + ". Поэтому показан адаптированный вариант из имеющихся продуктов.");
+        }
+        if (compatibleDish?.replacements?.length) {
+            warnings.push("Использованы допустимые замены: " + compatibleDish.replacements.join(", ") + ".");
+        }
+        if (!selected.length) warnings.push("RecipePro не нашёл продуктов с известной пищевой ролью. Рецепт собран как базовая закуска.");
 
         return {
             id:"generated-"+Date.now(),
-            title:titleFor(type,selected),
+            title:compatibleDish?.dish?.title || titleFor(type,selected),
             emoji:compatibleDish?.dish?.emoji||template.emoji,
             description:"Рецепт собран RecipePro из продуктов, которые указал пользователь.",
             time:compatibleDish?.dish?.time||template.time,
@@ -166,6 +209,7 @@
         build,
         buildFromText,
         chooseType,
+        canBuildType,
         types:TYPES
     };
 })();
