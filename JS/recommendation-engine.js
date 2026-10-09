@@ -172,8 +172,10 @@
             const builder = window.recipeProRecipeBuilder;
             if (builder?.canBuildType && !builder.canBuildType(unique, type, intent)) return;
 
-            const recipe = window.recipeProRecipeEngine?.build(unique, { ...intent, type });
-            if (!recipe) return;
+            const recipe = builder?.build
+                ? builder.build(unique, { ...intent, type })
+                : window.recipeProRecipeEngine?.build(unique, { ...intent, type });
+            if (!recipe || recipe.type !== type) return;
 
             const finalized = finalize(recipe);
             const scored = score(finalized, unique, intent);
