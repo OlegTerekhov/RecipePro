@@ -124,9 +124,25 @@
 
             const usable = products.find(item => {
                 const n = item.nutriments || {};
-                return item.product_name &&
-                    (n["energy-kcal_100g"] !== undefined || n.energy_100g !== undefined) &&
-                    n.proteins_100g !== undefined;
+                const kcal = parseNumber(
+                    n["energy-kcal_100g"] ??
+                    n["energy-kcal"] ??
+                    (parseNumber(n.energy_100g) !== null
+                        ? parseNumber(n.energy_100g) / 4.184
+                        : null)
+                );
+                const protein = parseNumber(n.proteins_100g);
+                const fat = parseNumber(n.fat_100g);
+                const carbs = parseNumber(n.carbohydrates_100g);
+
+                // Do not import incomplete nutrition as if missing macros were zero.
+                return Boolean(
+                    item.product_name &&
+                    kcal !== null && kcal >= 0 &&
+                    protein !== null && protein >= 0 &&
+                    fat !== null && fat >= 0 &&
+                    carbs !== null && carbs >= 0
+                );
             });
 
             if (!usable) return null;
