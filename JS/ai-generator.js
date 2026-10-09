@@ -277,10 +277,19 @@
 
         function changeAmount(item,factor,label){
             if(!item)return false;
-            const before=Number(item.amount)||0;
-            const next=Math.max(minAmount,Math.round(before*factor/10)*10);
-            if(next!==before){
-                item.amount=next;
+            const before=Math.max(0,Number(item.amount)||0);
+            if(before===0)return false;
+
+            // Не применяем общий минимум 20 г к маслу, специям и небольшим ингредиентам:
+            // иначе 10 г масла при уменьшении на 35% превращались в 20 г.
+            const isPantry=item.pantry===true;
+            const minimum=isPantry?0.1:Math.min(20,Math.max(1,before*0.25));
+            const step=before<5?0.5:before<30?1:5;
+            const next=Math.max(minimum,Math.round((before*factor)/step)*step);
+            const rounded=Math.round(next*10)/10;
+
+            if(Math.abs(rounded-before)>0.05){
+                item.amount=rounded;
                 changes.push(label||("скорректирован "+getProductName(getItemId(item))));
                 return true;
             }
