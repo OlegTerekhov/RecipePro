@@ -153,7 +153,9 @@
             productId:item.key,
             product:item.key==="cookingOil"?"масло":item.key,
             name:item.key==="cookingOil"?"Растительное масло":item.key==="salt"?"Соль":item.key==="pepper"?"Чёрный перец":"Вода",
-            amount:scaledAmount(item.key==="cookingOil"?10:item.key==="water"?250:item.key==="salt"?2:1),
+            amount: ["salt", "pepper"].includes(item.key)
+                ? Math.max(0.5, Math.round((item.key === "salt" ? 2 : 1) * servingMultiplier * 10) / 10)
+                : scaledAmount(item.key === "cookingOil" ? 10 : item.key === "water" ? 250 : 1),
             unit:item.key==="water"?"мл":"г",
             state:"raw",
             required:false,
