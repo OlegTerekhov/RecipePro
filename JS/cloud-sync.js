@@ -4,6 +4,8 @@
     const CONFIG = window.RECIPEPRO_SUPABASE_CONFIG || {};
     const STORAGE_KEYS = { recipes: "recipepro_user_recipes", favorites: "recipepro_favorites" };
     const TABLE = "recipepro_user_data";
+    const OWNER_KEY = "recipepro_cloud_owner";
+    const ACCOUNT_CACHE_PREFIX = "recipepro_account_cache_";
     const configured = Boolean(
         typeof CONFIG.url === "string" && CONFIG.url.startsWith("https://") &&
         typeof CONFIG.publishableKey === "string" && CONFIG.publishableKey.trim()
@@ -11,6 +13,7 @@
 
     let client = null;
     let currentUser = null;
+    let syncingUserId = null;
     let isApplyingCloudData = false;
     let saveTimer = null;
     let overlay = null;
@@ -52,6 +55,32 @@
         const favorites = mergeById(readArray(STORAGE_KEYS.favorites), Array.isArray(cloudData?.favorites) ? cloudData.favorites : []);
         setLocalSnapshot(recipes, favorites);
         return { recipes, favorites };
+    }
+
+    function prepareLocalForUser(user) {
+        const previousOwner = localStorage.getItem(OWNER_KEY);
+        if (previousOwner && previousOwner !== user.id) {
+            const previousSnapshot = {
+                recipes: readArray(STORAGE_KEYS.recipes),
+                favorites: readArray(STORAGE_KEYS.favorites)
+            };
+            nativeSetItem.call(localStorage, ACCOUNT_CACHE_PREFIX + previousOwner, JSON.stringify(previousSnapshot));
+
+            let nextSnapshot = { recipes: [], favorites: [] };
+            try {
+                const cached = JSON.parse(localStorage.getItem(ACCOUNT_CACHE_PREFIX + user.id) || "null");
+                if (cached && typeof cached === "object") {
+                    nextSnapshot = {
+                        recipes: Array.isArray(cached.recipes) ? cached.recipes : [],
+                        favorites: Array.isArray(cached.favorites) ? cached.favorites : []
+                    };
+                }
+            } catch {
+                nextSnapshot = { recipes: [], favorites: [] };
+            }
+            setLocalSnapshot(nextSnapshot.recipes, nextSnapshot.favorites);
+        }
+        nativeSetItem.call(localStorage, OWNER_KEY, user.id);
     }
 
     function setStatus(message, type) {
@@ -230,8 +259,11 @@
             return;
         }
 
+        if (syncingUserId === user.id) return;
+        syncingUserId = user.id;
         setStatus("Загружаем данные из облака…", "neutral");
         try {
+            prepareLocalForUser(user);
             const result = await client.from(TABLE).select("recipes,favorites").eq("user_id", user.id).maybeSingle();
             if (result.error) throw result.error;
             const merged = mergeSnapshot(result.data || { recipes: [], favorites: [] });
@@ -239,6 +271,8 @@
             setStatus("Синхронизация завершена. Аккаунт: " + (user.email || "подключён"), "success");
         } catch (error) {
             setStatus("Ошибка облачной синхронизации: " + (error?.message || "проверь таблицу и политики RLS"), "error");
+        } finally {
+            if (syncingUserId === user.id) syncingUserId = null;
         }
     }
 
@@ -286,7 +320,7 @@
 
     Storage.prototype.setItem = function (key, value) {
         nativeSetItem.call(this, key, value);
-        if (key === STORAGE_KEYS.recipes || key === STORAGE_KEYS.favorites) scheduleSave();
+        if (this === window.localStorage && (key === STORAGE_KEYS.recipes || key === STORAGE_KEYS.favorites)) scheduleSave();
     };
 
     function init() {
