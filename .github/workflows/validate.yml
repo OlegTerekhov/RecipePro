@@ -33,7 +33,11 @@ jobs:
           test -f manifest.webmanifest
           test -f icon.svg
           test -f CSS/style.css
-          echo "PWA shell files exist."
+          test -f JS/supabase-config.js
+          test -f JS/cloud-sync.js
+          test -f supabase/schema.sql
+          test -f docs/CLOUD_BACKEND.md
+          echo "PWA shell and cloud backend files exist."
 
       - name: Check JavaScript syntax
         run: |
