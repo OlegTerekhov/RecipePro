@@ -161,17 +161,12 @@
             '<div id="recipeProCloudAccount">',
             '<label class="recipepro-cloud-label" for="recipeProCloudEmail">Электронная почта</label>',
             '<input class="recipepro-cloud-email" id="recipeProCloudEmail" type="email" autocomplete="email" placeholder="you@example.com">',
-            '<div id="recipeProCloudOtpWrap" hidden>',
-            '<label class="recipepro-cloud-label" for="recipeProCloudOtp" style="margin-top:14px">Код из письма</label>',
-            '<input class="recipepro-cloud-email" id="recipeProCloudOtp" inputmode="numeric" autocomplete="one-time-code" maxlength="8" placeholder="Введи код из письма">',
-            '</div>',
             '<div class="recipepro-cloud-status" id="recipeProCloudStatus" role="status" aria-live="polite">Проверяем подключение…</div>',
             '<div class="recipepro-cloud-actions">',
-            '<button class="recipepro-cloud-primary" id="recipeProCloudSignIn" type="button">Получить код на почту</button>',
-            '<button id="recipeProCloudVerify" type="button" hidden>Подтвердить код</button>',
+            '<button class="recipepro-cloud-primary" id="recipeProCloudSignIn" type="button">Отправить ссылку для входа</button>',
             '<button id="recipeProCloudSignOut" type="button" hidden>Выйти</button>',
             '</div></div>',
-            '<p class="recipepro-cloud-footnote">Вход выполняется по одноразовому коду из письма. Никому не передавай этот код. Данные доступны только твоему аккаунту.</p>',
+            '<p class="recipepro-cloud-footnote">Открой ссылку из письма один раз. Данные доступны только твоему аккаунту.</p>',
             '</div>'
         ].join("");
         document.body.appendChild(overlay);
@@ -181,8 +176,7 @@
         overlay.addEventListener("click", event => {
             if (event.target === overlay) closeDialog();
         });
-        overlay.querySelector("#recipeProCloudSignIn").addEventListener("click", sendSignInCode);
-        overlay.querySelector("#recipeProCloudVerify").addEventListener("click", verifySignInCode);
+        overlay.querySelector("#recipeProCloudSignIn").addEventListener("click", sendSignInLink);
         overlay.querySelector("#recipeProCloudSignOut").addEventListener("click", signOut);
         document.addEventListener("keydown", event => {
             if (event.key === "Escape") closeDialog();
@@ -217,35 +211,31 @@
         overlay.classList.add("is-open");
         if (!configured || !client) setStatus("Облако ещё не настроено", "neutral");
         else if (currentUser) setStatus("Вход выполнен: " + currentUser.email, "success");
-        else setStatus("Введи почту — отправим одноразовый код.", "neutral");
+        else setStatus("Введи почту — отправим ссылку для входа.", "neutral");
     }
 
     function closeDialog() {
         if (overlay) overlay.classList.remove("is-open");
     }
 
-    async function sendSignInCode() {
+    async function sendSignInLink() {
         if (!client) return;
         const emailInput = document.getElementById("recipeProCloudEmail");
         const email = emailInput.value.trim();
         const button = document.getElementById("recipeProCloudSignIn");
-        const verifyButton = document.getElementById("recipeProCloudVerify");
-        const otpWrap = document.getElementById("recipeProCloudOtpWrap");
         if (!email || !emailInput.checkValidity()) {
             emailInput.reportValidity();
             return;
         }
-
-        const cooldownKey = "recipepro_email_code_last_request";
+        const cooldownKey = "recipepro_magic_link_last_request";
         const lastRequest = Number(localStorage.getItem(cooldownKey) || 0);
         const remaining = 60 - Math.floor((Date.now() - lastRequest) / 1000);
         if (remaining > 0) {
-            setStatus("Подожди " + remaining + " сек. перед повторным запросом кода. Не нажимай кнопку несколько раз.", "error");
+            setStatus("Подожди " + remaining + " сек. перед повторным запросом письма.", "error");
             return;
         }
-
         button.disabled = true;
-        setStatus("Отправляем код на почту…", "neutral");
+        setStatus("Отправляем ссылку для входа…", "neutral");
         try {
             const result = await client.auth.signInWithOtp({
                 email,
@@ -253,46 +243,16 @@
             });
             if (result.error) throw result.error;
             localStorage.setItem(cooldownKey, String(Date.now()));
-            otpWrap.hidden = false;
-            verifyButton.hidden = false;
-            document.getElementById("recipeProCloudOtp").focus();
-            setStatus("Если адрес зарегистрирован, письмо с кодом отправлено. Введи код из письма ниже. Не переходи по ссылке из письма.", "success");
+            setStatus("Письмо отправлено, если адрес зарегистрирован. Открой ссылку один раз на этом устройстве. Не открывай ссылку повторно.", "success");
         } catch (error) {
             const message = error?.message || "неизвестная ошибка";
             if (/rate limit|too many|429|over_email_send_rate_limit/i.test(message)) {
-                setStatus("Почтовый лимит Supabase ещё действует. Не запрашивай новые письма; попробуем позже или настроим SMTP.", "error");
+                setStatus("Почтовый лимит Supabase ещё действует. Не запрашивай новые письма; попробуем позже.", "error");
             } else if (/user not found|signup is disabled/i.test(message)) {
-                setStatus("Не удалось отправить код для этого аккаунта. Проверь адрес и настройки авторизации Supabase.", "error");
+                setStatus("Не удалось отправить ссылку для этого аккаунта. Проверь адрес и настройки авторизации Supabase.", "error");
             } else {
-                setStatus("Не удалось отправить код: " + message, "error");
+                setStatus("Не удалось отправить ссылку: " + message, "error");
             }
-        } finally {
-            button.disabled = false;
-        }
-    }
-
-    async function verifySignInCode() {
-        if (!client) return;
-        const email = document.getElementById("recipeProCloudEmail").value.trim();
-        const tokenInput = document.getElementById("recipeProCloudOtp");
-        const token = tokenInput.value.trim().replace(/\\s+/g, "");
-        const button = document.getElementById("recipeProCloudVerify");
-        if (!email || !token) {
-            setStatus("Введи адрес почты и код из письма.", "error");
-            return;
-        }
-        button.disabled = true;
-        setStatus("Проверяем код…", "neutral");
-        try {
-            const result = await client.auth.verifyOtp({ email, token, type: "email" });
-            if (result.error) throw result.error;
-            if (!result.data?.session?.user) {
-                setStatus("Код принят, но сессия не получена. Обнови страницу и проверь вход.", "error");
-                return;
-            }
-            await handleSession(result.data.session.user);
-        } catch (error) {
-            setStatus("Код не принят: " + (error?.message || "он мог истечь или быть использован").replace(/<[^>]*>/g, ""), "error");
         } finally {
             button.disabled = false;
         }
@@ -314,7 +274,7 @@
 
         if (!user) {
             if (previousId) setStatus("Вы вышли. Локальные рецепты сохранены на этом устройстве.", "neutral");
-            else setStatus("Введи почту — отправим одноразовый код.", "neutral");
+            else setStatus("Введи почту — отправим ссылку для входа.", "neutral");
             return;
         }
 
