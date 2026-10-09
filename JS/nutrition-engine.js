@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    const VERSION = "2.1.0";
+    const VERSION = "2.2.0";
     const DEFAULTS = {
         cookedWeightRatio: 1,
         friedOilPer100g: 0
@@ -174,7 +174,7 @@
             total.fat += result.fat;
             total.carbs += result.carbs;
 
-            if (!result.known && !row?.pantry) unknownCount += 1;
+            if (!result.known) unknownCount += 1;
 
             details.push({
                 product: row.product || row.productId,
