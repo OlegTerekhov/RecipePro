@@ -65,6 +65,10 @@
 
     function getOilAmount(row, cookedAmount) {
         if (normalizeState(row?.state) !== "fried") return 0;
+        if (row?.pantry === true) return 0;
+
+        const id = normalizeProductId(row?.product || row?.productId);
+        if (id === "масло" || id === "cookingoil" || id === "растительное масло") return 0;
 
         if (row?.oilAmount !== undefined) {
             return Math.max(0, number(row.oilAmount));
@@ -240,13 +244,21 @@
 
         return {
             ...recipe,
-            ingredients: (recipe.ingredients || []).map(row => ({
-                ...row,
-                state: normalizedState,
-                oilPer100: normalizedState === "fried"
-                    ? Math.max(0, number(options.oilPer100, 5))
-                    : 0
-            }))
+            ingredients: (recipe.ingredients || []).map(row => {
+                const id = normalizeProductId(row?.product || row?.productId);
+                const isPantry = row?.pantry === true;
+                const isOil = id === "масло" || id === "cookingoil" || id === "растительное масло";
+
+                if (isPantry || isOil) return { ...row };
+
+                return {
+                    ...row,
+                    state: normalizedState,
+                    oilPer100: normalizedState === "fried"
+                        ? Math.max(0, number(options.oilPer100, 5))
+                        : 0
+                };
+            })
         };
     }
 
