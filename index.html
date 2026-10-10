@@ -1800,5 +1800,61 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 }
 </script>
 
+
+<script>
+(() => {
+    let installPrompt = null;
+    let installButton = null;
+
+    function setupInstallButton() {
+        if (installButton || !document.querySelector(".header-inner")) return;
+
+        const header = document.querySelector(".header-inner");
+        const myRecipesButton = document.getElementById("myRecipesBtn");
+        installButton = document.createElement("button");
+        installButton.type = "button";
+        installButton.className = "header-action";
+        installButton.id = "recipeProInstallBtn";
+        installButton.textContent = "Установить";
+        installButton.hidden = true;
+        installButton.setAttribute("aria-label", "Установить RecipePro на устройство");
+        installButton.style.marginRight = "10px";
+        installButton.addEventListener("click", async () => {
+            if (!installPrompt) return;
+            installButton.disabled = true;
+            try {
+                await installPrompt.prompt();
+                await installPrompt.userChoice;
+                installPrompt = null;
+                installButton.hidden = true;
+            } catch (error) {
+                console.warn("RecipePro install prompt:", error);
+            } finally {
+                installButton.disabled = false;
+            }
+        });
+        header.insertBefore(installButton, myRecipesButton || null);
+    }
+
+    window.addEventListener("beforeinstallprompt", event => {
+        event.preventDefault();
+        installPrompt = event;
+        setupInstallButton();
+        if (installButton) installButton.hidden = false;
+    });
+
+    window.addEventListener("appinstalled", () => {
+        installPrompt = null;
+        if (installButton) installButton.hidden = true;
+    });
+
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", setupInstallButton, { once: true });
+    } else {
+        setupInstallButton();
+    }
+})();
+</script>
+
 </body>
 </html>
