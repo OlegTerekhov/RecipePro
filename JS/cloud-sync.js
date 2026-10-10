@@ -436,8 +436,22 @@
     // Explicit save notification is a fallback for browser Storage differences.
     window.addEventListener("recipepro:data-changed", scheduleSave);
 
-    // Retry local changes when connectivity returns after an offline edit.
-    window.addEventListener("online", scheduleSave);
+    // When the connection returns, merge local edits with the latest cloud snapshot.
+    // Uploading local state blindly here could overwrite changes made on another device.
+    window.addEventListener("online", () => {
+        if (currentUser) handleSession(currentUser);
+        else scheduleSave();
+    });
+
+    // Refresh cloud data when the app is brought back to the foreground on another device.
+    // This keeps an already-open tab in sync after edits made on a phone or computer.
+    function refreshCloudWhenActive() {
+        if (!currentUser || document.visibilityState === "hidden") return;
+        handleSession(currentUser);
+    }
+
+    window.addEventListener("focus", refreshCloudWhenActive);
+    document.addEventListener("visibilitychange", refreshCloudWhenActive);
 
     function init() {
         createDialog();
