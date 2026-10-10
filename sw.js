@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "recipepro-shell-v15";
+const CACHE_NAME = "recipepro-shell-v16";
 const APP_SHELL = [
     "./",
     "./index.html",
@@ -18,7 +18,7 @@ const APP_SHELL = [
     "./JS/app.js?v=20261010-delete2",
     "./JS/ai-generator.js",
     "./JS/supabase-config.js",
-    "./JS/cloud-sync.js?v=20261010-userpass1",
+    "./JS/cloud-sync.js?v=20261010-userpass2",
     "./manifest.webmanifest",
     "./icon.svg"
 ];
