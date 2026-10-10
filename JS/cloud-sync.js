@@ -399,7 +399,7 @@
         if (!client) return;
         const emailInput = document.getElementById("recipeProCloudEmail");
         const email = emailInput.value.trim();
-        const button = document.getElementById("recipeProCloudSignIn");
+        const button = document.getElementById("recipeProCloudLegacySignIn");
         if (!email || !emailInput.checkValidity()) {
             emailInput.reportValidity();
             return;
@@ -416,7 +416,7 @@
         try {
             const result = await client.auth.signInWithOtp({
                 email,
-                options: { shouldCreateUser: false }
+                options: { shouldCreateUser: false, emailRedirectTo: "https://olegterekhov.github.io/RecipePro/" }
             });
             if (result.error) throw result.error;
             localStorage.setItem(cooldownKey, String(Date.now()));
