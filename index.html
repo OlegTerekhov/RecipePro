@@ -27,7 +27,7 @@
         rel="stylesheet"
     >
 
-    <link rel="stylesheet" href="CSS/style.css?v=20261008-r2">
+    <link rel="stylesheet" href="CSS/style.css?v=20261010-mobile1">
 </head>
 
 <body>
@@ -1854,6 +1854,35 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
     } else {
         setupInstallButton();
     }
+})();
+</script>
+
+
+<script>
+(() => {
+    if (document.getElementById("recipeProMobileInstallHelp")) return;
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.id = "recipeProMobileInstallHelp";
+    button.textContent = "＋ Установить приложение";
+    button.setAttribute("aria-label", "Как установить RecipePro на телефон");
+
+    button.addEventListener("click", () => {
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+            || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+        const isAndroid = /Android/i.test(navigator.userAgent);
+
+        if (isIOS) {
+            alert("Установка RecipePro на iPhone:\n\n1. Открой сайт в Safari (не внутри Telegram или другого приложения).\n2. Нажми кнопку «Поделиться» — квадрат со стрелкой вверх.\n3. Выбери «На экран Домой» (при необходимости — «Ещё»).\n4. Нажми «Добавить».\n\nЕсли пункта нет, прокрути список действий вниз.");
+        } else if (isAndroid) {
+            alert("Установка RecipePro на Android:\n\n1. Открой сайт в Chrome.\n2. Нажми меню ⋮ в правом верхнем углу.\n3. Выбери «Установить приложение» или «Добавить на главный экран».\n4. Подтверди установку.\n\nЕсли пункта нет, обнови страницу и подожди несколько секунд.");
+        } else {
+            alert("Открой RecipePro в браузере телефона.\n\nНа iPhone: Safari → «Поделиться» → «На экран Домой».\nНа Android: Chrome → меню ⋮ → «Установить приложение» или «Добавить на главный экран».");
+        }
+    });
+
+    document.body.appendChild(button);
 })();
 </script>
 
