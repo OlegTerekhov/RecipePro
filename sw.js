@@ -21,7 +21,6 @@ const APP_ASSETS = [
     "./JS/ai-generator.js",
     "./JS/supabase-config.js",
     "./JS/cloud-sync.js",
-    "./JS/supabase-client.js",
     "./manifest.webmanifest",
     "./icon.svg"
 ];
