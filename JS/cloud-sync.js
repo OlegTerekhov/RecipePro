@@ -202,6 +202,11 @@
             ".recipepro-cloud-description{margin:0 0 20px;color:#68736d;font:13px/1.6 Inter,sans-serif}",
             ".recipepro-cloud-label{display:block;margin:0 0 7px;font:600 12px Inter,sans-serif}",
             ".recipepro-cloud-email{box-sizing:border-box;width:100%;height:46px;padding:0 13px;border:1px solid rgba(32,55,47,.18);border-radius:12px;background:#fff;color:#20372f;font:14px Inter,sans-serif}",
+            ".recipepro-cloud-field{margin:0 0 13px}",
+            ".recipepro-cloud-password{box-sizing:border-box;width:100%;height:46px;padding:0 13px;border:1px solid rgba(32,55,47,.18);border-radius:12px;background:#fff;color:#20372f;font:14px Inter,sans-serif}",
+            ".recipepro-cloud-password:focus{outline:3px solid rgba(32,55,47,.08);border-color:#20372f}",
+            ".recipepro-cloud-secondary{background:transparent!important;border-style:dashed!important}",
+            ".recipepro-cloud-legacy{margin-top:15px;padding-top:15px;border-top:1px solid rgba(32,55,47,.1)}",
             ".recipepro-cloud-email:focus{outline:3px solid rgba(32,55,47,.08);border-color:#20372f}",
             ".recipepro-cloud-status{margin:14px 0;padding:11px 12px;border-radius:12px;background:#f4f1ea;color:#59675f;font:12px/1.55 Inter,sans-serif;overflow-wrap:anywhere}",
             ".recipepro-cloud-status[data-state='success']{background:#eaf4ee;color:#315846}",
@@ -247,14 +252,18 @@
             '<p class="recipepro-cloud-description">Сохраняй избранное и собственные рецепты в облаке, чтобы они были доступны после входа на другом устройстве.</p>',
             '<div id="recipeProCloudSetup"></div>',
             '<div id="recipeProCloudAccount">',
-            '<label class="recipepro-cloud-label" for="recipeProCloudEmail">Электронная почта</label>',
-            '<input class="recipepro-cloud-email" id="recipeProCloudEmail" type="email" autocomplete="email" placeholder="you@example.com">',
-            '<div class="recipepro-cloud-status" id="recipeProCloudStatus" role="status" aria-live="polite">Проверяем подключение…</div>',
+            '<div class="recipepro-cloud-field"><label class="recipepro-cloud-label" for="recipeProCloudUsername">Логин</label><input class="recipepro-cloud-password" id="recipeProCloudUsername" type="text" autocomplete="username" autocapitalize="none" maxlength="24" placeholder="например, oleg_1995"></div>',
+            '<div class="recipepro-cloud-field"><label class="recipepro-cloud-label" for="recipeProCloudPassword">Пароль</label><input class="recipepro-cloud-password" id="recipeProCloudPassword" type="password" autocomplete="current-password" minlength="10" maxlength="128" placeholder="Не менее 10 символов"></div>',
+            '<div class="recipepro-cloud-status" id="recipeProCloudStatus" role="status" aria-live="polite">Войди или создай аккаунт по логину и паролю.</div>',
             '<div class="recipepro-cloud-actions">',
-            '<button class="recipepro-cloud-primary" id="recipeProCloudSignIn" type="button">Отправить ссылку для входа</button>',
+            '<button class="recipepro-cloud-primary" id="recipeProCloudSignIn" type="button">Войти</button>',
+            '<button id="recipeProCloudRegister" type="button">Создать аккаунт</button>',
+            '<button class="recipepro-cloud-secondary" id="recipeProCloudLegacyToggle" type="button">Старый вход по почте</button>',
             '<button id="recipeProCloudSignOut" type="button" hidden>Выйти</button>',
-            '</div></div>',
-            '<p class="recipepro-cloud-footnote">Открой ссылку из письма один раз. Данные доступны только твоему аккаунту.</p>',
+            '</div>',
+            '<div class="recipepro-cloud-legacy" id="recipeProCloudLegacy" hidden><label class="recipepro-cloud-label" for="recipeProCloudEmail">Почта старого аккаунта</label><input class="recipepro-cloud-email" id="recipeProCloudEmail" type="email" autocomplete="email" placeholder="you@example.com"><div class="recipepro-cloud-actions"><button id="recipeProCloudLegacySignIn" class="recipepro-cloud-primary" type="button">Отправить ссылку для входа</button></div></div>',
+            '</div>',
+            '<p class="recipepro-cloud-footnote">Логин и пароль не требуют почты. Запиши их в надёжном месте: восстановление пароля без почты пока не предусмотрено.</p>',
             '</div>'
         ].join("");
         document.body.appendChild(overlay);
@@ -264,7 +273,14 @@
         overlay.addEventListener("click", event => {
             if (event.target === overlay) closeDialog();
         });
-        overlay.querySelector("#recipeProCloudSignIn").addEventListener("click", sendSignInLink);
+        overlay.querySelector("#recipeProCloudSignIn").addEventListener("click", signInWithUsername);
+        overlay.querySelector("#recipeProCloudRegister").addEventListener("click", registerWithUsername);
+        overlay.querySelector("#recipeProCloudLegacyToggle").addEventListener("click", () => {
+            const legacy = document.getElementById("recipeProCloudLegacy");
+            legacy.hidden = !legacy.hidden;
+            if (!legacy.hidden) document.getElementById("recipeProCloudEmail").focus();
+        });
+        overlay.querySelector("#recipeProCloudLegacySignIn").addEventListener("click", sendSignInLink);
         overlay.querySelector("#recipeProCloudSignOut").addEventListener("click", signOut);
         document.addEventListener("keydown", event => {
             if (event.key === "Escape") closeDialog();
@@ -298,12 +314,85 @@
         createDialog();
         overlay.classList.add("is-open");
         if (!configured || !client) setStatus("Облако ещё не настроено", "neutral");
-        else if (currentUser) setStatus("Вход выполнен: " + currentUser.email, "success");
-        else setStatus("Введи почту — отправим ссылку для входа.", "neutral");
+        else if (currentUser) setStatus("Вход выполнен: " + (currentUser.user_metadata?.username || currentUser.email || "аккаунт"), "success");
+        else setStatus("Войди или создай аккаунт по логину и паролю.", "neutral");
     }
 
     function closeDialog() {
         if (overlay) overlay.classList.remove("is-open");
+    }
+
+
+    async function usernameAuthRequest(action, username, password) {
+        if (!client) throw new Error("Облачное хранилище ещё не подключено.");
+        const { data, error } = await client.functions.invoke("recipepro-username-auth", {
+            body: { action, username, password }
+        });
+        if (error) {
+            let detail = error.message || "Ошибка запроса.";
+            try {
+                if (error.context && typeof error.context.json === "function") {
+                    const body = await error.context.json();
+                    if (body?.error) detail = body.error;
+                }
+            } catch {}
+            throw new Error(detail);
+        }
+        if (data?.error) throw new Error(data.error);
+        return data;
+    }
+
+    function readUsernameCredentials() {
+        const usernameInput = document.getElementById("recipeProCloudUsername");
+        const passwordInput = document.getElementById("recipeProCloudPassword");
+        const username = usernameInput.value.trim().toLowerCase();
+        const password = passwordInput.value;
+        if (!/^[a-z0-9_]{3,24}$/.test(username)) {
+            usernameInput.focus();
+            throw new Error("Логин: 3–24 символа, только латинские буквы, цифры и _.");
+        }
+        if (password.length < 10) {
+            passwordInput.focus();
+            throw new Error("Пароль должен содержать не менее 10 символов.");
+        }
+        if (password.length > 128) throw new Error("Пароль слишком длинный.");
+        return { username, password };
+    }
+
+    async function signInWithUsername() {
+        const button = document.getElementById("recipeProCloudSignIn");
+        if (!client) return;
+        button.disabled = true;
+        try {
+            const { username, password } = readUsernameCredentials();
+            setStatus("Проверяем логин…", "neutral");
+            const resolved = await usernameAuthRequest("resolve", username, password);
+            const { error } = await client.auth.signInWithPassword({ email: resolved.email, password });
+            if (error) throw error;
+            setStatus("Вход выполнен. Загружаем рецепты…", "success");
+        } catch (error) {
+            setStatus(error?.message || "Не удалось войти.", "error");
+        } finally {
+            button.disabled = false;
+        }
+    }
+
+    async function registerWithUsername() {
+        const button = document.getElementById("recipeProCloudRegister");
+        if (!client) return;
+        button.disabled = true;
+        try {
+            const { username, password } = readUsernameCredentials();
+            setStatus("Создаём защищённый аккаунт…", "neutral");
+            const created = await usernameAuthRequest("register", username, password);
+            const { error } = await client.auth.signInWithPassword({ email: created.email, password });
+            if (error) throw error;
+            setStatus("Аккаунт создан. Сохраняем твои рецепты…", "success");
+        } catch (error) {
+            setStatus(error?.message || "Не удалось создать аккаунт.", "error");
+        } finally {
+            button.disabled = false;
+        }
     }
 
     async function sendSignInLink() {
@@ -350,19 +439,25 @@
         const previousId = currentUser?.id || null;
         currentUser = user;
         const signInButton = document.getElementById("recipeProCloudSignIn");
-        const verifyButton = document.getElementById("recipeProCloudVerify");
-        const otpWrap = document.getElementById("recipeProCloudOtpWrap");
+        const registerButton = document.getElementById("recipeProCloudRegister");
+        const legacyToggle = document.getElementById("recipeProCloudLegacyToggle");
+        const legacy = document.getElementById("recipeProCloudLegacy");
         const signOutButton = document.getElementById("recipeProCloudSignOut");
         const emailInput = document.getElementById("recipeProCloudEmail");
+        const usernameInput = document.getElementById("recipeProCloudUsername");
+        const passwordInput = document.getElementById("recipeProCloudPassword");
         if (signInButton) signInButton.hidden = Boolean(user);
-        if (verifyButton) verifyButton.hidden = Boolean(user) || Boolean(otpWrap?.hidden);
-        if (otpWrap && user) otpWrap.hidden = true;
+        if (registerButton) registerButton.hidden = Boolean(user);
+        if (legacyToggle) legacyToggle.hidden = Boolean(user);
+        if (legacy && user) legacy.hidden = true;
         if (signOutButton) signOutButton.hidden = !user;
-        if (emailInput && user?.email) emailInput.value = user.email;
+        if (emailInput && user?.email && !user.email.endsWith("@users.recipepro.invalid")) emailInput.value = user.email;
+        if (usernameInput && user?.user_metadata?.username) usernameInput.value = user.user_metadata.username;
+        if (passwordInput && user) passwordInput.value = "";
 
         if (!user) {
             if (previousId) setStatus("Вы вышли. Локальные рецепты сохранены на этом устройстве.", "neutral");
-            else setStatus("Введи почту — отправим ссылку для входа.", "neutral");
+            else setStatus("Войди или создай аккаунт по логину и паролю.", "neutral");
             return;
         }
 
@@ -376,7 +471,7 @@
             const merged = mergeSnapshot(result.data || { recipes: [], favorites: [] }, user);
             await uploadSnapshot(merged, user);
             saveBaseline(merged, user);
-            setStatus("Синхронизация завершена. Аккаунт: " + (user.email || "подключён"), "success");
+            setStatus("Синхронизация завершена. Аккаунт: " + (user.user_metadata?.username || user.email || "подключён"), "success");
         } catch (error) {
             setStatus("Ошибка облачной синхронизации: " + (error?.message || "проверь таблицу и политики RLS"), "error");
         } finally {
