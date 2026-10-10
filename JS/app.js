@@ -2258,7 +2258,8 @@ document.addEventListener("DOMContentLoaded", () => {
   ========================================================= */
 
   function renderRecipeCard(
-    recipe
+    recipe,
+    forceDeleteAction = false
   ) {
     const nutrition =
       calculateRecipeNutrition(
@@ -2275,7 +2276,7 @@ document.addEventListener("DOMContentLoaded", () => {
         ? recipe.tags
         : [];
 
-    const isUserRecipe = state.userRecipes.some(
+    const isUserRecipe = forceDeleteAction || state.userRecipes.some(
       (item) => String(item.id) === String(recipe.id)
     );
 
@@ -5420,9 +5421,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     grid.innerHTML =
       state.userRecipes
-        .map(
-          renderRecipeCard
-        )
+        .map((recipe) => renderRecipeCard(recipe, true))
         .join("");
 
 
