@@ -1834,6 +1834,7 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
             }
         });
         header.insertBefore(installButton, myRecipesButton || null);
+        if (installPrompt) installButton.hidden = false;
     }
 
     window.addEventListener("beforeinstallprompt", event => {
