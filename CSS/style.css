@@ -5405,3 +5405,36 @@ select {
         overflow-x: auto !important;
     }
 }
+
+
+/* Safari browser viewport correction: keep the document within the phone viewport. */
+@supports (-webkit-touch-callout: none) {
+    html {
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: clip !important;
+    }
+
+    body {
+        min-width: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: clip !important;
+        position: relative;
+    }
+
+    body > * {
+        max-width: 100%;
+    }
+
+    .container,
+    .site-header,
+    main,
+    .hero,
+    .section,
+    footer {
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+}
