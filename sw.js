@@ -1,36 +1,21 @@
 "use strict";
 
-const CACHE_NAME = "recipepro-shell-v17";
-const CORE_SHELL = [
-    "./",
-    "./index.html"
-];
+const CACHE_NAME = "recipepro-shell-v18";
+const CORE_SHELL = ["./", "./index.html"];
 const APP_ASSETS = [
-    "./CSS/style.css",
-    "./JS/products.js",
-    "./JS/product-resolver.js",
-    "./JS/recipes.js",
-    "./JS/recipe-intelligence.js",
-    "./JS/ingredient-intelligence.js",
-    "./JS/recipe-engine.js",
-    "./JS/recipe-builder.js",
-    "./JS/recommendation-engine.js",
-    "./JS/nutrition-engine.js",
-    "./JS/nutrition.js",
-    "./JS/app.js",
-    "./JS/ai-generator.js",
-    "./JS/supabase-config.js",
-    "./JS/cloud-sync.js",
-    "./manifest.webmanifest",
-    "./icon.svg"
+    "./CSS/style.css", "./JS/products.js", "./JS/product-resolver.js",
+    "./JS/recipes.js", "./JS/recipe-intelligence.js", "./JS/ingredient-intelligence.js",
+    "./JS/recipe-engine.js", "./JS/recipe-builder.js", "./JS/recommendation-engine.js",
+    "./JS/nutrition-engine.js", "./JS/nutrition.js", "./JS/app.js", "./JS/ai-generator.js",
+    "./JS/supabase-config.js", "./JS/cloud-sync.js", "./manifest.webmanifest", "./icon.svg"
 ];
+const EXTERNAL_ASSETS = ["https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"];
 
 self.addEventListener("install", event => {
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
-        // The document itself is essential. If it cannot be cached, fail the install.
         await cache.addAll(CORE_SHELL);
-        // A single optional asset must not cancel caching of the entire application.
+
         await Promise.all(APP_ASSETS.map(async path => {
             try {
                 const url = new URL(path, self.registration.scope).href;
@@ -41,6 +26,17 @@ self.addEventListener("install", event => {
                 console.warn("RecipePro: asset cache failed", path, error);
             }
         }));
+
+        // Optional SDK: caching it avoids a slow CDN from delaying app startup offline.
+        await Promise.all(EXTERNAL_ASSETS.map(async url => {
+            try {
+                const response = await fetch(new Request(url, { cache: "reload", mode: "cors" }));
+                if (response.ok && response.type !== "opaque") await cache.put(url, response);
+            } catch (error) {
+                console.warn("RecipePro: optional cloud SDK not cached", error);
+            }
+        }));
+
         await self.skipWaiting();
     })());
 });
@@ -48,11 +44,9 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
     event.waitUntil(
         caches.keys()
-            .then(keys => Promise.all(
-                keys
-                    .filter(key => key.startsWith("recipepro-") && key !== CACHE_NAME)
-                    .map(key => caches.delete(key))
-            ))
+            .then(keys => Promise.all(keys
+                .filter(key => key.startsWith("recipepro-") && key !== CACHE_NAME)
+                .map(key => caches.delete(key))))
             .then(() => self.clients.claim())
     );
 });
@@ -60,25 +54,57 @@ self.addEventListener("activate", event => {
 self.addEventListener("fetch", event => {
     const request = event.request;
     const url = new URL(request.url);
+    if (request.method !== "GET") return;
 
-    if (request.method !== "GET" || url.origin !== self.location.origin) return;
+    // Cache-first for the optional cross-origin SDK; fail quickly if uncached.
+    if (EXTERNAL_ASSETS.some(asset => url.href === asset || url.href.startsWith(asset + "?"))) {
+        event.respondWith((async () => {
+            const cache = await caches.open(CACHE_NAME);
+            const cached = await cache.match(request, { ignoreSearch: true });
+            if (cached) return cached;
+            try {
+                const response = await fetch(request);
+                if (response.ok && response.type !== "opaque") await cache.put(request, response.clone());
+                return response;
+            } catch {
+                return new Response("/* RecipePro cloud sync unavailable offline. */", {
+                    status: 200,
+                    headers: { "Content-Type": "application/javascript; charset=utf-8" }
+                });
+            }
+        })());
+        return;
+    }
+
+    if (url.origin !== self.location.origin) return;
 
     if (request.mode === "navigate") {
         event.respondWith((async () => {
-            try {
-                const response = await fetch(request);
-                if (response.ok) {
-                    const cache = await caches.open(CACHE_NAME);
-                    await cache.put(new URL("./index.html", self.registration.scope).href, response.clone());
-                }
+            const cache = await caches.open(CACHE_NAME);
+            const indexUrl = new URL("./index.html", self.registration.scope).href;
+            const cached = await cache.match(indexUrl);
+
+            const networkResponse = fetch(request).then(async response => {
+                if (response.ok) await cache.put(indexUrl, response.clone());
                 return response;
+            });
+
+            // A network timeout should never leave the installed app on a blank screen.
+            try {
+                return await Promise.race([
+                    networkResponse,
+                    new Promise((_, reject) => setTimeout(() => reject(new Error("Navigation timeout")), 1800))
+                ]);
             } catch {
-                const cached = await caches.match(new URL("./index.html", self.registration.scope).href);
                 if (cached) return cached;
-                return new Response(
-                    "<!doctype html><html lang='ru'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>RecipePro</title><body style='font:16px system-ui;padding:24px;color:#20372f;background:#f7f3ed'><h1>RecipePro</h1><p>Офлайн-версия ещё не сохранена на этом устройстве.</p><p>Подключись к интернету, открой приложение на несколько секунд и повтори попытку.</p></body></html>",
-                    { headers: { "Content-Type": "text/html; charset=utf-8" } }
-                );
+                try {
+                    return await networkResponse;
+                } catch {
+                    return new Response(
+                        "<!doctype html><html lang='ru'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>RecipePro</title><body style='font:16px system-ui;padding:24px;color:#20372f;background:#f7f3ed'><h1>RecipePro</h1><p>Офлайн-версия ещё не сохранена на этом устройстве.</p><p>Подключись к интернету, открой приложение на несколько секунд и повтори попытку.</p></body></html>",
+                        { headers: { "Content-Type": "text/html; charset=utf-8" } }
+                    );
+                }
             }
         })());
         return;
