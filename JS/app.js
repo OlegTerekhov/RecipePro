@@ -338,17 +338,26 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
 
-    /* Form */
+    /* Form: capture submit reliably and show unexpected errors */
 
-    const recipeForm =
-      $("#recipeForm");
+    document.addEventListener(
+      "submit",
+      (event) => {
+        if (!event.target || event.target.id !== "recipeForm") {
+          return;
+        }
 
-    if (recipeForm) {
-      recipeForm.addEventListener(
-        "submit",
-        handleRecipeSubmit
-      );
-    }
+        event.preventDefault();
+
+        try {
+          handleRecipeSubmit(event);
+        } catch (error) {
+          console.error("RecipePro: ошибка сохранения рецепта", error);
+          alert("Не удалось сохранить рецепт. Ошибка: " + (error?.message || "неизвестная ошибка"));
+        }
+      },
+      true
+    );
 
 
     /* Live preview */
