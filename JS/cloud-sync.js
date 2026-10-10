@@ -40,21 +40,109 @@
         }
     }
 
+    function itemKey(item, index) {
+        const id = item && typeof item === "object" ? item.id : item;
+        return id == null ? "__item_" + index + "_" + JSON.stringify(item) : String(id);
+    }
+
+    function toItemMap(items) {
+        const map = new Map();
+        (Array.isArray(items) ? items : []).forEach((item, index) => map.set(itemKey(item, index), item));
+        return map;
+    }
+
+    function sameItem(a, b) {
+        return JSON.stringify(a) === JSON.stringify(b);
+    }
+
     function mergeById(localItems, cloudItems) {
         const merged = new Map();
-        [...cloudItems, ...localItems].forEach((item, index) => {
-            const id = item && typeof item === "object" ? item.id : item;
-            const key = id == null ? "__item_" + index + "_" + JSON.stringify(item) : String(id);
-            merged.set(key, item);
-        });
+        [...(Array.isArray(cloudItems) ? cloudItems : []), ...(Array.isArray(localItems) ? localItems : [])]
+            .forEach((item, index) => merged.set(itemKey(item, index), item));
         return [...merged.values()];
     }
 
-    function mergeSnapshot(cloudData) {
-        const recipes = mergeById(readArray(STORAGE_KEYS.recipes), Array.isArray(cloudData?.recipes) ? cloudData.recipes : []);
-        const favorites = mergeById(readArray(STORAGE_KEYS.favorites), Array.isArray(cloudData?.favorites) ? cloudData.favorites : []);
-        setLocalSnapshot(recipes, favorites);
-        return { recipes, favorites };
+    function mergeThreeWay(baseItems, localItems, cloudItems) {
+        const base = toItemMap(baseItems);
+        const local = toItemMap(localItems);
+        const cloud = toItemMap(cloudItems);
+        const keys = new Set([...base.keys(), ...local.keys(), ...cloud.keys()]);
+        const merged = [];
+
+        keys.forEach(key => {
+            const inBase = base.has(key);
+            const inLocal = local.has(key);
+            const inCloud = cloud.has(key);
+
+            if (inBase) {
+                // A deletion on either side wins over a stale copy on the other side.
+                if (!inLocal || !inCloud) return;
+
+                const baseItem = base.get(key);
+                const localItem = local.get(key);
+                const cloudItem = cloud.get(key);
+                const localChanged = !sameItem(localItem, baseItem);
+                const cloudChanged = !sameItem(cloudItem, baseItem);
+
+                // Keep a one-sided edit; if both sides changed, prefer the local edit.
+                merged.push(localChanged ? localItem : cloudItem);
+                return;
+            }
+
+            // Items created since the last successful sync are kept from either side.
+            if (inLocal) merged.push(local.get(key));
+            else if (inCloud) merged.push(cloud.get(key));
+        });
+
+        return merged;
+    }
+
+    function baselineKey(userId) {
+        return "recipepro_last_synced_" + userId;
+    }
+
+    function readBaseline(userId) {
+        try {
+            const value = JSON.parse(localStorage.getItem(baselineKey(userId)) || "null");
+            if (!value || typeof value !== "object") return null;
+            if (!Array.isArray(value.recipes) || !Array.isArray(value.favorites)) return null;
+            return value;
+        } catch {
+            return null;
+        }
+    }
+
+    function saveBaseline(snapshot, user) {
+        if (!user) return;
+        nativeSetItem.call(localStorage, baselineKey(user.id), JSON.stringify({
+            recipes: snapshot.recipes,
+            favorites: snapshot.favorites
+        }));
+    }
+
+    function mergeSnapshot(cloudData, user) {
+        const local = {
+            recipes: readArray(STORAGE_KEYS.recipes),
+            favorites: readArray(STORAGE_KEYS.favorites)
+        };
+        const cloud = {
+            recipes: Array.isArray(cloudData?.recipes) ? cloudData.recipes : [],
+            favorites: Array.isArray(cloudData?.favorites) ? cloudData.favorites : []
+        };
+        const baseline = readBaseline(user.id);
+
+        // First login on a device has no change history, so bootstrap by merging.
+        // Later logins use a three-way merge so deletions and edits propagate.
+        const snapshot = baseline ? {
+            recipes: mergeThreeWay(baseline.recipes, local.recipes, cloud.recipes),
+            favorites: mergeThreeWay(baseline.favorites, local.favorites, cloud.favorites)
+        } : {
+            recipes: mergeById(local.recipes, cloud.recipes),
+            favorites: mergeById(local.favorites, cloud.favorites)
+        };
+
+        setLocalSnapshot(snapshot.recipes, snapshot.favorites);
+        return snapshot;
     }
 
     function prepareLocalForUser(user) {
@@ -285,8 +373,9 @@
             prepareLocalForUser(user);
             const result = await client.from(TABLE).select("recipes,favorites").eq("user_id", user.id).maybeSingle();
             if (result.error) throw result.error;
-            const merged = mergeSnapshot(result.data || { recipes: [], favorites: [] });
+            const merged = mergeSnapshot(result.data || { recipes: [], favorites: [] }, user);
             await uploadSnapshot(merged, user);
+            saveBaseline(merged, user);
             setStatus("Синхронизация завершена. Аккаунт: " + (user.email || "подключён"), "success");
         } catch (error) {
             setStatus("Ошибка облачной синхронизации: " + (error?.message || "проверь таблицу и политики RLS"), "error");
@@ -311,10 +400,12 @@
         window.clearTimeout(saveTimer);
         saveTimer = window.setTimeout(async () => {
             try {
-                await uploadSnapshot({
+                const snapshot = {
                     recipes: readArray(STORAGE_KEYS.recipes),
                     favorites: readArray(STORAGE_KEYS.favorites)
-                });
+                };
+                await uploadSnapshot(snapshot);
+                saveBaseline(snapshot, currentUser);
                 setStatus("Изменения сохранены в облаке.", "success");
             } catch (error) {
                 setStatus("Не удалось сохранить в облако: " + (error?.message || "ошибка"), "error");
@@ -344,6 +435,9 @@
 
     // Explicit save notification is a fallback for browser Storage differences.
     window.addEventListener("recipepro:data-changed", scheduleSave);
+
+    // Retry local changes when connectivity returns after an offline edit.
+    window.addEventListener("online", scheduleSave);
 
     function init() {
         createDialog();
