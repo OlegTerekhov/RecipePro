@@ -2275,6 +2275,9 @@ document.addEventListener("DOMContentLoaded", () => {
         ? recipe.tags
         : [];
 
+    const isUserRecipe = state.userRecipes.some(
+      (item) => String(item.id) === String(recipe.id)
+    );
 
     const smartResult =
       getSmartResultForRecipe(
@@ -2434,15 +2437,29 @@ document.addEventListener("DOMContentLoaded", () => {
               } г белка
             </span>
 
-            <button
-              class="recipe-open-button"
-              type="button"
-              data-open-recipe="${escapeHtml(
-                recipe.id
-              )}"
-            >
-              Смотреть рецепт →
-            </button>
+            <div class="recipe-card-actions">
+              <button
+                class="recipe-open-button"
+                type="button"
+                data-open-recipe="${escapeHtml(
+                  recipe.id
+                )}"
+              >
+                Смотреть рецепт →
+              </button>
+
+              ${isUserRecipe ? `
+                <button
+                  class="recipe-delete-button"
+                  type="button"
+                  data-delete-recipe="${escapeHtml(recipe.id)}"
+                  aria-label="Удалить рецепт ${escapeHtml(recipe.title)}"
+                  title="Удалить мой рецепт"
+                >
+                  Удалить
+                </button>
+              ` : ""}
+            </div>
 
           </div>
 
@@ -2497,6 +2514,47 @@ document.addEventListener("DOMContentLoaded", () => {
           );
         }
       );
+
+    container
+      .querySelectorAll("[data-delete-recipe]")
+      .forEach((button) => {
+        button.addEventListener("click", (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          deleteUserRecipe(button.dataset.deleteRecipe);
+        });
+      });
+  }
+
+  function deleteUserRecipe(recipeId) {
+    const recipe = state.userRecipes.find(
+      (item) => String(item.id) === String(recipeId)
+    );
+
+    if (!recipe) return;
+
+    const confirmed = window.confirm(
+      `Удалить рецепт «${recipe.title || "Без названия"}»? Это действие нельзя отменить.`
+    );
+
+    if (!confirmed) return;
+
+    state.userRecipes = state.userRecipes.filter(
+      (item) => String(item.id) !== String(recipeId)
+    );
+
+    state.favorites = state.favorites.filter(
+      (id) => String(id) !== String(recipeId)
+    );
+
+    saveUserData();
+    renderRecipes();
+    renderMyRecipes();
+    renderHero();
+
+    if (String(state.currentRecipeId) === String(recipeId)) {
+      closeRecipeModal();
+    }
   }
 
 
