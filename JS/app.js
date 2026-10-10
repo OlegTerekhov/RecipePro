@@ -157,7 +157,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* Popular products */
 
-    $$$(".popular-item").forEach(
+    $$(".popular-item").forEach(
       (item) => {
         item.addEventListener(
           "click",
@@ -181,12 +181,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     /* Filters */
 
-    $$$(".filter-button").forEach(
+    $$(".filter-button").forEach(
       (button) => {
         button.addEventListener(
           "click",
           () => {
-            $$$(".filter-button")
+            $$(".filter-button")
               .forEach((item) => {
                 item.classList.remove(
                   "active"
@@ -1990,7 +1990,7 @@ document.addEventListener("DOMContentLoaded", () => {
       "all";
 
 
-    $$$(".filter-button")
+    $$(".filter-button")
       .forEach(
         (button) => {
           button.classList.remove(
@@ -2517,7 +2517,7 @@ document.addEventListener("DOMContentLoaded", () => {
     state.smartSearchResults = [];
 
 
-    $$$(".filter-button")
+    $$(".filter-button")
       .forEach(
         (button) => {
           button.classList.remove(
@@ -3048,7 +3048,7 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
 
-    $$$(".adaptation-chip").forEach((chip) => {
+    $$(".adaptation-chip").forEach((chip) => {
       chip.addEventListener("click", () => {
         const input = $("#adaptationRequest");
         if (!input) return;
@@ -3065,7 +3065,7 @@ document.addEventListener("DOMContentLoaded", () => {
         input.value = presets[chip.dataset.adaptationPreset] || "";
         input.focus();
 
-        $$$(".adaptation-chip").forEach((item) => item.classList.remove("active"));
+        $$(".adaptation-chip").forEach((item) => item.classList.remove("active"));
         chip.classList.add("active");
       });
     });
@@ -3102,7 +3102,7 @@ document.addEventListener("DOMContentLoaded", () => {
     result.hidden = true;
     generateButton.hidden = false;
     saveButton.hidden = true;
-    $$$(".adaptation-chip").forEach((item) => item.classList.remove("active"));
+    $$(".adaptation-chip").forEach((item) => item.classList.remove("active"));
 
     modal.classList.add("active");
     document.body.classList.add("modal-open");
@@ -5959,7 +5959,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const steps = [];
 
 
-    $$$(".step-row")
+    $$(".step-row")
       .forEach(
         (row) => {
           const value =
