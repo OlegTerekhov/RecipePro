@@ -1372,6 +1372,34 @@ p {
 }
 
 
+/* CARD ACTIONS */
+.recipe-card-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.recipe-delete-button {
+    min-height: 38px;
+    padding: 0 13px;
+    border: 1px solid #ead8d3;
+    border-radius: 999px;
+    background: #fffaf8;
+    color: #9b5145;
+    font-size: 9px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+
+.recipe-delete-button:hover {
+    background: #9b5145;
+    border-color: #9b5145;
+    color: #fff;
+}
+
 /* USER RECIPE */
 
 
