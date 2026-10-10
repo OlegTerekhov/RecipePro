@@ -35,3 +35,16 @@ drop policy if exists "Users can delete their own RecipePro data" on public.reci
 create policy "Users can delete their own RecipePro data"
     on public.recipepro_user_data for delete to authenticated
     using ((select auth.uid()) = user_id);
+
+
+-- Username registry for password-based accounts without an email address.
+-- Access is reserved for the trusted Edge Function using the service role key.
+create table if not exists public.recipepro_usernames (
+    username_normalized text primary key,
+    user_id uuid not null unique references auth.users (id) on delete cascade,
+    created_at timestamptz not null default now(),
+    constraint recipepro_username_format check (username_normalized ~ '^[a-z0-9_]{3,24}$')
+);
+
+alter table public.recipepro_usernames enable row level security;
+revoke all on table public.recipepro_usernames from anon, authenticated;
