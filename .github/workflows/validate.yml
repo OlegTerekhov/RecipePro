@@ -54,10 +54,11 @@ jobs:
             ...[...html.matchAll(/(?:src|href)="((?:\.\/)?(?:JS|CSS)\/[^"?]+)(?:\?[^"]*)?"/g)].map(m => m[1]),
             ...[...sw.matchAll(/"((?:\.\/)?(?:JS|CSS)\/[^"]+)"/g)].map(m => m[1])
           ];
-          const missing = [...new Set(paths)].filter(p => !fs.existsSync(p.replace(/^\.\//, '')));
+          const normalizedPaths = [...new Set(paths.map(p => p.split('?')[0]))];
+          const missing = normalizedPaths.filter(p => !fs.existsSync(p.replace(/^\.\//, '')));
           if (missing.length) {
             console.error('Missing local assets:', missing.join(', '));
             process.exit(1);
           }
-          console.log('Checked local assets:', [...new Set(paths)].length);
+          console.log('Checked local assets:', normalizedPaths.length);
           NODE
