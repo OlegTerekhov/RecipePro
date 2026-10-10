@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "recipepro-shell-v18";
+const CACHE_NAME = "recipepro-shell-v19";
 const CORE_SHELL = ["./", "./index.html"];
 const APP_ASSETS = [
     "./CSS/style.css", "./JS/products.js", "./JS/product-resolver.js",
@@ -11,15 +11,29 @@ const APP_ASSETS = [
 ];
 const EXTERNAL_ASSETS = ["https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"];
 
+async function fetchWithTimeout(request, timeoutMs = 5000) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+        const req = request instanceof Request
+            ? new Request(request, { signal: controller.signal })
+            : new Request(request, { signal: controller.signal });
+        return await fetch(req);
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
 self.addEventListener("install", event => {
     event.waitUntil((async () => {
         const cache = await caches.open(CACHE_NAME);
         await cache.addAll(CORE_SHELL);
 
+        // Cache local files independently so one missing/slow asset cannot cancel installation.
         await Promise.all(APP_ASSETS.map(async path => {
             try {
                 const url = new URL(path, self.registration.scope).href;
-                const response = await fetch(new Request(url, { cache: "reload" }));
+                const response = await fetchWithTimeout(new Request(url, { cache: "reload" }));
                 if (response.ok) await cache.put(url, response);
                 else console.warn("RecipePro: asset not cached", path, response.status);
             } catch (error) {
@@ -27,10 +41,12 @@ self.addEventListener("install", event => {
             }
         }));
 
-        // Optional SDK: caching it avoids a slow CDN from delaying app startup offline.
+        // The cloud SDK is optional; cache it when reachable, but never let it hold up install.
         await Promise.all(EXTERNAL_ASSETS.map(async url => {
             try {
-                const response = await fetch(new Request(url, { cache: "reload", mode: "cors" }));
+                const response = await fetchWithTimeout(
+                    new Request(url, { cache: "reload", mode: "cors" }), 2500
+                );
                 if (response.ok && response.type !== "opaque") await cache.put(url, response);
             } catch (error) {
                 console.warn("RecipePro: optional cloud SDK not cached", error);
@@ -63,7 +79,7 @@ self.addEventListener("fetch", event => {
             const cached = await cache.match(request, { ignoreSearch: true });
             if (cached) return cached;
             try {
-                const response = await fetch(request);
+                const response = await fetchWithTimeout(request, 2500);
                 if (response.ok && response.type !== "opaque") await cache.put(request, response.clone());
                 return response;
             } catch {
@@ -84,12 +100,12 @@ self.addEventListener("fetch", event => {
             const indexUrl = new URL("./index.html", self.registration.scope).href;
             const cached = await cache.match(indexUrl);
 
-            const networkResponse = fetch(request).then(async response => {
+            const networkResponse = fetchWithTimeout(request, 1800).then(async response => {
                 if (response.ok) await cache.put(indexUrl, response.clone());
                 return response;
             });
 
-            // A network timeout should never leave the installed app on a blank screen.
+            // A slow or missing network must not leave the installed app on a blank screen.
             try {
                 return await Promise.race([
                     networkResponse,
@@ -115,7 +131,7 @@ self.addEventListener("fetch", event => {
         const cached = await cache.match(request, { ignoreSearch: true });
         if (cached) return cached;
         try {
-            const response = await fetch(request);
+            const response = await fetchWithTimeout(request, 5000);
             if (response.ok) await cache.put(request, response.clone());
             return response;
         } catch {
