@@ -3,6 +3,8 @@ window.recipes = [
     {
         id: "chicken-potato",
 
+        image: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=900&q=82",
+
         title: "Курица с картофелем",
 
         description:
@@ -62,6 +64,8 @@ window.recipes = [
     {
         id: "omelet-cheese-tomato",
 
+        image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=900&q=82",
+
         title: "Омлет с сыром и помидорами",
 
         description:
@@ -115,6 +119,8 @@ window.recipes = [
 
     {
         id: "rice-chicken",
+
+        image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=82",
 
         title: "Рис с курицей",
 
@@ -173,6 +179,8 @@ window.recipes = [
     {
         id: "pasta-chicken",
 
+        image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=900&q=82",
+
         title: "Паста с курицей",
 
         description:
@@ -224,6 +232,8 @@ window.recipes = [
 
     {
         id: "potato-casserole",
+
+        image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=900&q=82",
 
         title: "Картофельная запеканка",
 
@@ -277,6 +287,8 @@ window.recipes = [
 
     {
         id: "chicken-soup",
+
+        image: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=82",
 
         title: "Куриный суп",
 
@@ -336,6 +348,8 @@ window.recipes = [
     {
         id: "oatmeal-banana",
 
+        image: "https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=900&q=82",
+
         title: "Овсянка с бананом",
 
         description:
@@ -387,6 +401,8 @@ window.recipes = [
 
     {
         id: "cottage-cheese-breakfast",
+
+        image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=900&q=82",
 
         title: "Творожный завтрак",
 
