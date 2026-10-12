@@ -11,6 +11,7 @@ test("meal planner and shopping list are included in the page and offline cache"
   const worker = read("sw.js");
   assert.match(html, /id="rpMealPlanner"/);
   assert.match(html, /id="rpShoppingList"/);
+  assert.match(html, /id="rpRecipeHistory"/);
   assert.match(html, /JS\/meal-planner\.js/);
   assert.match(html, /CSS\/meal-planner\.css/);
   assert.match(worker, /\.\/JS\/meal-planner\.js/);
@@ -26,6 +27,8 @@ test("planner and shopping list use persistent local storage", () => {
   assert.match(module, /function renderShopping\(/);
   assert.match(module, /rpCopyShoppingBtn/);
   assert.match(module, /rpClearCheckedBtn/);
+  assert.match(module, /recipepro_recipe_history/);
+  assert.match(module, /function recordHistory\(/);
 });
 
 test("cloud schema and sync include meal plans and shopping lists", () => {
@@ -34,6 +37,8 @@ test("cloud schema and sync include meal plans and shopping lists", () => {
   assert.match(schema, /meal_plan jsonb not null default '\{\}'::jsonb/);
   assert.match(schema, /shopping_list jsonb not null default '\[\]'::jsonb/);
   assert.match(sync, /meal_plan: snapshot\.plan/);
+  assert.match(schema, /history jsonb/);
+  assert.match(sync, /history: snapshot\.history/);
   assert.match(sync, /shopping_list: snapshot\.shopping/);
   assert.match(sync, /mergePlanThreeWay\(baseline\.plan, local\.plan, cloud\.plan\)/);
   assert.match(sync, /STORAGE_KEYS\.shopping/);
