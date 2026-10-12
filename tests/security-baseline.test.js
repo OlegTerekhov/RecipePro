@@ -44,3 +44,11 @@ test("username authentication endpoint restricts origin, method and password len
   assert.match(handler, /password\.length > 128/);
   assert.match(handler, /Deno\.env\.get\("SUPABASE_SERVICE_ROLE_KEY"\)/);
 });
+
+test("delayed cloud saves are bound to the account that scheduled them", () => {
+  const sync = read("JS/cloud-sync.js");
+  assert.match(sync, /const targetUser = currentUser/);
+  assert.match(sync, /currentUser\.id !== targetUser\.id/);
+  assert.match(sync, /uploadSnapshot\(snapshot, targetUser\)/);
+  assert.match(sync, /saveBaseline\(snapshot, targetUser\)/);
+});
