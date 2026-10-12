@@ -12,6 +12,7 @@
     );
 
     let client = null;
+    let clientInitPromise = null;
     let currentUser = null;
     let syncingUserId = null;
     let isApplyingCloudData = false;
@@ -223,6 +224,66 @@
         document.head.appendChild(style);
     }
 
+    function loadSupabaseSdk() {
+        if (window.supabase?.createClient) return Promise.resolve();
+        if (window.recipeProSupabaseSdkPromise) return window.recipeProSupabaseSdkPromise;
+
+        window.recipeProSupabaseSdkPromise = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+            script.async = true;
+            script.dataset.recipeproSupabaseSdk = "true";
+            const timeout = window.setTimeout(() => {
+                script.onload = null;
+                script.onerror = null;
+                reject(new Error("Истекло время загрузки облачного модуля."));
+            }, 10000);
+
+            script.onload = () => {
+                window.clearTimeout(timeout);
+                if (window.supabase?.createClient) resolve();
+                else reject(new Error("Библиотека облачного хранилища загрузилась некорректно."));
+            };
+            script.onerror = () => {
+                window.clearTimeout(timeout);
+                reject(new Error("Не удалось загрузить облачный модуль."));
+            };
+            document.head.appendChild(script);
+        }).catch(error => {
+            window.recipeProSupabaseSdkPromise = null;
+            throw error;
+        });
+
+        return window.recipeProSupabaseSdkPromise;
+    }
+
+    function initializeCloudClient() {
+        if (client) return Promise.resolve(client);
+        if (clientInitPromise) return clientInitPromise;
+
+        clientInitPromise = loadSupabaseSdk().then(() => {
+            if (!window.supabase?.createClient) throw new Error("Библиотека Supabase недоступна.");
+
+            client = window.supabase.createClient(CONFIG.url, CONFIG.publishableKey, {
+                auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true }
+            });
+            client.auth.onAuthStateChange((event, session) => {
+                window.setTimeout(() => handleSession(session?.user || null), 0);
+            });
+
+            return client.auth.getSession().then(({ data, error }) => {
+                if (error) throw error;
+                handleSession(data?.session?.user || null);
+                return client;
+            });
+        }).catch(error => {
+            clientInitPromise = null;
+            throw error;
+        });
+
+        return clientInitPromise;
+    }
+
     function createDialog() {
         if (overlay) return;
         ensureStyles();
@@ -286,7 +347,7 @@
             if (event.key === "Escape") closeDialog();
         });
 
-        if (!configured || !window.supabase?.createClient) {
+        if (!configured) {
             document.getElementById("recipeProCloudAccount").hidden = true;
             document.getElementById("recipeProCloudSetup").innerHTML =
                 '<div class="recipepro-cloud-config-help">Облачное хранилище подготовлено, но ещё не подключено. Создай бесплатный проект в <a href="https://supabase.com/dashboard" target="_blank" rel="noopener noreferrer">Supabase</a>, выполни SQL из файла <code>supabase/schema.sql</code>, затем добавь URL проекта и publishable key в <code>JS/supabase-config.js</code>. Секретный service_role key сюда добавлять нельзя.</div>';
@@ -295,26 +356,21 @@
         }
 
         document.getElementById("recipeProCloudSetup").hidden = true;
-        client = window.supabase.createClient(CONFIG.url, CONFIG.publishableKey, {
-            auth: { autoRefreshToken: true, persistSession: true, detectSessionInUrl: true }
-        });
-        client.auth.onAuthStateChange((event, session) => {
-            window.setTimeout(() => handleSession(session?.user || null), 0);
-        });
-        client.auth.getSession().then(({ data, error }) => {
-            if (error) {
-                setStatus("Не удалось проверить сессию: " + error.message, "error");
-                return;
-            }
-            handleSession(data.session?.user || null);
+        initializeCloudClient().catch(error => {
+            setStatus("Облачный модуль пока недоступен. Локальные данные сохранены; подключение повторится при восстановлении сети. " + (error?.message || ""), "error");
         });
     }
 
     function openDialog() {
         createDialog();
         overlay.classList.add("is-open");
-        if (!configured || !client) setStatus("Облако ещё не настроено", "neutral");
-        else if (currentUser) setStatus("Вход выполнен: " + (currentUser.user_metadata?.username || currentUser.email || "аккаунт"), "success");
+        if (!configured) setStatus("Облако ещё не настроено", "neutral");
+        else if (!client) {
+            setStatus("Подключаем облачный модуль…", "neutral");
+            initializeCloudClient().catch(error => {
+                setStatus("Не удалось подключить облако. Проверь интернет и попробуй ещё раз. " + (error?.message || ""), "error");
+            });
+        } else if (currentUser) setStatus("Вход выполнен: " + (currentUser.user_metadata?.username || currentUser.email || "аккаунт"), "success");
         else setStatus("Войди или создай аккаунт по логину и паролю.", "neutral");
     }
 
@@ -534,6 +590,13 @@
     // When the connection returns, merge local edits with the latest cloud snapshot.
     // Uploading local state blindly here could overwrite changes made on another device.
     window.addEventListener("online", () => {
+        if (!configured) return;
+        if (!client) {
+            initializeCloudClient().catch(error => {
+                setStatus("Облако пока недоступно. Локальные изменения сохранены; повторим попытку позже. " + (error?.message || ""), "error");
+            });
+            return;
+        }
         if (currentUser) handleSession(currentUser);
         else scheduleSave();
     });
@@ -541,8 +604,11 @@
     // Refresh cloud data when the app is brought back to the foreground on another device.
     // This keeps an already-open tab in sync after edits made on a phone or computer.
     function refreshCloudWhenActive() {
-        if (!currentUser || document.visibilityState === "hidden") return;
-        handleSession(currentUser);
+        if (document.visibilityState === "hidden" || !configured) return;
+        if (currentUser) handleSession(currentUser);
+        else if (!client) {
+            initializeCloudClient().catch(() => {});
+        }
     }
 
     window.addEventListener("focus", refreshCloudWhenActive);
@@ -550,11 +616,6 @@
 
     function init() {
         createDialog();
-        if (client) {
-            client.auth.getSession().then(({ data }) => {
-                if (data?.session?.user) handleSession(data.session.user);
-            });
-        }
     }
 
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
