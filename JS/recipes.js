@@ -64,7 +64,7 @@ window.recipes = [
     {
         id: "omelet-cheese-tomato",
 
-        image: "https://images.unsplash.com/photo-1637036124319-4fa1881c9ce6?auto=format&fit=crop&w=900&q=82",
+        image: "https://images.pexels.com/photos/1437268/pexels-photo-1437268.jpeg?auto=compress&cs=tinysrgb&w=900",
 
         title: "Омлет с сыром и помидорами",
 
@@ -120,7 +120,7 @@ window.recipes = [
     {
         id: "rice-chicken",
 
-        image: "https://images.unsplash.com/photo-1744444202869-54debf97b285?auto=format&fit=crop&w=900&q=82",
+        image: "https://images.pexels.com/photos/6066052/pexels-photo-6066052.jpeg?auto=compress&cs=tinysrgb&w=900",
 
         title: "Рис с курицей",
 
@@ -348,7 +348,7 @@ window.recipes = [
     {
         id: "oatmeal-banana",
 
-        image: "https://images.unsplash.com/photo-1715098841757-0e9690ec12d6?auto=format&fit=crop&w=900&q=82",
+        image: "https://images.pexels.com/photos/4725737/pexels-photo-4725737.jpeg?auto=compress&cs=tinysrgb&w=900",
 
         title: "Овсянка с бананом",
 
