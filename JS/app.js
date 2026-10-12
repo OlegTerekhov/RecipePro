@@ -6189,6 +6189,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
   /* =========================================================
+     PUBLIC API FOR APP MODULES
+  ========================================================= */
+
+  window.recipeProOpenRecipe = openRecipeModal;
+  window.recipeProGetRecipeById = getRecipeById;
+  window.recipeProGetAllRecipes = getAllRecipes;
+
+  /* =========================================================
      START
   ========================================================= */
 
