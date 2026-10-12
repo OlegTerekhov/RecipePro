@@ -115,14 +115,19 @@
         document.body.appendChild(overlay);
     }
 
-    async function detectProducts(input) {
-        const text=input.toLowerCase().replace(/ё/g,"е");
+    function detectProducts(input) {
+        const text=String(input||"").toLowerCase().replace(/ё/g,"е");
         const local=PRODUCT_ORDER.filter(id => (ALIASES[id]||[id]).some(alias => text.includes(alias.replace(/ё/g,"е"))));
-        if(window.recipeProProductResolver){
-            const resolved=await window.recipeProProductResolver.resolve(input);
-            return [...new Set([...local,...resolved])].slice(0,10);
+        const resolver=window.recipeProProductResolver;
+        if(typeof resolver?.localResolve==="function"){
+            try {
+                const resolved=resolver.localResolve(input);
+                return [...new Set([...local,...(Array.isArray(resolved)?resolved:[])])].slice(0,10);
+            } catch(error) {
+                console.warn("RecipePro local product matching:",error);
+            }
         }
-        return local.slice(0,8);
+        return local.slice(0,10);
     }
 
     function parseRequest(input) {
@@ -398,7 +403,7 @@ ${nutritionWarning}
 <strong class="ai-generator-label" style="margin-top:18px">Как приготовить</strong><ol class="ai-generator-steps">${stepHtml}</ol>
 ${changes}
 ${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-generator-alternatives-title">Другие варианты</div>${alternatives.map((item,index)=>`<div class="ai-generator-alternative ${index===0?"is-best":""}"><div class="ai-generator-alternative-emoji">${esc(item.recipe.emoji)}</div><div class="ai-generator-alternative-main"><strong>${esc(item.recipe.title)}</strong><small>${item.recipe.time} мин · ${item.recipe.nutrition.calories} ккал · ${item.recipe.nutrition.protein} г белка · ${esc(item.reason||"подходит по продуктам")}</small></div><div class="ai-generator-alternative-score">${Math.round(item.score)}</div></div>`).join("")}</div>`:""}
-<div class="ai-generator-note">Распознано: ${detected.map(id=>esc(getProductName(id)||id)).join(", ")}. Локальная база RecipePro дополнена внешней базой продуктов при необходимости; КБЖУ является ориентировочной оценкой.</div>
+<div class="ai-generator-note">Распознано: ${detected.map(id=>esc(getProductName(id)||id)).join(", ")}. Подбор работает по локальному каталогу; КБЖУ является ориентировочной оценкой.</div>
 <div class="ai-generator-save-row"><button class="primary-button large" id="aiGeneratorSave" type="button">Сохранить в мои рецепты →</button></div>
 </div>`;
     }
@@ -430,10 +435,10 @@ ${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-gen
             result.innerHTML='<div class="ai-generator-result"><strong>Опиши продукты</strong><p style="margin-top:7px">Напиши, что есть дома и, если хочешь, добавь ограничения по калориям, белку, времени или порциям.</p></div>';
             return;
         }
-        result.innerHTML='<div class="ai-generator-result"><strong>RecipePro ищет продукты…</strong><p style="margin-top:7px">Проверяю локальную базу и открытую базу продуктов.</p></div>';
+        result.innerHTML='<div class="ai-generator-result"><strong>RecipePro ищет продукты…</strong><p style="margin-top:7px">Проверяю локальный каталог продуктов — интернет не требуется.</p></div>';
         const detected=await detectProducts(input);
         if(!detected.length){
-            result.innerHTML='<div class="ai-generator-result"><strong>Не удалось распознать продукты</strong><p style="margin-top:7px">Попробуй написать названия продуктов через запятую. Если продукта нет в локальной базе, RecipePro попробует найти его во внешней базе.</p></div>';
+            result.innerHTML='<div class="ai-generator-result"><strong>Не удалось распознать продукты</strong><p style="margin-top:7px">Попробуй написать названия продуктов через запятую и используй названия из локального каталога RecipePro.</p></div>';
             return;
         }
         const constraints=parseRequest(input);
