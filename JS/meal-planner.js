@@ -1,6 +1,6 @@
 (() => {
   "use strict";
-  const KEYS = { plan: "recipepro_meal_plan", shopping: "recipepro_shopping_list" };
+  const KEYS = { plan: "recipepro_meal_plan", shopping: "recipepro_shopping_list", history: "recipepro_recipe_history" };
   const MEALS = [{key:"breakfast",label:"Завтрак"},{key:"lunch",label:"Обед"},{key:"dinner",label:"Ужин"}];
   const $ = (s, root=document) => root.querySelector(s);
   const $$ = (s, root=document) => [...root.querySelectorAll(s)];
@@ -72,7 +72,41 @@
     try{await navigator.clipboard.writeText(text);status("Список скопирован — можно отправить его в заметки или мессенджер.");}
     catch{const area=document.createElement("textarea");area.value=text;area.setAttribute("readonly","");area.style.position="fixed";area.style.opacity="0";document.body.appendChild(area);area.select();const ok=document.execCommand("copy");area.remove();status(ok?"Список скопирован.":"Не удалось скопировать список. Попробуй выделить и скопировать вручную.");}
   }
+  function getHistory(){const value=read(KEYS.history,[]);return Array.isArray(value)?value:[];}
+  function recordHistory(id){
+    const recipe=typeof window.recipeProGetRecipeById==="function"?window.recipeProGetRecipeById(id):allRecipes().find(r=>String(r.id)===String(id));
+    if(!recipe)return;
+    const history=getHistory().filter(item=>String(item.id)!==String(recipe.id));
+    history.unshift({id:recipe.id,title:recipe.title,emoji:recipe.emoji||"🍽️",viewedAt:new Date().toISOString()});
+    write(KEYS.history,history.slice(0,12));
+    renderHistory();
+  }
+  function renderHistory(){
+    const root=$("#rpHistoryList");if(!root)return;
+    const history=getHistory();
+    if(!history.length){root.innerHTML='<div class="rp-empty-state"><span>📖</span><strong>История пока пуста</strong><p>Открывай рецепты — последние просмотренные появятся здесь.</p></div>';return;}
+    root.innerHTML=history.map(item=>{
+      const date=new Date(item.viewedAt);
+      const label=Number.isNaN(date.getTime())?"Недавно":new Intl.DateTimeFormat("ru-RU",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}).format(date);
+      return '<article class="rp-history-item"><span class="rp-history-emoji">'+esc(item.emoji||"🍽️")+'</span><div class="rp-history-copy"><strong>'+esc(item.title)+'</strong><small>'+esc(label)+'</small></div><button type="button" class="rp-tool-button secondary" data-history-open="'+esc(item.id)+'">Открыть</button></article>';
+    }).join("");
+  }
   function bind(){
+    document.addEventListener("click",event=>{
+      const historyButton=event.target.closest("[data-history-open]");
+      if(historyButton){event.preventDefault();if(typeof window.recipeProOpenRecipe==="function")window.recipeProOpenRecipe(historyButton.dataset.historyOpen);recordHistory(historyButton.dataset.historyOpen);return;}
+      const openButton=event.target.closest("[data-open-recipe]");
+      if(openButton){recordHistory(openButton.dataset.openRecipe);return;}
+      if(event.target.closest("#heroRecipeOpen")){
+        const title=($("#heroRecipeTitle")?.textContent||"").trim();
+        const recipe=allRecipes().find(item=>item.title===title);
+        if(recipe)recordHistory(recipe.id);
+      }
+    });
+    $("#rpClearHistoryBtn")?.addEventListener("click",()=>{
+      if(!window.confirm("Очистить историю просмотренных рецептов?"))return;
+      write(KEYS.history,[]);renderHistory();
+    });
     $("#rpPlannerGrid")?.addEventListener("change",e=>{const s=e.target.closest("select[data-meal]");if(!s)return;const card=s.closest("[data-day]");if(!card)return;const plan=getPlan(),date=card.dataset.day;if(!plan[date])plan[date]={};if(s.value)plan[date][s.dataset.meal]=s.value;else delete plan[date][s.dataset.meal];if(!Object.keys(plan[date]).length)delete plan[date];write(KEYS.plan,plan);updatePlanSummary();});
     $("#rpBuildShoppingBtn")?.addEventListener("click",buildShopping);
     $("#rpAddShoppingBtn")?.addEventListener("click",addManual);
@@ -82,8 +116,8 @@
     $("#rpCopyShoppingBtn")?.addEventListener("click",copyList);
     $("#rpClearCheckedBtn")?.addEventListener("click",()=>{write(KEYS.shopping,getShopping().filter(i=>!i.checked));renderShopping();status("Купленные продукты удалены из списка.");});
     $("#rpClearPlanBtn")?.addEventListener("click",()=>{if(!window.confirm("Очистить весь план питания на неделю?"))return;write(KEYS.plan,{});renderPlanner();status("План очищен. Список покупок не изменён.");});
-    window.addEventListener("storage",e=>{if([KEYS.plan,KEYS.shopping,"recipepro_user_recipes"].includes(e.key)){renderPlanner();renderShopping();}});
+    window.addEventListener("storage",e=>{if([KEYS.plan,KEYS.shopping,KEYS.history,"recipepro_user_recipes"].includes(e.key)){renderPlanner();renderShopping();renderHistory();}});
   }
-  function init(){if(!$("#rpPlannerGrid")||!$("#rpShoppingItems"))return;renderPlanner();renderShopping();bind();}
+  function init(){if(!$("#rpPlannerGrid")||!$("#rpShoppingItems"))return;renderPlanner();renderShopping();renderHistory();bind();}
   if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
 })();
