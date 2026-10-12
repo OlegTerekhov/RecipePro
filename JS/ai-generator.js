@@ -389,7 +389,7 @@
         const changes=recipe.aiChanges?.length?`<div class="ai-generator-changes"><strong>RecipePro AI изменил рецепт</strong><ul>${recipe.aiChanges.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:"";
         $("#aiGeneratorResult").innerHTML=`
 <div class="ai-generator-result">
-<div class="ai-generator-result-top"><div class="ai-generator-result-emoji">${recipe.emoji}</div><div><h3>${esc(recipe.title)}</h3><p>${esc(recipe.description)}</p></div></div>
+<div class="ai-generator-result-top"><div class="ai-generator-result-emoji">${esc(recipe.emoji)}</div><div><h3>${esc(recipe.title)}</h3><p>${esc(recipe.description)}</p></div></div>
 <div class="ai-generator-tags"><span class="ai-generator-tag">${recipe.time} мин</span><span class="ai-generator-tag">${recipe.nutrition.calories} ккал / порция</span><span class="ai-generator-tag">${recipe.nutrition.protein} г белка</span><span class="ai-generator-tag">${recipe.servings} порции</span></div>
 ${chips?`<div class="ai-generator-constraints">${chips}</div>`:""}
 ${warnings}
@@ -397,7 +397,7 @@ ${nutritionWarning}
 <strong class="ai-generator-label">Ингредиенты</strong><div class="ai-generator-ingredients">${ingredientHtml}</div>
 <strong class="ai-generator-label" style="margin-top:18px">Как приготовить</strong><ol class="ai-generator-steps">${stepHtml}</ol>
 ${changes}
-${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-generator-alternatives-title">Другие варианты</div>${alternatives.map((item,index)=>`<div class="ai-generator-alternative ${index===0?"is-best":""}"><div class="ai-generator-alternative-emoji">${item.recipe.emoji}</div><div class="ai-generator-alternative-main"><strong>${esc(item.recipe.title)}</strong><small>${item.recipe.time} мин · ${item.recipe.nutrition.calories} ккал · ${item.recipe.nutrition.protein} г белка · ${esc(item.reason||"подходит по продуктам")}</small></div><div class="ai-generator-alternative-score">${Math.round(item.score)}</div></div>`).join("")}</div>`:""}
+${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-generator-alternatives-title">Другие варианты</div>${alternatives.map((item,index)=>`<div class="ai-generator-alternative ${index===0?"is-best":""}"><div class="ai-generator-alternative-emoji">${esc(item.recipe.emoji)}</div><div class="ai-generator-alternative-main"><strong>${esc(item.recipe.title)}</strong><small>${item.recipe.time} мин · ${item.recipe.nutrition.calories} ккал · ${item.recipe.nutrition.protein} г белка · ${esc(item.reason||"подходит по продуктам")}</small></div><div class="ai-generator-alternative-score">${Math.round(item.score)}</div></div>`).join("")}</div>`:""}
 <div class="ai-generator-note">Распознано: ${detected.map(id=>esc(getProductName(id)||id)).join(", ")}. Локальная база RecipePro дополнена внешней базой продуктов при необходимости; КБЖУ является ориентировочной оценкой.</div>
 <div class="ai-generator-save-row"><button class="primary-button large" id="aiGeneratorSave" type="button">Сохранить в мои рецепты →</button></div>
 </div>`;
