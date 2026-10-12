@@ -5,9 +5,13 @@ create table if not exists public.recipepro_user_data (
     user_id uuid primary key references auth.users (id) on delete cascade,
     recipes jsonb not null default '[]'::jsonb,
     favorites jsonb not null default '[]'::jsonb,
+    meal_plan jsonb not null default '{}'::jsonb,
+    shopping_list jsonb not null default '[]'::jsonb,
     updated_at timestamptz not null default now(),
     constraint recipepro_recipes_is_array check (jsonb_typeof(recipes) = 'array'),
-    constraint recipepro_favorites_is_array check (jsonb_typeof(favorites) = 'array')
+    constraint recipepro_favorites_is_array check (jsonb_typeof(favorites) = 'array'),
+    constraint recipepro_meal_plan_is_object check (jsonb_typeof(meal_plan) = 'object'),
+    constraint recipepro_shopping_list_is_array check (jsonb_typeof(shopping_list) = 'array')
 );
 
 alter table public.recipepro_user_data enable row level security;
