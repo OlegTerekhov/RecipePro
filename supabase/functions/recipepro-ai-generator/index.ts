@@ -57,8 +57,9 @@ Deno.serve(async (req: Request) => {
   const authHeader = req.headers.get("authorization");
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const anonKey = Deno.env.get("SUPABASE_ANON_KEY");
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   const openAiKey = Deno.env.get("OPENAI_API_KEY");
-  if (!supabaseUrl || !anonKey) return respond(500, { error: "Сервер авторизации не настроен." });
+  if (!supabaseUrl || !anonKey || !serviceRoleKey) return respond(500, { error: "Сервер авторизации не настроен." });
   if (!openAiKey) return respond(503, { error: "ИИ пока не подключён: администратору нужно добавить OPENAI_API_KEY в секреты Supabase." });
   if (!authHeader?.startsWith("Bearer ")) return respond(401, { error: "Для генерации через ИИ войди в аккаунт RecipePro." });
 
@@ -101,6 +102,23 @@ Deno.serve(async (req: Request) => {
       category: String(item.category || "other").slice(0, 40),
     }));
   const constraints = body.constraints && typeof body.constraints === "object" ? body.constraints : {};
+
+  // Enforce a persistent per-user quota before spending on the model.
+  const admin = createClient(supabaseUrl, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  const { data: quotaAllowed, error: quotaError } = await admin.rpc("recipepro_consume_ai_quota", {
+    p_user_id: authData.user.id,
+    p_limit: 10,
+    p_window_seconds: 3600,
+  });
+  if (quotaError) {
+    console.error("RecipePro AI quota check failed:", quotaError);
+    return respond(503, { error: "Не удалось проверить лимит генераций. Попробуй позже." });
+  }
+  if (quotaAllowed !== true) {
+    return respond(429, { error: "Лимит достигнут: не более 10 генераций ИИ за час на аккаунт. Попробуй позже." });
+  }
 
   const systemPrompt = [
     "Ты — кулинарный помощник RecipePro. Составь практичный, безопасный и понятный рецепт на русском языке.",
