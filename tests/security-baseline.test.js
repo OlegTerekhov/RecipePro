@@ -74,3 +74,18 @@ test("delayed cloud saves are bound to the account that scheduled them", () => {
   assert.match(sync, /uploadSnapshot\(snapshot, targetUser\)/);
   assert.match(sync, /saveBaseline\(snapshot, targetUser\)/);
 });
+
+test("recipe builder gives protein-specific cooking temperatures", () => {
+  const builder = read("JS/recipe-builder.js");
+  assert.match(builder, /Для цельных кусков свинины ориентир — не менее 63 °C внутри с отдыхом 3 минуты/);
+  assert.match(builder, /свиной фарш готовьте до 71 °C/);
+  assert.match(builder, /Птицу доведите до внутренней температуры не менее 74 °C/);
+  assert.doesNotMatch(builder, /Если это птица, температура внутри самого толстого куска/);
+});
+
+test("AI endpoint distinguishes exhausted billing quota from temporary rate limits", () => {
+  const handler = read("supabase/functions/recipepro-ai-generator/index.ts");
+  assert.match(handler, /insufficient_quota/);
+  assert.match(handler, /openai_quota_exceeded/);
+  assert.match(handler, /временно ограничил частоту запросов/);
+});
