@@ -164,9 +164,45 @@ Deno.serve(async (req: Request) => {
 
     if (!response.ok) {
       const status = response.status;
-      if (status === 401 || status === 403) return respond(502, { error: "Провайдер ИИ отклонил серверный ключ. Проверь OPENAI_API_KEY." });
-      if (status === 429) return respond(429, { error: "Сервис ИИ временно перегружен или исчерпан лимит. Попробуй позже." });
-      return respond(502, { error: "Сервис ИИ временно недоступен. Попробуй ещё раз." });
+      let providerError: Record<string, unknown> = {};
+      try {
+        providerError = await response.json();
+      } catch {
+        // The provider may return a non-JSON error body.
+      }
+      const detail = providerError?.error && typeof providerError.error === "object"
+        ? providerError.error as Record<string, unknown>
+        : {};
+      const providerCode = String(detail.code || detail.type || "").toLowerCase();
+      const providerMessage = String(detail.message || "").toLowerCase();
+      const quotaCodes = new Set([
+        "insufficient_quota",
+        "credit_balance_exhausted",
+        "billing_hard_limit_reached",
+        "usage_limit_exceeded",
+        "organization_usage_limit_exceeded",
+        "organization_spend_limit_exceeded",
+        "project_spend_limit_exceeded",
+      ]);
+      const quotaFailure = quotaCodes.has(providerCode)
+        || /insufficient_quota|credit balance|spend limit|quota|billing/.test(providerMessage);
+
+      // Log only the HTTP status and provider error code; never log the API key or prompt.
+      console.error("RecipePro OpenAI request rejected:", { status, code: providerCode || "unknown" });
+
+      if (status === 401 || status === 403) {
+        return respond(502, { error: "OpenAI отклонил API-ключ или доступ к модели. Проверь секрет OPENAI_API_KEY и доступ проекта." });
+      }
+      if (quotaFailure || status === 402) {
+        return respond(402, { error: "OpenAI API: нет доступных кредитов или достигнут лимит расходов. Проверь биллинг и лимиты API.", code: "openai_quota_exceeded" });
+      }
+      if (status === 429) {
+        return respond(429, { error: "OpenAI временно ограничил частоту запросов. Подожди немного и попробуй снова.", code: providerCode || "rate_limit_exceeded" });
+      }
+      if (status === 404) {
+        return respond(502, { error: "OpenAI не нашёл модель или у проекта нет к ней доступа. Проверь настройки API-проекта." });
+      }
+      return respond(502, { error: "OpenAI вернул ошибку HTTP " + status + ". Подробности записаны в серверный журнал без ключа и текста запроса.", code: providerCode || "provider_error" });
     }
 
     const payload = await response.json();
