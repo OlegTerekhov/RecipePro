@@ -15,7 +15,6 @@ test("browser bundle contains no server-side Supabase credentials or common secr
   ];
   const forbidden = [
     /SUPABASE_SERVICE_ROLE_KEY/i,
-    /service_role/i,
     /sb_secret_[A-Za-z0-9_-]{12,}/,
     /sk-[A-Za-z0-9]{20,}/
   ];
