@@ -27,6 +27,7 @@
     >
 
     <link rel="stylesheet" href="CSS/style.css?v=20261010-delete2">
+    <link rel="stylesheet" href="CSS/meal-planner.css?v=20261012-r1">
 </head>
 
 <body>
@@ -41,6 +42,8 @@
 
         <nav class="main-nav">
             <a href="#recipes">Рецепты</a>
+            <a href="#rpMealPlanner">План питания</a>
+            <a href="#rpShoppingList">Покупки</a>
             <a href="#products">Продукты</a>
             <a href="#diets">Питание</a>
         </nav>
@@ -353,6 +356,60 @@
 
     </div>
 
+</section>
+
+
+
+<section class="section rp-tools-section" id="rpMealPlanner">
+    <div class="container">
+        <div class="rp-tools-intro">
+            <div>
+                <div class="rp-tools-kicker">Планируй заранее</div>
+                <h2>Меню на неделю</h2>
+                <p>Распредели любимые блюда по дням, а RecipePro соберёт ингредиенты в общий список покупок. План сохраняется на этом устройстве и доступен без интернета.</p>
+            </div>
+            <div class="rp-muted-count" id="rpPlanSummary">0 приёмов пищи запланировано</div>
+        </div>
+
+        <div class="rp-tools-panel">
+            <div class="rp-tools-panel-head">
+                <div>
+                    <h3>Твой план питания</h3>
+                    <p>Выбери блюдо для завтрака, обеда или ужина. Можно оставить свободные дни.</p>
+                </div>
+                <button class="rp-tool-button secondary" id="rpClearPlanBtn" type="button">Очистить план</button>
+            </div>
+            <div class="rp-planner-grid" id="rpPlannerGrid" aria-label="План питания на семь дней"></div>
+            <div class="rp-tools-actions">
+                <button class="rp-tool-button" id="rpBuildShoppingBtn" type="button">Собрать список покупок <span aria-hidden="true">→</span></button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section rp-tools-section" id="rpShoppingList">
+    <div class="container">
+        <div class="rp-tools-panel">
+            <div class="rp-tools-panel-head">
+                <div>
+                    <div class="rp-tools-kicker">Всё необходимое</div>
+                    <h3>Список покупок</h3>
+                    <p>Добавляй продукты вручную, отмечай купленное и копируй оставшийся список перед походом в магазин.</p>
+                </div>
+                <div class="rp-muted-count" id="rpShoppingCount">Список пока пуст</div>
+            </div>
+            <div class="rp-shopping-add">
+                <input id="rpShoppingInput" type="text" maxlength="120" placeholder="Добавить продукт, например: оливковое масло" aria-label="Новый продукт">
+                <button class="rp-tool-button" id="rpAddShoppingBtn" type="button">Добавить продукт <span aria-hidden="true">+</span></button>
+            </div>
+            <div class="rp-shopping-items" id="rpShoppingItems" aria-live="polite"></div>
+            <div class="rp-tools-actions">
+                <button class="rp-tool-button secondary" id="rpCopyShoppingBtn" type="button">Копировать список</button>
+                <button class="rp-tool-button secondary" id="rpClearCheckedBtn" type="button">Убрать купленное</button>
+            </div>
+            <p class="rp-shopping-status" id="rpShoppingStatus" aria-live="polite">Список сохраняется на устройстве автоматически.</p>
+        </div>
+    </div>
 </section>
 
 
@@ -1783,6 +1840,7 @@
 <script src="JS/nutrition-engine.js?v=20261009-r5"></script>
 <script src="JS/nutrition.js?v=20261009-r2"></script>
 <script src="JS/app.js?v=20261010-delete2"></script>
+<script src="JS/meal-planner.js?v=20261012-r1"></script>
 <script src="JS/ai-generator.js?v=20261009-r6"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="JS/supabase-config.js"></script>
