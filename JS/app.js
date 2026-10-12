@@ -2349,11 +2349,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
         <div class="recipe-card-top">
 
-          <div class="recipe-card-emoji">
-            ${escapeHtml(
-              recipe.emoji ||
-              "🍽️"
-            )}
+          <div class="recipe-card-emoji${recipe.image ? " has-photo" : ""}">
+            ${ 
+              recipe.image
+                ? `<img class="recipe-card-photo" src="${escapeHtml(recipe.image)}" alt="${escapeHtml(recipe.title)}" loading="lazy" decoding="async"><span class="recipe-photo-fallback">${escapeHtml(recipe.emoji || "🍽️")}</span>`
+                : escapeHtml(recipe.emoji || "🍽️")
+            }
           </div>
 
           <button
@@ -2692,9 +2693,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     if (emoji) {
-      emoji.textContent =
-        recipe.emoji ||
-        "🍽️";
+      emoji.textContent = recipe.emoji || "🍽️";
+      const imageStage = emoji.closest(".hero-recipe-image");
+      if (imageStage) {
+        imageStage.querySelector(".hero-recipe-photo")?.remove();
+        if (recipe.image) {
+          const photo = document.createElement("img");
+          photo.className = "hero-recipe-photo";
+          photo.src = recipe.image;
+          photo.alt = recipe.title || "Фото блюда";
+          photo.loading = "eager";
+          photo.decoding = "async";
+          photo.addEventListener("error", () => photo.remove(), { once: true });
+          imageStage.prepend(photo);
+          emoji.style.display = "none";
+        } else {
+          emoji.style.display = "";
+        }
+      }
     }
 
 
@@ -2810,9 +2826,19 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     if (emoji) {
-      emoji.textContent =
-        recipe.emoji ||
-        "🍽️";
+      emoji.textContent = recipe.emoji || "🍽️";
+      emoji.classList.toggle("has-photo", Boolean(recipe.image));
+      emoji.querySelector(".modal-recipe-photo")?.remove();
+      if (recipe.image) {
+        const photo = document.createElement("img");
+        photo.className = "modal-recipe-photo";
+        photo.src = recipe.image;
+        photo.alt = recipe.title || "Фото блюда";
+        photo.loading = "eager";
+        photo.decoding = "async";
+        photo.addEventListener("error", () => photo.remove(), { once: true });
+        emoji.prepend(photo);
+      }
     }
 
 
