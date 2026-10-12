@@ -1,9 +1,9 @@
 "use strict";
 
-const CACHE_NAME = "recipepro-shell-v23";
+const CACHE_NAME = "recipepro-shell-v24";
 const CORE_SHELL = ["./", "./index.html"];
 const APP_ASSETS = [
-    "./CSS/style.css", "./CSS/meal-planner.css", "./JS/meal-planner.js", "./JS/products.js", "./JS/product-resolver.js",
+    "./CSS/style.css", "./CSS/meal-planner.css", "./JS/meal-planner.js", "./JS/backup.js", "./JS/products.js", "./JS/product-resolver.js",
     "./JS/recipes.js", "./JS/recipe-intelligence.js", "./JS/ingredient-intelligence.js",
     "./JS/recipe-engine.js", "./JS/recipe-builder.js", "./JS/recommendation-engine.js",
     "./JS/nutrition-engine.js", "./JS/nutrition.js", "./JS/app.js", "./JS/ai-generator.js",
