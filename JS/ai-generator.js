@@ -437,6 +437,43 @@ ${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-gen
             return;
         }
         const constraints=parseRequest(input);
+        let serverAiError = "";
+
+        // Prefer the real server-side model when the account is signed in.
+        // If AI is not configured or the session is unavailable, keep the local generator usable.
+        const catalog = Object.entries(window.products || {}).map(([id, product]) => ({
+            id,
+            name: product?.name || id,
+            category: product?.category || "other"
+        }));
+        const catalogIds = new Set(catalog.map(item => item.id));
+        if (window.recipeProInvokeAI && detected.every(id => catalogIds.has(id))) {
+            try {
+                const response = await window.recipeProInvokeAI({
+                    input,
+                    detected,
+                    constraints,
+                    catalog
+                });
+                if (response?.recipe) {
+                    const recipe = adaptRecipe(response.recipe, constraints);
+                    recipe.aiChanges = [...(recipe.aiChanges || []), "рецепт составлен серверным ИИ; КБЖУ пересчитано движком RecipePro"];
+                    recipe.aiWarnings = [...new Set([...(recipe.aiWarnings || []), "КБЖУ — расчётная оценка по локальной базе продуктов; фактические значения зависят от марки и способа приготовления."])];
+                    renderResult(recipe, detected, constraints, []);
+                    const note = $("#aiGeneratorResult .ai-generator-note");
+                    if (note) note.textContent = "Сгенерировано серверным ИИ. КБЖУ рассчитано движком RecipePro по локальной базе продуктов и может отличаться от фактических значений.";
+                    $("#aiGeneratorSave")?.addEventListener("click", () => handleSave(recipe, constraints, input));
+                    return;
+                }
+                serverAiError = "Сервис ИИ вернул пустой ответ.";
+            } catch (error) {
+                serverAiError = error?.message || "Серверный ИИ временно недоступен.";
+                console.warn("RecipePro server AI unavailable; using local generator:", error);
+            }
+        } else if (window.recipeProInvokeAI) {
+            serverAiError = "Часть продуктов не найдена в основном каталоге. Используется локальный генератор.";
+        }
+
         const builder=window.recipeProRecipeBuilder;
         const built=builder?.build?.(detected,constraints);
         const recommendation=window.recipeProRecommendationEngine?.recommend(detected,constraints);
@@ -456,6 +493,12 @@ ${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-gen
         const generatedCandidates=ranked.length ? ranked : (built ? [{recipe:built,score:0,reasons:["собрано из ваших продуктов"]}] : []);
         const alternatives=generatedCandidates.slice(1,4).map(item=>({ ...item, recipe:adaptRecipe(item.recipe,constraints) }));
         renderResult(recipe,detected,constraints,alternatives);
+        if (serverAiError) {
+            const resultCard = $("#aiGeneratorResult .ai-generator-result");
+            if (resultCard) {
+                resultCard.insertAdjacentHTML("afterbegin", '<div class="ai-generator-warning">Сейчас используется локальный генератор. Серверный ИИ: ' + esc(serverAiError) + '</div>');
+            }
+        }
         $("#aiGeneratorSave")?.addEventListener("click",()=>handleSave(recipe,constraints,input));
     }
 
