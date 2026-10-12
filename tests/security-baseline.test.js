@@ -33,6 +33,7 @@ test("cloud database enforces per-user row isolation with RLS", () => {
   assert.match(schema, /using \(\(select auth\.uid\(\)\) = user_id\)/i);
   assert.match(schema, /with check \(\(select auth\.uid\(\)\) = user_id\)/i);
   assert.match(schema, /revoke all on table public\.recipepro_usernames from anon, authenticated/i);
+  assert.match(schema, /recipepro_usernames_no_client_access/i);
 });
 
 test("username authentication endpoint restricts origin, method and password length", () => {
