@@ -78,7 +78,7 @@
     $("#rpAddShoppingBtn")?.addEventListener("click",addManual);
     $("#rpShoppingInput")?.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();addManual();}});
     $("#rpShoppingItems")?.addEventListener("change",e=>{const input=e.target.closest("input[data-shopping-check]");if(!input)return;const items=getShopping(),item=items.find(i=>String(i.id)===input.dataset.shoppingCheck);if(item){item.checked=input.checked;write(KEYS.shopping,items);renderShopping();}});
-    $("#rpShoppingItems")?.addEventListener("click",e=>{const b=e.target.closest("button[data-shopping-remove]");if(!b)return;write(KEYS.shopping,getShopping().filter(i=>String(i.id)!==b.dataset.shoppingRemove));renderShopping();status("Продукт удалён.");});
+    $("#rpShoppingItems")?.addEventListener("click",e=>{const b=e.target.closest("button[data-shopping-remove]");if(!b)return;e.preventDefault();e.stopPropagation();write(KEYS.shopping,getShopping().filter(i=>String(i.id)!==b.dataset.shoppingRemove));renderShopping();status("Продукт удалён.");});
     $("#rpCopyShoppingBtn")?.addEventListener("click",copyList);
     $("#rpClearCheckedBtn")?.addEventListener("click",()=>{write(KEYS.shopping,getShopping().filter(i=>!i.checked));renderShopping();status("Купленные продукты удалены из списка.");});
     $("#rpClearPlanBtn")?.addEventListener("click",()=>{if(!window.confirm("Очистить весь план питания на неделю?"))return;write(KEYS.plan,{});renderPlanner();status("План очищен. Список покупок не изменён.");});
