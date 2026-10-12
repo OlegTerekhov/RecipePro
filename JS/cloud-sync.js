@@ -354,6 +354,33 @@
         return clientInitPromise;
     }
 
+    // Expose only an authenticated invocation helper; the Supabase client and session stay private.
+    window.recipeProInvokeAI = async function (payload) {
+        await initializeCloudClient();
+        const { data, error: sessionError } = await client.auth.getSession();
+        if (sessionError) throw sessionError;
+        if (!data?.session?.access_token) {
+            throw new Error("Для генерации через настоящий ИИ войди в аккаунт RecipePro. Пока доступен локальный генератор.");
+        }
+
+        const { data: result, error } = await client.functions.invoke("recipepro-ai-generator", {
+            body: payload
+        });
+        if (error) {
+            let message = "";
+            try {
+                const response = error.context;
+                if (response && typeof response.json === "function") {
+                    const body = await response.json();
+                    message = body?.error || "";
+                }
+            } catch {}
+            throw new Error(message || error.message || "Сервис ИИ временно недоступен.");
+        }
+        if (!result?.recipe) throw new Error(result?.error || "Сервис ИИ вернул некорректный ответ.");
+        return result;
+    };
+
     function createDialog() {
         if (overlay) return;
         ensureStyles();
