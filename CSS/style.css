@@ -5466,3 +5466,79 @@ select {
         max-width: 100% !important;
     }
 }
+
+
+/* RECIPE PHOTOGRAPHY — lazy-loaded, responsive and with emoji fallback */
+.recipe-card-emoji.has-photo {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    background: transparent;
+    filter: none;
+    transform: none;
+    overflow: hidden;
+}
+
+.recipe-card-emoji.has-photo .recipe-card-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0;
+    filter: none;
+    transition: transform 500ms cubic-bezier(.2,.7,.2,1);
+}
+
+.recipe-card:hover .recipe-card-emoji.has-photo .recipe-card-photo {
+    transform: scale(1.045);
+}
+
+.recipe-photo-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+    font-size: 76px;
+}
+
+.hero-recipe-photo {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.hero-recipe-image .hero-recipe-match {
+    z-index: 3;
+}
+
+.modal-emoji.has-photo {
+    position: relative;
+    overflow: hidden;
+    font-size: 0;
+    filter: none;
+}
+
+.modal-recipe-photo {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+@media (max-width: 700px) {
+    .recipe-card-top {
+        min-height: 210px;
+    }
+    .modal-emoji.has-photo {
+        min-height: 220px;
+    }
+}
