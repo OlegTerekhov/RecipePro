@@ -46,6 +46,12 @@ test("username authentication endpoint restricts origin, method and password len
   assert.match(handler, /Deno\.env\.get\("SUPABASE_SERVICE_ROLE_KEY"\)/);
 });
 
+test("AI-generated emoji is HTML-escaped before rendering", () => {
+  const generator = read("JS/ai-generator.js");
+  assert.match(generator, /ai-generator-result-emoji">\$\{esc\(recipe\.emoji\)\}/);
+  assert.match(generator, /ai-generator-alternative-emoji">\$\{esc\(item\.recipe\.emoji\)\}/);
+});
+
 test("server-side AI requires authenticated access and validates model output", () => {
   const handler = read("supabase/functions/recipepro-ai-generator/index.ts");
   assert.match(handler, /origin !== allowedOrigin/);
