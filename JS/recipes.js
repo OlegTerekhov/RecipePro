@@ -402,7 +402,7 @@ window.recipes = [
     {
         id: "cottage-cheese-breakfast",
 
-        image: "https://images.unsplash.com/photo-1720356778303-6cdc6d2e95ce?auto=format&fit=crop&w=900&q=82",
+        image: "https://images.pexels.com/photos/37907507/pexels-photo-37907507/free-photo-of-rustic-still-life-with-cottage-cheese-and-milk.jpeg?auto=compress&dpr=1&h=750&w=1260",
 
         title: "Творожный завтрак",
 
