@@ -45,6 +45,19 @@ test("username authentication endpoint restricts origin, method and password len
   assert.match(handler, /Deno\.env\.get\("SUPABASE_SERVICE_ROLE_KEY"\)/);
 });
 
+test("server-side AI requires authenticated access and validates model output", () => {
+  const handler = read("supabase/functions/recipepro-ai-generator/index.ts");
+  assert.match(handler, /origin !== allowedOrigin/);
+  assert.match(handler, /req\.method !== "POST"/);
+  assert.match(handler, /req\.headers\.get\("authorization"\)/);
+  assert.match(handler, /supabase\.auth\.getUser\(\)/);
+  assert.match(handler, /Deno\.env\.get\("OPENAI_API_KEY"\)/);
+  assert.match(handler, /input\.length > 2000/);
+  assert.match(handler, /catalogIds\.has\(product\)/);
+  assert.match(handler, /detected\.includes\(item\.product\)/);
+  assert.doesNotMatch(handler, /sk-[A-Za-z0-9]{20,}/);
+});
+
 test("delayed cloud saves are bound to the account that scheduled them", () => {
   const sync = read("JS/cloud-sync.js");
   assert.match(sync, /const targetUser = currentUser/);
