@@ -3,7 +3,7 @@ window.recipes = [
     {
         id: "chicken-potato",
 
-        image: "https://images.unsplash.com/photo-1532550907401-a500c9a57435?auto=format&fit=crop&w=900&q=82",
+        image: "https://images.unsplash.com/photo-1679310289677-fdcb43ffb6ee?auto=format&fit=crop&w=900&q=82",
 
         title: "Курица с картофелем",
 
@@ -64,7 +64,7 @@ window.recipes = [
     {
         id: "omelet-cheese-tomato",
 
-        image: "https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=900&q=82",
+        image: "https://images.unsplash.com/photo-1637036124319-4fa1881c9ce6?auto=format&fit=crop&w=900&q=82",
 
         title: "Омлет с сыром и помидорами",
 
@@ -120,7 +120,7 @@ window.recipes = [
     {
         id: "rice-chicken",
 
-        image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=900&q=82",
+        image: "https://images.unsplash.com/photo-1744444202869-54debf97b285?auto=format&fit=crop&w=900&q=82",
 
         title: "Рис с курицей",
 
@@ -179,7 +179,7 @@ window.recipes = [
     {
         id: "pasta-chicken",
 
-        image: "https://images.unsplash.com/photo-1473093295043-cdd812d0e601?auto=format&fit=crop&w=900&q=82",
+        image: "https://images.unsplash.com/photo-1702827761984-205e57a3a633?auto=format&fit=crop&w=900&q=82",
 
         title: "Паста с курицей",
 
@@ -233,7 +233,7 @@ window.recipes = [
     {
         id: "potato-casserole",
 
-        image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=900&q=82",
+        image: "https://images.unsplash.com/photo-1750772386927-4bd2547f6fd3?auto=format&fit=crop&w=900&q=82",
 
         title: "Картофельная запеканка",
 
@@ -288,7 +288,7 @@ window.recipes = [
     {
         id: "chicken-soup",
 
-        image: "https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=900&q=82",
+        image: "https://images.unsplash.com/photo-1544068192-4c4af19868c6?auto=format&fit=crop&w=900&q=82",
 
         title: "Куриный суп",
 
@@ -348,7 +348,7 @@ window.recipes = [
     {
         id: "oatmeal-banana",
 
-        image: "https://images.unsplash.com/photo-1517673132405-a56a62b18caf?auto=format&fit=crop&w=900&q=82",
+        image: "https://images.unsplash.com/photo-1715098841757-0e9690ec12d6?auto=format&fit=crop&w=900&q=82",
 
         title: "Овсянка с бананом",
 
@@ -402,7 +402,7 @@ window.recipes = [
     {
         id: "cottage-cheese-breakfast",
 
-        image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=900&q=82",
+        image: "https://images.unsplash.com/photo-1720356778303-6cdc6d2e95ce?auto=format&fit=crop&w=900&q=82",
 
         title: "Творожный завтрак",
 
