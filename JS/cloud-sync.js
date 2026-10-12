@@ -622,7 +622,13 @@
     function scheduleSave() {
         if (!client || !currentUser || isApplyingCloudData) return;
         window.clearTimeout(saveTimer);
+        const targetUser = currentUser;
+
         saveTimer = window.setTimeout(async () => {
+            // A user can sign out or switch accounts while this delayed save is waiting.
+            // Capture the owner now so data and its sync baseline can never cross accounts.
+            if (!currentUser || currentUser.id !== targetUser.id) return;
+
             try {
                 const snapshot = {
                     recipes: readArray(STORAGE_KEYS.recipes),
@@ -631,11 +637,15 @@
                     shopping: readArray(STORAGE_KEYS.shopping),
                     history: readArray(STORAGE_KEYS.history)
                 };
-                await uploadSnapshot(snapshot);
-                saveBaseline(snapshot, currentUser);
-                setStatus("Изменения сохранены в облаке.", "success");
+                await uploadSnapshot(snapshot, targetUser);
+                saveBaseline(snapshot, targetUser);
+                if (currentUser?.id === targetUser.id) {
+                    setStatus("Изменения сохранены в облако.", "success");
+                }
             } catch (error) {
-                setStatus("Не удалось сохранить в облако: " + (error?.message || "ошибка"), "error");
+                if (currentUser?.id === targetUser.id) {
+                    setStatus("Не удалось сохранить в облако: " + (error?.message || "ошибка"), "error");
+                }
             }
         }, 700);
     }
