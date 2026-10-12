@@ -136,6 +136,42 @@
         }));
     }
 
+    function mergePlanThreeWay(basePlan, localPlan, cloudPlan) {
+        const base = basePlan && typeof basePlan === "object" ? basePlan : {};
+        const local = localPlan && typeof localPlan === "object" ? localPlan : {};
+        const cloud = cloudPlan && typeof cloudPlan === "object" ? cloudPlan : {};
+        const result = {};
+        const dates = new Set([...Object.keys(base), ...Object.keys(local), ...Object.keys(cloud)]);
+
+        dates.forEach(date => {
+            const baseDay = base[date] && typeof base[date] === "object" ? base[date] : {};
+            const localDay = local[date] && typeof local[date] === "object" ? local[date] : {};
+            const cloudDay = cloud[date] && typeof cloud[date] === "object" ? cloud[date] : {};
+            const meals = new Set([...Object.keys(baseDay), ...Object.keys(localDay), ...Object.keys(cloudDay)]);
+            const mergedDay = {};
+
+            meals.forEach(meal => {
+                const inBase = Object.prototype.hasOwnProperty.call(baseDay, meal);
+                const inLocal = Object.prototype.hasOwnProperty.call(localDay, meal);
+                const inCloud = Object.prototype.hasOwnProperty.call(cloudDay, meal);
+                if (inBase && (!inLocal || !inCloud)) return;
+
+                if (!inBase) {
+                    if (inLocal) mergedDay[meal] = localDay[meal];
+                    else if (inCloud) mergedDay[meal] = cloudDay[meal];
+                    return;
+                }
+
+                const localChanged = !sameItem(localDay[meal], baseDay[meal]);
+                mergedDay[meal] = localChanged ? localDay[meal] : cloudDay[meal];
+            });
+
+            if (Object.keys(mergedDay).length) result[date] = mergedDay;
+        });
+
+        return result;
+    }
+
     function mergeSnapshot(cloudData, user) {
         const local = {
             recipes: readArray(STORAGE_KEYS.recipes),
@@ -155,7 +191,7 @@
         const snapshot = baseline ? {
             recipes: mergeThreeWay(baseline.recipes, local.recipes, cloud.recipes),
             favorites: mergeThreeWay(baseline.favorites, local.favorites, cloud.favorites),
-            plan: JSON.stringify(local.plan) !== JSON.stringify(baseline.plan) ? local.plan : cloud.plan,
+            plan: mergePlanThreeWay(baseline.plan, local.plan, cloud.plan),
             shopping: mergeThreeWay(baseline.shopping, local.shopping, cloud.shopping)
         } : {
             recipes: mergeById(local.recipes, cloud.recipes),
