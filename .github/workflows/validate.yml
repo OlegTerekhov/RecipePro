@@ -62,3 +62,6 @@ jobs:
           }
           console.log('Checked local assets:', normalizedPaths.length);
           NODE
+
+      - name: Run automated test suite
+        run: node --test tests/*.test.js
