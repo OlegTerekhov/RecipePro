@@ -93,7 +93,7 @@
 <div class="ai-generator-modal" role="dialog" aria-modal="true" aria-labelledby="aiGeneratorTitle">
 <button class="ai-generator-close" id="aiGeneratorClose" type="button" aria-label="Закрыть">×</button>
 <div class="ai-generator-head">
-<div class="ai-generator-kicker">RECIPEPRO AI / GENERATOR</div>
+<div class="ai-generator-kicker">RECIPEPRO OFFLINE / RECIPE BUILDER</div>
 <h2 id="aiGeneratorTitle">Придумаем блюдо из твоих продуктов</h2>
 <p>Опиши продукты и пожелания обычными словами. RecipePro распознает продукты, калории, белок, время и порции.</p>
 </div>
@@ -386,7 +386,7 @@
         const chips=constraintHtml(constraints).map(x=>`<span class="ai-generator-constraint">${esc(x)}</span>`).join("");
         const warnings=(recipe.aiWarnings||[]).map(x=>`<div class="ai-generator-warning">⚠️ ${esc(x)}</div>`).join("");
         const nutritionWarning=recipe.nutritionUnknownCount>0?`<div class="ai-generator-warning">⚠️ КБЖУ рассчитано не полностью: для ${recipe.nutritionUnknownCount} ингредиент(а/ов) нет данных о пищевой ценности. Значения не включают эти продукты.</div>`:"";
-        const changes=recipe.aiChanges?.length?`<div class="ai-generator-changes"><strong>RecipePro AI изменил рецепт</strong><ul>${recipe.aiChanges.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:"";
+        const changes=recipe.aiChanges?.length?`<div class="ai-generator-changes"><strong>RecipePro изменил рецепт</strong><ul>${recipe.aiChanges.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:"";
         $("#aiGeneratorResult").innerHTML=`
 <div class="ai-generator-result">
 <div class="ai-generator-result-top"><div class="ai-generator-result-emoji">${esc(recipe.emoji)}</div><div><h3>${esc(recipe.title)}</h3><p>${esc(recipe.description)}</p></div></div>
@@ -408,7 +408,7 @@ ${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-gen
         try{const raw=localStorage.getItem(key);saved=raw?JSON.parse(raw):[];if(!Array.isArray(saved))saved=[];}catch(error){saved=[];}
         const recipeToSave={
             ...recipe,id:"ai-"+Date.now()+"-"+Math.random().toString(36).slice(2,8),
-            title:recipe.title+" — AI-рецепт",tags:["Рецепт пользователя","AI Recipe"],filters:["protein"],isAiGenerated:true,
+            title:recipe.title+" — мой рецепт",tags:["Рецепт пользователя","Создано офлайн"],filters:["protein"],isAiGenerated:false,
             aiGeneratedAt:new Date().toISOString(),aiSourceProducts:recipe.ingredients.map(item=>item.product||item.productId),
             aiRequest:input,aiConstraints:constraints,aiChanges:recipe.aiChanges||[],aiWarnings:recipe.aiWarnings||[]
         };
@@ -421,7 +421,7 @@ ${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-gen
             $("#aiGeneratorSave").disabled=true;$("#aiGeneratorSave").textContent="✓ Сохранено";
             $("#aiGeneratorResult").insertAdjacentHTML("beforeend",'<div class="ai-generator-saved">Рецепт сохранён в «Мои рецепты»</div>');
             setTimeout(()=>{close();window.location.hash="#my-recipes";window.location.reload();},700);
-        }catch(error){console.error("RecipePro AI save error:",error);alert("Не удалось сохранить рецепт. Попробуй ещё раз.");}
+        }catch(error){console.error("RecipePro offline recipe save error:",error);alert("Не удалось сохранить рецепт. Попробуй ещё раз.");}
     }
 
     async function generate(){
