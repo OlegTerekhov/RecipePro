@@ -55,6 +55,8 @@ test("server-side AI requires authenticated access and validates model output", 
   assert.match(handler, /input\.length > 2000/);
   assert.match(handler, /catalogIds\.has\(product\)/);
   assert.match(handler, /detected\.includes\(item\.product\)/);
+  assert.match(handler, /recipepro_consume_ai_quota/);
+  assert.match(handler, /p_limit: 10/);
   assert.doesNotMatch(handler, /sk-[A-Za-z0-9]{20,}/);
 });
 
