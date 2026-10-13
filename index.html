@@ -29,6 +29,7 @@
     <link rel="stylesheet" href="CSS/style.css?v=20261013-diary-focus1">
     <link rel="stylesheet" href="CSS/meal-planner.css?v=20261012-r2">
     <link rel="stylesheet" href="CSS/mobile.css?v=20261013-goal-recommendations1">
+    <link rel="stylesheet" href="CSS/preferences.css?v=20261013-themes-language1">
 </head>
 
 <body>
@@ -45,6 +46,17 @@
             <a href="#dailyDiary">Дневник</a>
             <a href="#recipes">Рецепты</a>
         </nav>
+        <div class="rp-preferences" aria-label="Настройки внешнего вида и языка">
+            <button id="rpThemeToggle" class="rp-preference-button" type="button" aria-pressed="false" title="Включить тёмную тему">
+                <span id="rpThemeIcon" aria-hidden="true">☾</span><span id="rpThemeLabel">Тёмная тема</span>
+            </button>
+            <label class="rp-language-control"><span class="rp-language-label">Язык</span>
+                <select id="rpLanguageSelect" aria-label="Язык интерфейса">
+                    <option value="ru">Русский</option>
+                    <option value="en">English</option>
+                </select>
+            </label>
+        </div>
 
     </div>
 </header>
@@ -1438,6 +1450,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="JS/supabase-config.js"></script>
 <script src="JS/cloud-sync.js?v=20261013-diary-sync1"></script>
+<script src="JS/preferences.js?v=20261013-themes-language1"></script>
 
 
 <script>
