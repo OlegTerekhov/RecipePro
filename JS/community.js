@@ -90,6 +90,48 @@
         macroMarkup(row.nutrition || {}) + ingredientSummary(row.ingredients) + '</div></article>';
     }).join("");
   }
+  async function restoreCloudProfile() {
+    try {
+      const session = await api().getSession();
+      if (!session.user) return;
+      const local = JSON.parse(localStorage.getItem("recipepro_profile_v1") || "{}");
+      if (local && (local.name || local.bio || local.photo)) return;
+      const remote = await api().getOwnProfile();
+      if (!remote) return;
+      const restored = {
+        name: remote.display_name || "",
+        bio: remote.bio || "",
+        photo: remote.avatar_path || "",
+        isPublic: remote.is_public === true,
+        updatedAt: remote.updated_at || new Date().toISOString()
+      };
+      localStorage.setItem("recipepro_profile_v1", JSON.stringify(restored));
+      const name = $("rpProfileName");
+      const bio = $("rpProfileBio");
+      const title = $("rpProfileTitle");
+      const preview = $("rpProfileBioPreview");
+      const checkbox = $("rpProfilePublic");
+      const avatar = $("rpProfileAvatar");
+      if (name) name.value = restored.name;
+      if (bio) bio.value = restored.bio;
+      if (title) title.textContent = restored.name || "Твоя кулинарная история";
+      if (preview) preview.textContent = restored.bio || "Сохраняй любимые блюда, записывай авторские рецепты и собирай собственную коллекцию.";
+      if (checkbox) checkbox.checked = restored.isPublic;
+      if (avatar) {
+        avatar.innerHTML = "";
+        if (restored.photo) {
+          const img = document.createElement("img");
+          img.src = restored.photo;
+          img.alt = "Фото профиля";
+          avatar.appendChild(img);
+        } else avatar.textContent = (restored.name.trim()[0] || "R").toLocaleUpperCase("ru-RU");
+      }
+      const node = $("rpProfileStatus");
+      if (node) node.textContent = "Профиль загружен из облака.";
+    } catch (_) {
+      // A visitor without an account can still use the local-first app.
+    }
+  }
   async function refreshFeed() {
     const feed = $("rpCommunityFeed");
     if (feed) feed.innerHTML = '<div class="rp-community-empty">Загружаем блюда сообщества…</div>';
@@ -174,6 +216,7 @@
     $("rpCommunityUnpublish")?.addEventListener("click", unpublishSelected);
     $("rpProfileCloudSave")?.addEventListener("click", saveCloudProfile);
     refreshFeed();
+    restoreCloudProfile();
     window.addEventListener("online", refreshFeed);
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
