@@ -25,3 +25,51 @@ body[data-theme="dark"] #recipeProBottomNav{background:rgba(20,30,24,.96);border
 body[data-theme="dark"] #recipeProBottomNav a{color:var(--text-soft)}body[data-theme="dark"] #recipeProBottomNav a[aria-current="page"]{color:#a6cbb3}
 body[data-theme="dark"] :is(.rp-community-card h3,.rp-community-detail h2,.rp-community-detail h3,.rp-community-detail-ingredients li,.rp-community-author-recipe,.rp-community-title-button h3){color:var(--text)}
 body[data-theme="dark"] .rp-preference-button{background:var(--surface);color:var(--text);border-color:var(--line)}
+
+
+/* Contrast and component coverage for the dark palette. */
+body[data-theme="dark"] :is(
+  .section-heading h2,.section-heading h3,.rp-diary-heading h2,.rp-diary-panel h3,
+  .rp-tools-intro h2,.rp-tools-panel h3,.recipe-card h3,.recipe-card h4,
+  .hero-recipe-content h3,.hero-recipe-content h4,.modal-section h3,
+  .modal-section-label,.modal-kicker,.modal-ingredients,.recipe-steps,
+  .create-recipe-modal h2,.create-recipe-modal h3,.create-recipe-modal h4,
+  .create-recipe-modal label,.create-preview-label,.create-progress-item,
+  .form-section-description,.rp-shopping-name,.rp-history-list,.rp-profile-panel,
+  .rp-planner-grid,.rp-shopping-items,.rp-tools-actions,.rp-diary-date label
+){color:var(--text)}
+body[data-theme="dark"] :is(
+  .rp-planner-grid>*,.rp-shopping-items>*,.rp-shopping-item,.rp-history-item,
+  .rp-profile-card,.rp-profile-preview,.rp-community-detail,.recipe-modal-hero,
+  .modal-section,.create-recipe-modal,.create-preview,.create-preview-card,
+  .form-section,.ingredients-builder,.steps-builder,.nutrition-preview,
+  .rp-product-search-note,.rp-scanner-status,.rp-recipe-photo-preview
+){background-color:var(--surface);color:var(--text);border-color:var(--line)}
+body[data-theme="dark"] :is(.rp-tools-panel p,.rp-shopping-status,.rp-history-list p,.create-recipe-modal p,.recipe-modal p,.modal-section p,.modal-section li,.rp-product-search-note,.rp-scanner-status){color:var(--text-soft)}
+body[data-theme="dark"] :is(.rp-product-suggestion,.rp-recent-product,.rp-scan-trigger,.rp-portion-shortcuts button,.rp-tool-button,.builder-add-button,.modal-close,.rp-scanner-close,.filter-button){background:#202e26;color:var(--text);border-color:var(--line)}
+body[data-theme="dark"] :is(.rp-product-suggestion-external,.rp-product-suggestion:hover,.rp-recent-product:active,.rp-scan-trigger:active){background:#263b2e;color:var(--text)}
+body[data-theme="dark"] option{background:#17221b;color:var(--text)}
+.rp-preference-button:focus-visible,.rp-language-control select:focus-visible,
+body[data-theme="dark"] button:focus-visible,body[data-theme="dark"] a:focus-visible,
+body[data-theme="dark"] input:focus-visible,body[data-theme="dark"] select:focus-visible,
+body[data-theme="dark"] textarea:focus-visible{outline:2px solid var(--green-600);outline-offset:3px}
+@media(max-width:760px){
+  .header-inner{align-items:center}
+  .rp-preferences{gap:7px}
+  .rp-preference-button,.rp-language-control{min-height:40px;padding-inline:10px;font-size:11px}
+  .rp-language-control{gap:5px}
+  .rp-language-control select{max-width:90px;font-size:12px}
+  body[data-theme="dark"] .site-header{background:rgba(17,25,21,.96)}
+  body[data-theme="dark"] #recipeProBottomNav a[aria-current="page"]{background:#263b2e}
+  body[data-theme="dark"] #recipeProBottomNav a:active{background:#304637}
+}
+@media(max-width:360px){
+  .rp-preferences{gap:6px}
+  .rp-preference-button,.rp-language-control{padding-inline:8px}
+  .rp-preference-button{gap:6px}
+  .rp-language-label{display:none}
+  .rp-language-control select{max-width:86px}
+}
+@media(prefers-reduced-motion:reduce){
+  body[data-theme="dark"] *,body[data-theme="dark"] *::before,body[data-theme="dark"] *::after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
