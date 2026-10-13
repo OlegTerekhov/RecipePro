@@ -68,27 +68,138 @@
     if (!names.length) return "";
     return '<div class="rp-community-ingredients"><strong>Ингредиенты</strong><br>' + names.map(esc).join(" · ") + '</div>';
   }
+  const SAVED_COMMUNITY_KEY = "recipepro_saved_community_v1";
+  let currentFeedRows = [];
+  function readSavedCommunity() {
+    try { const rows = JSON.parse(localStorage.getItem(SAVED_COMMUNITY_KEY) || "[]"); return Array.isArray(rows) ? rows : []; }
+    catch (_) { return []; }
+  }
+  function saveSavedCommunity(rows) { localStorage.setItem(SAVED_COMMUNITY_KEY, JSON.stringify(rows)); }
+  function ensureCommunityExtras() {
+    const root = $("rpCommunity");
+    if (!root) return;
+    if (!$("rpCommunitySaved")) {
+      const section = document.createElement("section");
+      section.className = "rp-community-saved-section";
+      section.innerHTML = '<div class="rp-community-subhead"><div><span class="rp-community-eyebrow">ТВОЯ КОЛЛЕКЦИЯ</span><h3>Сохранённые блюда</h3><p>Блюда других авторов, которые ты хочешь приготовить позже.</p></div></div><div id="rpCommunitySaved" class="rp-community-feed"></div>';
+      const feed = $("rpCommunityFeed");
+      if (feed) feed.insertAdjacentElement("afterend", section); else root.appendChild(section);
+    }
+    if (!$("rpCommunityDialog")) {
+      const dialog = document.createElement("div");
+      dialog.className = "rp-community-dialog";
+      dialog.id = "rpCommunityDialog";
+      dialog.hidden = true;
+      dialog.innerHTML = '<div class="rp-community-dialog-backdrop" data-community-close></div><section class="rp-community-dialog-panel" role="dialog" aria-modal="true" aria-labelledby="rpCommunityDialogTitle"><button type="button" class="rp-community-dialog-close" data-community-close aria-label="Закрыть">×</button><div id="rpCommunityDialogContent"></div></section>';
+      document.body.appendChild(dialog);
+    }
+  }
+  function imageMarkup(url, title, className) {
+    return typeof url === "string" && /^https:\/\//i.test(url)
+      ? '<img loading="lazy" src="' + esc(url) + '" alt="' + esc(title || "Блюдо") + '">'
+      : '<span aria-hidden="true">✦</span>';
+  }
   function renderFeed(rows) {
     const feed = $("rpCommunityFeed");
     if (!feed) return;
-    if (!rows.length) {
+    currentFeedRows = Array.isArray(rows) ? rows : [];
+    if (!currentFeedRows.length) {
       feed.innerHTML = '<div class="rp-community-empty">Пока нет опубликованных блюд. Стань первым автором сообщества.</div>';
       return;
     }
-    feed.innerHTML = rows.map(row => {
+    feed.innerHTML = currentFeedRows.map(row => {
       const profile = row.profile || {};
       const author = profile.display_name || (profile.username ? "@" + profile.username : "Автор RecipePro");
-      const image = typeof row.image_path === "string" && /^https:\/\//i.test(row.image_path)
-        ? '<img loading="lazy" src="' + esc(row.image_path) + '" alt="' + esc(row.title) + '">'
-        : '<span aria-hidden="true">✦</span>';
       const avatar = typeof profile.avatar_path === "string" && /^https:\/\//i.test(profile.avatar_path)
         ? '<img src="' + esc(profile.avatar_path) + '" alt="">'
         : '<span class="rp-community-author-initial">' + esc((author.trim()[0] || "R").toLocaleUpperCase("ru-RU")) + '</span>';
-      return '<article class="rp-community-card"><div class="rp-community-card-image">' + image + '</div>' +
-        '<div class="rp-community-card-body"><div class="rp-community-author">' + avatar + '<span>' + esc(author) + '</span></div>' +
-        '<h3>' + esc(row.title || "Авторское блюдо") + '</h3><p>' + esc(row.description || "Автор пока не добавил описание.") + '</p>' +
-        macroMarkup(row.nutrition || {}) + ingredientSummary(row.ingredients) + '</div></article>';
+      const saved = readSavedCommunity().some(item => item.id === row.id);
+      return '<article class="rp-community-card" data-community-card="' + esc(row.id) + '"><button class="rp-community-card-image rp-community-open" type="button" data-community-open="' + esc(row.id) + '" aria-label="Открыть блюдо">' + imageMarkup(row.image_path, row.title) + '</button>' +
+        '<div class="rp-community-card-body"><button type="button" class="rp-community-author rp-community-author-button" data-community-author="' + esc(row.user_id) + '">' + avatar + '<span>' + esc(author) + '</span><span class="rp-community-author-arrow">↗</span></button>' +
+        '<button type="button" class="rp-community-title-button" data-community-open="' + esc(row.id) + '"><h3>' + esc(row.title || "Авторское блюдо") + '</h3></button><p>' + esc(row.description || "Автор пока не добавил описание.") + '</p>' +
+        macroMarkup(row.nutrition || {}) + ingredientSummary(row.ingredients) +
+        '<div class="rp-community-card-actions"><button type="button" class="rp-community-primary" data-community-open="' + esc(row.id) + '">Подробнее</button><button type="button" class="rp-community-save" data-community-save="' + esc(row.id) + '">' + (saved ? "✓ В коллекции" : "＋ Сохранить") + '</button></div></div></article>';
     }).join("");
+  }
+  function renderSavedCommunity() {
+    const node = $("rpCommunitySaved");
+    if (!node) return;
+    const rows = readSavedCommunity();
+    if (!rows.length) {
+      node.innerHTML = '<div class="rp-community-empty">Коллекция пока пуста. Сохраняй понравившиеся блюда из общей ленты.</div>';
+      return;
+    }
+    node.innerHTML = rows.map(row => '<article class="rp-community-card rp-community-saved-card"><div class="rp-community-card-image">' + imageMarkup(row.image_path, row.title) + '</div><div class="rp-community-card-body"><div class="rp-community-author"><span class="rp-community-author-initial">' + esc((row.author || "R").trim()[0].toLocaleUpperCase("ru-RU")) + '</span><span>' + esc(row.author || "Автор RecipePro") + '</span></div><h3>' + esc(row.title || "Авторское блюдо") + '</h3>' + macroMarkup(row.nutrition || {}) + '<div class="rp-community-card-actions"><button type="button" class="rp-community-primary" data-community-saved-open="' + esc(row.id) + '">Подробнее</button><button type="button" class="rp-community-save" data-community-remove="' + esc(row.id) + '">Убрать</button></div></div></article>').join("");
+  }
+  function openCommunityDialog(html) {
+    ensureCommunityExtras();
+    const dialog = $("rpCommunityDialog");
+    const content = $("rpCommunityDialogContent");
+    if (!dialog || !content) return;
+    content.innerHTML = html;
+    dialog.hidden = false;
+    document.body.classList.add("rp-community-dialog-open");
+    const panel = dialog.querySelector(".rp-community-dialog-panel");
+    if (panel) panel.scrollTop = 0;
+  }
+  function closeCommunityDialog() {
+    const dialog = $("rpCommunityDialog");
+    if (dialog) dialog.hidden = true;
+    document.body.classList.remove("rp-community-dialog-open");
+  }
+  function openRecipeDetails(row, savedOnly) {
+    if (!row) return;
+    const profile = row.profile || {};
+    const author = row.author || profile.display_name || (profile.username ? "@" + profile.username : "Автор RecipePro");
+    const ingredients = Array.isArray(row.ingredients) ? row.ingredients : [];
+    const fullIngredients = ingredients.length ? '<ul class="rp-community-detail-ingredients">' + ingredients.map(item => {
+      if (typeof item === "string") return '<li>' + esc(item) + '</li>';
+      if (!item || typeof item !== "object") return "";
+      const productId = item.product || item.productId || "";
+      const product = window.products && productId ? window.products[productId] : null;
+      const name = item.name || item.title || item.productName || (product && product.name) || productId || "Ингредиент";
+      const amount = item.amount ?? item.grams ?? item.quantity ?? "";
+      const unit = item.unit || "г";
+      return '<li><span>' + esc(name) + '</span><strong>' + (amount !== "" ? esc(amount) + " " + esc(unit) : "") + '</strong></li>';
+    }).join("") + '</ul>' : '<p class="rp-community-empty">Автор не добавил список ингредиентов.</p>';
+    openCommunityDialog('<div class="rp-community-detail"><div class="rp-community-detail-image">' + imageMarkup(row.image_path, row.title) + '</div><div class="rp-community-eyebrow">RECIPEPRO / СООБЩЕСТВО</div><h2 id="rpCommunityDialogTitle">' + esc(row.title || "Авторское блюдо") + '</h2><button type="button" class="rp-community-author rp-community-author-button" data-community-author="' + esc(row.user_id || "") + '">' + (profile.avatar_path && /^https:\/\//i.test(profile.avatar_path) ? '<img src="' + esc(profile.avatar_path) + '" alt="">' : '<span class="rp-community-author-initial">' + esc((author.trim()[0] || "R").toLocaleUpperCase("ru-RU")) + '</span>') + '<span>' + esc(author) + '</span><span class="rp-community-author-arrow">Профиль автора ↗</span></button><p class="rp-community-detail-description">' + esc(row.description || "Автор пока не добавил описание.") + '</p>' + macroMarkup(row.nutrition || {}) + '<h3>Ингредиенты</h3>' + fullIngredients + '<div class="rp-community-card-actions"><button type="button" class="rp-community-primary" data-community-save="' + esc(row.id) + '">' + (readSavedCommunity().some(item => item.id === row.id) ? "✓ В коллекции" : "＋ Сохранить в коллекцию") + '</button>' + (savedOnly ? '<button type="button" class="rp-community-save" data-community-remove="' + esc(row.id) + '">Убрать из коллекции</button>' : '') + '</div><p class="rp-community-disclaimer">Пищевая ценность зависит от точного состава, веса ингредиентов и способа приготовления.</p></div>');
+  }
+  function openAuthorProfile(userId) {
+    const rows = currentFeedRows.filter(row => String(row.user_id) === String(userId));
+    const profile = rows.find(row => row.profile)?.profile || {};
+    const author = profile.display_name || (profile.username ? "@" + profile.username : "Автор RecipePro");
+    const avatar = profile.avatar_path && /^https:\/\//i.test(profile.avatar_path) ? '<img src="' + esc(profile.avatar_path) + '" alt="">' : '<span class="rp-community-author-initial">' + esc((author.trim()[0] || "R").toLocaleUpperCase("ru-RU")) + '</span>';
+    openCommunityDialog('<div class="rp-community-author-page"><div class="rp-community-author-hero">' + avatar + '<div><div class="rp-community-eyebrow">АВТОР RECIPEPRO</div><h2 id="rpCommunityDialogTitle">' + esc(author) + '</h2><p>' + esc(profile.bio || "Автор пока не добавил описание профиля.") + '</p></div></div><h3>Опубликованные блюда</h3><div class="rp-community-author-recipes">' + (rows.length ? rows.map(row => '<button type="button" class="rp-community-author-recipe" data-community-open="' + esc(row.id) + '"><span>' + esc(row.title || "Авторское блюдо") + '</span><span>Открыть ↗</span></button>').join("") : '<p class="rp-community-empty">У автора пока нет других блюд в загруженной ленте.</p>') + '</div></div>');
+  }
+  function handleCommunityClick(event) {
+    const target = event.target.closest("[data-community-open], [data-community-save], [data-community-remove], [data-community-author], [data-community-saved-open], [data-community-close]");
+    if (!target) return;
+    if (target.hasAttribute("data-community-close")) { closeCommunityDialog(); return; }
+    const id = target.dataset.communityOpen || target.dataset.communitySave || target.dataset.communityRemove || target.dataset.communitySavedOpen;
+    if (target.hasAttribute("data-community-author")) { openAuthorProfile(target.dataset.communityAuthor); return; }
+    if (target.hasAttribute("data-community-remove")) {
+      saveSavedCommunity(readSavedCommunity().filter(row => String(row.id) !== String(target.dataset.communityRemove)));
+      renderSavedCommunity(); renderFeed(currentFeedRows); status("Блюдо удалено из твоей коллекции.", false); return;
+    }
+    if (target.hasAttribute("data-community-save")) {
+      const row = currentFeedRows.find(item => String(item.id) === String(target.dataset.communitySave)) || readSavedCommunity().find(item => String(item.id) === String(target.dataset.communitySave));
+      if (!row) return;
+      const profile = row.profile || {};
+      const author = profile.display_name || (profile.username ? "@" + profile.username : row.author || "Автор RecipePro");
+      const saved = readSavedCommunity();
+      if (!saved.some(item => String(item.id) === String(row.id))) {
+        saved.unshift({ ...row, author, profile: undefined });
+        saveSavedCommunity(saved.slice(0, 100));
+        status("«" + (row.title || "Блюдо") + "» добавлено в твою коллекцию.", false);
+      } else status("Это блюдо уже есть в твоей коллекции.", false);
+      renderSavedCommunity(); renderFeed(currentFeedRows);
+      if (! $("rpCommunityDialog")?.hidden) openRecipeDetails(row, false);
+      return;
+    }
+    if (id) {
+      const row = currentFeedRows.find(item => String(item.id) === String(id)) || readSavedCommunity().find(item => String(item.id) === String(id));
+      if (row) openRecipeDetails(row, !currentFeedRows.some(item => String(item.id) === String(id)));
+    }
   }
   async function restoreCloudProfile() {
     try {
@@ -133,6 +244,7 @@
     }
   }
   async function refreshFeed() {
+    ensureCommunityExtras();
     const feed = $("rpCommunityFeed");
     if (feed) feed.innerHTML = '<div class="rp-community-empty">Загружаем блюда сообщества…</div>';
     if (!api()) {
@@ -142,6 +254,7 @@
     try {
       const rows = await api().listFeed();
       renderFeed(rows);
+      renderSavedCommunity();
       status("В ленте: " + rows.length + " опубликованных блюд.", false);
     } catch (error) {
       if (feed) feed.innerHTML = '<div class="rp-community-empty">Не удалось загрузить ленту. Проверь подключение к интернету и обнови страницу.</div>';
@@ -208,7 +321,12 @@
   }
   function init() {
     if (!$("rpCommunity")) return;
+    ensureCommunityExtras();
     refreshRecipeSelect();
+    renderSavedCommunity();
+    $("rpCommunity").addEventListener("click", handleCommunityClick);
+    $("rpCommunityDialog")?.addEventListener("click", handleCommunityClick);
+    document.addEventListener("keydown", event => { if (event.key === "Escape") closeCommunityDialog(); });
     const grid = $("myRecipesGrid");
     if (grid) new MutationObserver(refreshRecipeSelect).observe(grid, { childList: true, subtree: true });
     $("rpCommunityRefresh")?.addEventListener("click", refreshFeed);
