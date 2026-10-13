@@ -185,3 +185,10 @@ button, a, input, select, textarea { touch-action: manipulation; }
 @media (max-width:760px) { .hero-grid { display:block; } .hero-content { max-width:none; } .hero h1 { max-width:100%; } .recipe-discovery-tools .search-box { display:flex!important; } .recipe-discovery-tools .ai-generator-trigger { display:flex!important; } .recipe-discovery-tools .popular-searches { display:block!important; } .recipe-discovery-tools .hero-recipe-wrap { display:block; } }
 
 @media (max-width:760px) { .recipes-section .hero-recipe-wrap { display:block!important; max-width:100%; margin:0 0 28px; } }
+
+
+/* Fast portion presets for the daily food diary. */
+.rp-portion-shortcuts { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; }
+.rp-portion-shortcuts button { min-height:34px; min-width:48px; padding:0 10px; border:1px solid #deded5; border-radius:999px; background:#fff; color:#33483d; font:inherit; font-size:12px; cursor:pointer; }
+.rp-portion-shortcuts button[aria-pressed="true"] { border-color:#294d3d; background:#e8efe9; color:#20372f; font-weight:700; }
+.rp-portion-shortcuts button:focus-visible { outline:2px solid #294d3d; outline-offset:2px; }
