@@ -14,7 +14,34 @@ const matches=new Map();
 for(const [id,p] of all){const names=[id,p.name,...(p.aliases||[])].map(norm).filter(n=>n.length>=4);if(names.some(n=>q.includes(n)))matches.set(id,{id,product:p});}
 return matches.size===1?[...matches.values()][0]:null;}
 function calc(p,grams,state){const engine=window.recipeProNutritionEngine;if(engine&&typeof engine.calculateIngredient==="function"){const result=engine.calculateIngredient({product:p,amount:grams,state:state==="boiled"?"boiled":"raw"});return{calories:result.calories,protein:result.protein,fat:result.fat,carbs:result.carbs};}const raw=p.raw||{},ratio=Number(p.cookedWeightRatio);let basis=Number(grams);if(state==="boiled"&&Number.isFinite(ratio)&&ratio>0)basis/=ratio;const f=basis/100;return{calories:Number(raw.kcal||0)*f,protein:Number(raw.protein||0)*f,fat:Number(raw.fat||0)*f,carbs:Number(raw.carbs||0)*f};}
-function goals(){return read(GOALS,null);}function diary(){return read(STORE,{});}function date(){return $("rpDiaryDate").value||today();}function entries(){const d=diary();return Array.isArray(d[date()])?d[date()]:[];}
+function goals(){return read(GOALS,null);}
+function productMatches(value){
+const q=norm(value);if(!q||!window.products)return[];
+const all=Object.entries(window.products).map(([id,product])=>({id,product}));
+const exact=all.filter(({id,product})=>norm(id)===q||norm(product.name)===q||(product.aliases||[]).some(a=>norm(a)===q));
+if(exact.length)return exact.slice(0,6);
+if(q.length<2)return[];
+const starts=all.filter(({id,product})=>[product.name,id,...(product.aliases||[])].some(n=>norm(n).startsWith(q)));
+const includes=all.filter(({id,product})=>[product.name,id,...(product.aliases||[])].some(n=>norm(n).includes(q)));
+return [...starts,...includes.filter(x=>!starts.some(y=>y.id===x.id))].slice(0,6);
+}
+function renderProductSuggestions(){
+const input=$("rpFoodProduct"),host=$("rpProductSuggestions");if(!input||!host)return;
+const q=input.value.trim();if(!q){host.hidden=true;host.innerHTML="";return;}
+const matches=productMatches(q);if(!matches.length){host.hidden=true;host.innerHTML="";return;}
+host.innerHTML=matches.map(({id,product})=>'<button type="button" class="rp-product-suggestion" role="option" data-product-id="'+escapeHtml(id)+'"><span>'+escapeHtml(product.name)+'</span><small>'+fmt(product.raw?.kcal||0,0)+' ккал · '+fmt(product.raw?.protein||0)+' г белка / 100 г</small></button>').join("");
+host.hidden=false;
+}
+function recentProducts(){
+const all=diary(),seen=new Set(),result=[];
+Object.keys(all).sort().reverse().forEach(day=>{(all[day]||[]).slice().reverse().forEach(entry=>{if(entry.productId&&!seen.has(entry.productId)&&window.products?.[entry.productId]){seen.add(entry.productId);result.push({id:entry.productId,name:window.products[entry.productId].name,grams:entry.grams,state:entry.state,meal:entry.meal});}});});
+return result.slice(0,5);
+}
+function renderRecentProducts(){
+const host=$("rpRecentProducts");if(!host)return;
+const recent=recentProducts();host.innerHTML=recent.map(item=>'<button type="button" class="rp-recent-product" data-recent-product="'+escapeHtml(item.id)+'" data-grams="'+Number(item.grams||100)+'" data-state="'+(item.state==="boiled"?"boiled":"raw")+'" data-meal="'+escapeHtml(item.meal||"Обед")+'">'+escapeHtml(item.name)+'<small>'+fmt(item.grams||100,0)+' г</small></button>').join("");
+host.hidden=!recent.length;
+}function diary(){return read(STORE,{});}function date(){return $("rpDiaryDate").value||today();}function entries(){const d=diary();return Array.isArray(d[date()])?d[date()]:[];}
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function renderLog(list){const host=$("rpFoodLog");if(!list.length){host.innerHTML='<p class="rp-diary-empty">Пока нет записей. Добавь первый продукт выше.</p>';return;}
 host.innerHTML=["Завтрак","Обед","Ужин","Перекус"].map(meal=>{const group=list.filter(e=>e.meal===meal);if(!group.length)return"";return '<div class="rp-food-meal-group"><h4>'+meal+'</h4>'+group.map(e=>'<article class="rp-food-log-row"><div class="rp-food-log-name"><strong>'+escapeHtml(e.name)+'</strong><span>'+fmt(e.grams,0)+' г · '+(e.state==="boiled"?"приготовленный вес":"сырой / сухой вес")+'</span></div><div class="rp-food-log-kcal"><strong>'+fmt(e.calories,0)+'</strong><span>ккал</span></div><div class="rp-food-log-macros"><span>Б '+fmt(e.protein)+'</span><span>Ж '+fmt(e.fat)+'</span><span>У '+fmt(e.carbs)+'</span></div><button type="button" class="rp-food-delete" data-delete-entry="'+escapeHtml(e.id)+'" aria-label="Удалить '+escapeHtml(e.name)+'">×</button></article>').join("")+'</div>';}).join("");}
@@ -24,7 +51,7 @@ $("rpDiaryDayLabel").textContent=date()===today()?"Сегодня":new Date(date
 const cg=Number(g.calories||0),pct=cg?Math.round(total.calories/cg*100):0;$("rpDiaryCaloriePercent").textContent=Math.min(pct,999)+"%";$("rpDiaryCalorieRing").style.setProperty("--rp-progress",Math.min(pct,100)+"%");
 $("rpDiaryCaloriesRemaining").textContent=cg?(total.calories>=cg?"На "+fmt(total.calories-cg,0)+" ккал выше цели":"Осталось "+fmt(cg-total.calories,0)+" ккал"):"Сначала укажи дневную норму";
 [["Protein","protein"],["Fat","fat"],["Carbs","carbs"]].forEach(([label,key])=>{const target=Number(g[key]||0),value=total[key];$("rpDiary"+label+"Bar").style.width=target?Math.min(100,value/target*100)+"%":"0%";$("rpDiary"+label+"Remaining").textContent=target?(value>=target?"Норма достигнута · +"+fmt(value-target)+" г":"Осталось "+fmt(target-value)+" г"):"Норма не задана";});
-if(g.calories!==undefined){$("rpGoalCalories").value=g.calories;$("rpGoalProtein").value=g.protein;$("rpGoalFat").value=g.fat;$("rpGoalCarbs").value=g.carbs;}renderLog(list);}
+if(g.calories!==undefined){$("rpGoalCalories").value=g.calories;$("rpGoalProtein").value=g.protein;$("rpGoalFat").value=g.fat;$("rpGoalCarbs").value=g.carbs;}renderLog(list);renderRecentProducts();}
 function save(list){const d=diary();d[date()]=list;try{localStorage.setItem(STORE,JSON.stringify(d));render();}catch(_){$("rpFoodStatus").textContent="Не удалось сохранить данные. Возможно, память браузера заполнена.";}}
 function importRecipeIngredients(event){
 const detail=event.detail||{},items=Array.isArray(detail.ingredients)?detail.ingredients:[];
@@ -50,8 +77,16 @@ else $("rpFoodStatus").textContent="Не удалось добавить инг�
 if (window.__RECIPEPRO_TEST__) window.recipeProFoodDiary = { findProduct };
 function init(){if(!$("rpFoodForm")||!window.products)return;$("rpDiaryDate").value=today();window.addEventListener("recipepro:import-ingredients",importRecipeIngredients);
 const options=$("rpFoodProductList");Object.values(window.products).forEach(p=>{[p.name,...(p.aliases||[]).slice(0,3)].forEach(name=>{const o=document.createElement("option");o.value=name;options.appendChild(o);});});
+const productInput=$("rpFoodProduct"),suggestions=$("rpProductSuggestions");
+productInput.addEventListener("input",renderProductSuggestions);
+productInput.addEventListener("focus",renderProductSuggestions);
+productInput.addEventListener("keydown",e=>{if(e.key==="Escape"){suggestions.hidden=true;return;}if(e.key==="Enter"&&!suggestions.hidden){const first=suggestions.querySelector("[data-product-id]");if(first){e.preventDefault();chooseProduct(first.dataset.productId);}}});
+function chooseProduct(id){const p=window.products[id];if(!p)return;productInput.value=p.name;suggestions.hidden=true;suggestions.innerHTML="";$("rpFoodGrams").focus();$("rpFoodStatus").textContent="Выбран продукт из каталога. Укажи вес и добавь запись.";}
+suggestions.addEventListener("click",e=>{const b=e.target.closest("[data-product-id]");if(b)chooseProduct(b.dataset.productId);});
+$("rpRecentProducts").addEventListener("click",e=>{const b=e.target.closest("[data-recent-product]");if(!b)return;chooseProduct(b.dataset.recentProduct);$("rpFoodGrams").value=b.dataset.grams||100;$("rpFoodState").value=b.dataset.state||"raw";$("rpFoodMeal").value=b.dataset.meal||"Обед";$("rpFoodGrams").focus();});
+document.addEventListener("click",e=>{if(!e.target.closest(".rp-food-name"))suggestions.hidden=true;});
 $("rpGoalsForm").addEventListener("submit",e=>{e.preventDefault();const g={calories:Number($("rpGoalCalories").value),protein:Number($("rpGoalProtein").value),fat:Number($("rpGoalFat").value),carbs:Number($("rpGoalCarbs").value)};if(Object.values(g).some(v=>!Number.isFinite(v)||v<0)||g.calories<=0){$("rpGoalsStatus").textContent="Калории должны быть больше нуля, остальные значения — не меньше нуля.";return;}localStorage.setItem(GOALS,JSON.stringify(g));$("rpGoalsStatus").textContent="Твоя норма сохранена на этом устройстве.";render();});
-$("rpFoodForm").addEventListener("submit",e=>{e.preventDefault();const found=findProduct($("rpFoodProduct").value),grams=Number($("rpFoodGrams").value);if(!found){$("rpFoodStatus").textContent="Не нашёл этот продукт в каталоге. Выбери название из подсказок — так расчёт не будет выдуманным.";return;}if(!Number.isFinite(grams)||grams<=0||grams>10000){$("rpFoodStatus").textContent="Укажи вес от 1 до 10 000 г.";return;}const state=$("rpFoodState").value,values=calc(found.product,grams,state),id=window.crypto&&crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);const list=entries();list.push({id,productId:found.id,name:found.product.name,grams,state,meal:$("rpFoodMeal").value,...values,createdAt:new Date().toISOString()});save(list);$("rpFoodProduct").value="";$("rpFoodGrams").value="100";$("rpFoodStatus").textContent="Добавлено: "+found.product.name+". Значения рассчитаны по каталогу RecipePro.";});
+$("rpFoodForm").addEventListener("submit",e=>{e.preventDefault();const found=findProduct($("rpFoodProduct").value),grams=Number($("rpFoodGrams").value);if(!found){$("rpFoodStatus").textContent="Не нашёл этот продукт в каталоге. Выбери название из подсказок — так расчёт не будет выдуманным.";return;}if(!Number.isFinite(grams)||grams<=0||grams>10000){$("rpFoodStatus").textContent="Укажи вес от 1 до 10 000 г.";return;}const state=$("rpFoodState").value,values=calc(found.product,grams,state),id=window.crypto&&crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);const list=entries();list.push({id,productId:found.id,name:found.product.name,grams,state,meal:$("rpFoodMeal").value,...values,createdAt:new Date().toISOString()});save(list);$("rpFoodProduct").value="";$("rpProductSuggestions").hidden=true;$("rpFoodGrams").value="100";$("rpFoodStatus").textContent="Добавлено: "+found.product.name+". Значения рассчитаны по каталогу RecipePro.";});
 $("rpFoodLog").addEventListener("click",e=>{const b=e.target.closest("[data-delete-entry]");if(b)save(entries().filter(x=>String(x.id)!==b.dataset.deleteEntry));});
 $("rpDiaryDate").addEventListener("change",render);$("rpClearDiaryBtn").addEventListener("click",()=>{if(entries().length&&confirm("Удалить все записи питания за выбранный день?"))save([]);});render();}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
