@@ -9,7 +9,7 @@ function norm(v){return String(v||"").toLowerCase().replace(/ё/g,"е").replace(
 function findProduct(value){const q=norm(value);if(!q||!window.products)return null;const all=Object.entries(window.products);
 for(const [id,p] of all)if(norm(id)===q||norm(p.name)===q)return{id,product:p};
 for(const [id,p] of all)if((p.aliases||[]).some(a=>norm(a)===q))return{id,product:p};
-if(q.length<4)return null;
+if(q.length<4||/(?:^|\\s)(?:с|и|плюс)(?:\\s|$)/.test(q))return null;
 const matches=new Map();
 for(const [id,p] of all){const names=[id,p.name,...(p.aliases||[])].map(norm).filter(n=>n.length>=4);if(names.some(n=>q.includes(n)))matches.set(id,{id,product:p});}
 return matches.size===1?[...matches.values()][0]:null;}
