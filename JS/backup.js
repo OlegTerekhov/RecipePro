@@ -6,7 +6,9 @@
     favorites: "recipepro_favorites",
     plan: "recipepro_meal_plan",
     shopping: "recipepro_shopping_list",
-    history: "recipepro_recipe_history"
+    history: "recipepro_recipe_history",
+    diary: "recipepro_food_diary_v1",
+    goals: "recipepro_nutrition_goals_v1"
   };
   const MAX_BACKUP_BYTES = 5 * 1024 * 1024;
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -50,7 +52,7 @@
   function createBackup() {
     const data = {};
     for (const [name, key] of Object.entries(KEYS)) {
-      const fallback = name === "plan" ? {} : [];
+      const fallback = ["plan", "diary", "goals"].includes(name) ? {} : [];
       data[name] = readJson(key, fallback);
     }
     return {
@@ -74,7 +76,7 @@
     link.click();
     link.remove();
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
-    announce("Резервная копия подготовлена. Храни файл в надёжном месте.");
+    announce("Резервная копия подготовлена: включены дневник питания и дневные цели. Храни файл в надёжном месте.");
   }
 
   function validateBackup(parsed) {
@@ -87,6 +89,19 @@
     }
     if (d.recipes.length > 5000 || d.favorites.length > 10000 || d.shopping.length > 10000 || d.history.length > 1000 || Object.keys(d.plan).length > 1000) {
       throw new Error("В резервной копии слишком много элементов.");
+    }
+    if (d.diary === undefined) d.diary = {};
+    if (!d.diary || typeof d.diary !== "object" || Array.isArray(d.diary) || Object.keys(d.diary).length > 5000) throw new Error("Дневник питания в резервной копии повреждён.");
+    for (const [day, entries] of Object.entries(d.diary)) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || !Array.isArray(entries) || entries.length > 1000) throw new Error("Обнаружен некорректный день в дневнике питания.");
+      for (const entry of entries) {
+        if (!entry || typeof entry !== "object" || !Number.isFinite(Number(entry.grams)) || Number(entry.grams) <= 0 || Number(entry.grams) > 10000) throw new Error("В дневнике есть запись с некорректным весом.");
+      }
+    }
+    if (d.goals === undefined) d.goals = {};
+    if (!d.goals || typeof d.goals !== "object" || Array.isArray(d.goals)) throw new Error("Цели питания в резервной копии повреждены.");
+    for (const key of ["calories", "protein", "fat", "carbs"]) {
+      if (d.goals[key] !== undefined && (!Number.isFinite(Number(d.goals[key])) || Number(d.goals[key]) < 0 || Number(d.goals[key]) > 100000)) throw new Error("В резервной копии обнаружена некорректная цель питания.");
     }
     for (const recipe of d.recipes) {
       if (!recipe || typeof recipe !== "object" || !recipe.id || typeof recipe.title !== "string" || recipe.title.length > 300) {
@@ -105,13 +120,24 @@
     return result;
   }
 
+  function mergeDiary(current, incoming) {
+    const result = current && typeof current === "object" && !Array.isArray(current) ? { ...current } : {};
+    for (const [day, entries] of Object.entries(incoming || {})) {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || !Array.isArray(entries)) continue;
+      result[day] = mergeByIdentity(safeArray(result[day]), entries);
+    }
+    return result;
+  }
+
   function importData(data) {
     const merged = {
       recipes: mergeByIdentity(readJson(KEYS.recipes, []), data.recipes),
       favorites: [...new Set([...safeArray(readJson(KEYS.favorites, [])), ...data.favorites].map(String))],
       plan: mergePlan(readJson(KEYS.plan, {}), data.plan),
       shopping: mergeByIdentity(readJson(KEYS.shopping, []), data.shopping),
-      history: mergeByIdentity(readJson(KEYS.history, []), data.history)
+      history: mergeByIdentity(readJson(KEYS.history, []), data.history),
+      diary: mergeDiary(readJson(KEYS.diary, {}), data.diary),
+      goals: { ...(readJson(KEYS.goals, {}) || {}), ...(data.goals || {}) }
     };
 
     // Validate and build every collection before writing any of them.
@@ -145,7 +171,8 @@
         data.recipes.length + " рецептов",
         data.favorites.length + " избранных",
         Object.keys(data.plan).length + " дней плана",
-        data.shopping.length + " покупок"
+        data.shopping.length + " покупок",
+        Object.values(data.diary || {}).reduce((sum, day) => sum + day.length, 0) + " записей питания"
       ].join(", ");
       if (!window.confirm("Импортировать резервную копию (" + counts + ")?\n\nДанные будут объединены с текущими, а не заменят их.")) return;
       importData(data);
