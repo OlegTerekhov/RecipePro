@@ -86,30 +86,42 @@ window.products = {
     },
 
     "тунец": {
-        name: "Тунец",
+        name: "Тунец (сырой, желтопёрый)",
         category: "fish",
-        aliases: ["тунец", "тунца"],
+        aliases: ["тунец", "тунца", "желтопёрый тунец"],
         raw: {
-            kcal: 132,
-            protein: 28,
-            fat: 1.3,
+            kcal: 109,
+            protein: 24.4,
+            fat: 0.5,
             carbs: 0
         },
-        cookedWeightRatio: 0.75,
+        nutritionSource: {
+            database: "USDA FoodData Central SR Legacy",
+            fdcId: "175159",
+            state: "raw",
+            url: "https://fdc.nal.usda.gov/food-details/175159/nutrients"
+        },
+        cookedWeightRatio: 0.82,
         pieceWeight: 150
     },
 
     "креветки": {
-        name: "Креветки",
+        name: "Креветки (сырые)",
         category: "fish",
         aliases: ["креветки", "креветок", "креветку"],
         raw: {
-            kcal: 99,
-            protein: 24,
-            fat: 0.3,
-            carbs: 0.2
+            kcal: 85,
+            protein: 20.1,
+            fat: 0.5,
+            carbs: 0
         },
-        cookedWeightRatio: 0.8,
+        nutritionSource: {
+            database: "USDA FoodData Central SR Legacy",
+            fdcId: "175179",
+            state: "raw",
+            url: "https://fdc.nal.usda.gov/food-details/175179/nutrients"
+        },
+        cookedWeightRatio: 0.86,
         pieceWeight: 15
     },
 
