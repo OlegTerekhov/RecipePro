@@ -74,7 +74,7 @@ window.products = {
     "лосось": {
         name: "Лосось",
         category: "fish",
-        aliases: ["лосось", "лосося", "рыба"],
+        aliases: ["лосось", "лосося"],
         raw: {
             kcal: 208,
             protein: 20,
