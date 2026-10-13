@@ -283,12 +283,12 @@
       <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Запись питания</span><h3 id="rpAddFoodTitle">Что ты съел?</h3><p>Выбери продукт из каталога, укажи фактический вес и приём пищи.</p></div></div>
       <div id="rpRecentProducts" class="rp-recent-products" aria-label="Недавно добавленные продукты" hidden></div>
       <form id="rpFoodForm" class="rp-food-form">
-        <label class="rp-food-name">Продукт<input id="rpFoodProduct" type="text" list="rpFoodProductList" placeholder="Например, куриная грудка" autocomplete="off" aria-autocomplete="list" aria-controls="rpProductSuggestions" required><datalist id="rpFoodProductList"></datalist><div id="rpProductSuggestions" class="rp-product-suggestions" role="listbox" aria-label="Подходящие продукты" hidden></div></label>
+        <label class="rp-food-name">Продукт<input id="rpFoodProduct" type="text" list="rpFoodProductList" placeholder="Название или штрихкод" autocomplete="off" aria-autocomplete="list" aria-controls="rpProductSuggestions" required><datalist id="rpFoodProductList"></datalist><button id="rpOpenScanner" class="rp-scan-trigger" type="button" aria-haspopup="dialog"><span aria-hidden="true">▦</span> Сканировать штрихкод</button><div id="rpProductSuggestions" class="rp-product-suggestions" role="listbox" aria-label="Подходящие продукты" hidden></div></label>
         <label>Вес, г<input id="rpFoodGrams" type="number" min="1" max="10000" step="1" value="100" required></label>
         <label>Состояние<select id="rpFoodState"><option value="raw">Сырой / сухой</option><option value="boiled">Варёный / приготовленный</option></select></label>
         <label>Приём пищи<select id="rpFoodMeal"><option>Завтрак</option><option>Обед</option><option>Ужин</option><option>Перекус</option></select></label>
         <button class="rp-diary-primary" type="submit">Добавить в дневник <span>+</span></button>
-      </form><p class="rp-diary-status" id="rpFoodStatus" role="status">Расчёт основан на встроенном каталоге. Значения могут отличаться от этикетки конкретного продукта.</p>
+      </form><div id="rpBarcodeScanner" class="rp-scanner-modal" role="dialog" aria-modal="true" aria-labelledby="rpScannerTitle" hidden><div class="rp-scanner-backdrop" data-close-scanner></div><section class="rp-scanner-card"><div class="rp-scanner-head"><div><span class="rp-diary-kicker">Быстрое добавление</span><h3 id="rpScannerTitle">Сканер штрихкода</h3></div><button id="rpCloseScanner" class="rp-scanner-close" type="button" aria-label="Закрыть сканер">×</button></div><div class="rp-scanner-view"><video id="rpScannerVideo" playsinline muted aria-label="Изображение с камеры"></video><div class="rp-scanner-frame" aria-hidden="true"></div></div><p id="rpScannerStatus" class="rp-scanner-status" role="status">Наведи камеру на штрихкод упаковки.</p><button id="rpScannerManual" class="rp-diary-secondary rp-scanner-manual" type="button">Ввести штрихкод вручную</button></section></div><p class="rp-diary-status" id="rpFoodStatus" role="status">Расчёт основан на встроенном каталоге. Значения могут отличаться от этикетки конкретного продукта.</p>
     </section>
     <section class="rp-diary-panel rp-log-panel" aria-labelledby="rpLogTitle">
       <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">История за выбранный день</span><h3 id="rpLogTitle">Дневник питания</h3></div><button class="rp-diary-secondary" id="rpClearDiaryBtn" type="button">Очистить этот день</button></div>
@@ -1418,7 +1418,7 @@
 <script src="JS/nutrition-engine.js?v=20261009-r5"></script>
 <script src="JS/nutrition.js?v=20261009-r2"></script>
 <script src="JS/app.js?v=20261012-photos1"></script>
-    <script src="JS/food-diary.js?v=20261013-off2"></script>
+    <script src="JS/food-diary.js?v=20261013-scan1"></script>
     <script src="JS/profile.js?v=20261013-clean1"></script>
 <script src="JS/meal-planner.js?v=20261012-r3"></script>
 <script src="JS/ai-generator.js?v=20261012-offline2"></script>
