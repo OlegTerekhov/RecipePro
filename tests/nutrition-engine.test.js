@@ -5,9 +5,9 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
-const context = vm.createContext({ window: {}, document: { readyState: "loading", addEventListener() {} } });
+const context = vm.createContext({ window: { __RECIPEPRO_TEST__: true }, document: { readyState: "loading", addEventListener() {} } });
 
-for (const file of ["JS/products.js", "JS/nutrition-engine.js", "JS/food-diary.js"]) {
+for (const file of ["JS/products.js", "JS/nutrition-engine.js", "JS/food-diary.js", "JS/recipes.js"]) {
   const source = fs.readFileSync(path.join(root, file), "utf8");
   vm.runInContext(source, context, { filename: file });
 }
@@ -192,4 +192,53 @@ test("diary product matching rejects generic and ambiguous phrases", () => {
   assert.equal(resolver("курица с рисом"), null);
   assert.equal(resolver("курица").id, "курица");
   assert.equal(resolver("курица 100 г").id, "курица");
+});
+
+
+test("raw tuna and shrimp reference USDA raw-food records", () => {
+  const tuna = context.window.products["тунец"];
+  const shrimp = context.window.products["креветки"];
+  assert.deepEqual(
+    [tuna.raw.kcal, tuna.raw.protein, tuna.raw.fat, tuna.raw.carbs],
+    [109, 24.4, 0.5, 0]
+  );
+  assert.equal(tuna.nutritionSource.fdcId, "175159");
+  assert.deepEqual(
+    [shrimp.raw.kcal, shrimp.raw.protein, shrimp.raw.fat, shrimp.raw.carbs],
+    [85, 20.1, 0.5, 0]
+  );
+  assert.equal(shrimp.nutritionSource.fdcId, "175179");
+  assert.equal(tuna.cookedWeightRatio, 0.82);
+  assert.equal(shrimp.cookedWeightRatio, 0.86);
+});
+
+test("all published recipes reference known products and supported units", () => {
+  const products = context.window.products;
+  const recipes = context.window.recipes;
+  assert.equal(recipes.length, 8);
+  const allowedUnits = new Set(["г", "гр", "грамм", "грамма", "граммов", "мл", "шт"]);
+  for (const recipe of recipes) {
+    assert.ok(recipe.title && recipe.title.trim(), recipe.id + " needs a title");
+    assert.ok(Number.isFinite(recipe.servings) && recipe.servings > 0, recipe.id + " needs servings");
+    assert.ok(Array.isArray(recipe.ingredients) && recipe.ingredients.length > 0, recipe.id + " needs ingredients");
+    assert.ok(Array.isArray(recipe.steps) && recipe.steps.length > 0, recipe.id + " needs steps");
+    for (const ingredient of recipe.ingredients) {
+      assert.ok(products[ingredient.product], recipe.id + " references unknown product " + ingredient.product);
+      assert.ok(Number.isFinite(ingredient.amount) && ingredient.amount > 0, recipe.id + " has invalid amount");
+      assert.ok(allowedUnits.has(ingredient.unit), recipe.id + " has unsupported unit " + ingredient.unit);
+    }
+  }
+});
+
+test("recipes that explicitly fry ingredients include cooking oil in their nutrition", () => {
+  const recipes = context.window.recipes;
+  for (const id of ["chicken-potato", "omelet-cheese-tomato", "rice-chicken", "pasta-chicken"]) {
+    const recipe = recipes.find(item => item.id === id);
+    assert.ok(recipe.ingredients.some(item => item.product === "масло"), id + " must count the oil described in its cooking steps");
+  }
+});
+
+test("oatmeal with banana and milk is not mislabeled as a low-calorie recipe", () => {
+  const recipe = context.window.recipes.find(item => item.id === "oatmeal-banana");
+  assert.ok(!recipe.filters.includes("calories"));
 });
