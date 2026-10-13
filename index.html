@@ -281,8 +281,9 @@
     </div>
     <section class="rp-diary-panel rp-add-food-panel" aria-labelledby="rpAddFoodTitle">
       <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Запись питания</span><h3 id="rpAddFoodTitle">Что ты съел?</h3><p>Выбери продукт из каталога, укажи фактический вес и приём пищи.</p></div></div>
+      <div id="rpRecentProducts" class="rp-recent-products" aria-label="Недавно добавленные продукты" hidden></div>
       <form id="rpFoodForm" class="rp-food-form">
-        <label class="rp-food-name">Продукт<input id="rpFoodProduct" type="text" list="rpFoodProductList" placeholder="Например, куриная грудка" autocomplete="off" required><datalist id="rpFoodProductList"></datalist></label>
+        <label class="rp-food-name">Продукт<input id="rpFoodProduct" type="text" list="rpFoodProductList" placeholder="Например, куриная грудка" autocomplete="off" aria-autocomplete="list" aria-controls="rpProductSuggestions" required><datalist id="rpFoodProductList"></datalist><div id="rpProductSuggestions" class="rp-product-suggestions" role="listbox" aria-label="Подходящие продукты" hidden></div></label>
         <label>Вес, г<input id="rpFoodGrams" type="number" min="1" max="10000" step="1" value="100" required></label>
         <label>Состояние<select id="rpFoodState"><option value="raw">Сырой / сухой</option><option value="boiled">Варёный / приготовленный</option></select></label>
         <label>Приём пищи<select id="rpFoodMeal"><option>Завтрак</option><option>Обед</option><option>Ужин</option><option>Перекус</option></select></label>
@@ -1417,7 +1418,7 @@
 <script src="JS/nutrition-engine.js?v=20261009-r5"></script>
 <script src="JS/nutrition.js?v=20261009-r2"></script>
 <script src="JS/app.js?v=20261012-photos1"></script>
-    <script src="JS/food-diary.js?v=20261013-v6"></script>
+    <script src="JS/food-diary.js?v=20261013-mobile2"></script>
     <script src="JS/profile.js?v=20261013-clean1"></script>
 <script src="JS/meal-planner.js?v=20261012-r3"></script>
 <script src="JS/ai-generator.js?v=20261012-offline2"></script>
