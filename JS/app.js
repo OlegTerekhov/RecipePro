@@ -6089,6 +6089,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       description,
 
+      image: window.recipeProSelectedRecipeImage || "",
+
       emoji,
 
       tags: [
