@@ -109,3 +109,56 @@ test("per-serving values divide totals by the requested serving count", () => {
   assert.equal(result.perServing.calories, 120);
   assert.equal(result.perServing.protein, 23);
 });
+
+
+test("cooked rice converts cooked grams back to dry-weight nutrition", () => {
+  const result = engine.calculateIngredient({
+    product: "рис",
+    amount: 280,
+    state: "boiled"
+  });
+
+  assert.equal(result.rawEquivalent, 100);
+  assert.equal(result.calories, 360);
+  assert.equal(result.protein, 7);
+  assert.equal(result.carbs, 79);
+});
+
+test("cooked buckwheat converts cooked grams back to dry-weight nutrition", () => {
+  const result = engine.calculateIngredient({
+    product: "гречка",
+    amount: 250,
+    state: "cooked"
+  });
+
+  assert.equal(result.rawEquivalent, 100);
+  assert.equal(result.calories, 343);
+  assert.equal(result.protein, 13.6);
+  assert.equal(result.carbs, 71.5);
+});
+
+test("ingredient quantities that are negative or non-numeric never create negative nutrition", () => {
+  for (const amount of [-100, "not-a-number", null]) {
+    const result = engine.calculateIngredient({
+      product: "курица",
+      amount,
+      state: "raw"
+    });
+
+    assert.equal(result.calories, 0);
+    assert.equal(result.protein, 0);
+    assert.equal(result.fat, 0);
+    assert.equal(result.carbs, 0);
+  }
+});
+
+test("unknown product remains explicitly unknown", () => {
+  const result = engine.calculateIngredient({
+    product: "неизвестный продукт",
+    amount: 100,
+    state: "raw"
+  });
+
+  assert.equal(result.known, false);
+  assert.equal(result.calories, 0);
+});
