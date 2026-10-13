@@ -43,6 +43,7 @@
 
         <nav class="main-nav">
             <a href="#dailyDiary">Дневник</a>
+            <a href="#recipes">Рецепты</a>
         </nav>
 
     </div>
@@ -68,10 +69,106 @@
             </h1>
 
             <p class="hero-description">
-                Записывай продукты по весу, сохраняй свои блюда и отслеживай калории, белки, жиры и углеводы относительно личной дневной нормы.
+                Добавляй продукты за секунды, контролируй калории и БЖУ и понимай, сколько ещё осталось до твоей дневной цели.
             </p>
 
-            <div class="search-box">
+            <div class="hero-actions"><a class="hero-primary-link" href="#dailyDiary">Записать питание <span aria-hidden="true">→</span></a><a class="hero-secondary-link" href="#recipes">Подобрать блюдо</a></div>
+
+            
+
+            
+
+            
+
+        </div>
+
+
+        
+
+    </div>
+
+</section>
+
+
+<section class="section rp-diary-section" id="dailyDiary">
+  <div class="container">
+    <div class="rp-diary-heading">
+      <div><div class="section-eyebrow">Твой ежедневный контроль</div><h2>Питание под твоим контролем</h2><p>Укажи свою дневную норму, добавляй продукты по весу и следи за КБЖУ в течение дня.</p></div>
+      <div class="rp-diary-date"><label for="rpDiaryDate">День учёта</label><input id="rpDiaryDate" type="date"></div>
+    </div>
+    <div class="rp-diary-layout">
+      <section class="rp-diary-panel" aria-labelledby="rpGoalsTitle">
+        <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Личный профиль</span><h3 id="rpGoalsTitle">Моя дневная норма</h3></div><span class="rp-diary-icon" aria-hidden="true">◎</span></div>
+        <p class="rp-diary-help">Внеси значения, которые подходят именно тебе. RecipePro не будет назначать норму за тебя.</p>
+        <form id="rpGoalsForm" class="rp-goals-form">
+          <label>Калории, ккал<input type="number" id="rpGoalCalories" min="1" max="15000" step="1" placeholder="Например, 2100" required></label>
+          <label>Белки, г<input type="number" id="rpGoalProtein" min="0" max="1000" step="0.1" placeholder="Например, 130" required></label>
+          <label>Жиры, г<input type="number" id="rpGoalFat" min="0" max="1000" step="0.1" placeholder="Например, 70" required></label>
+          <label>Углеводы, г<input type="number" id="rpGoalCarbs" min="0" max="2000" step="0.1" placeholder="Например, 230" required></label>
+          <button class="rp-diary-primary" type="submit">Сохранить мою норму <span>→</span></button>
+        </form><p class="rp-diary-status" id="rpGoalsStatus" role="status">Норма хранится на этом устройстве.</p>
+      </section>
+      <section class="rp-diary-panel" aria-labelledby="rpTodayTitle">
+        <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Сводка за день</span><h3 id="rpTodayTitle">Уже съедено</h3></div><span class="rp-diary-day-label" id="rpDiaryDayLabel">Сегодня</span></div>
+        <div class="rp-diary-calorie-summary"><div><span>Калории</span><strong id="rpDiaryCalories">0</strong><small id="rpDiaryCaloriesRemaining">Сначала укажи дневную норму</small></div><div class="rp-diary-calorie-ring" id="rpDiaryCalorieRing"><span id="rpDiaryCaloriePercent">0%</span></div></div>
+        <div class="rp-diary-macro-list">
+          <div class="rp-diary-macro"><div><span>Белки</span><strong id="rpDiaryProtein">0 г</strong></div><div class="rp-diary-progress"><span id="rpDiaryProteinBar"></span></div><small id="rpDiaryProteinRemaining">Норма не задана</small></div>
+          <div class="rp-diary-macro"><div><span>Жиры</span><strong id="rpDiaryFat">0 г</strong></div><div class="rp-diary-progress"><span id="rpDiaryFatBar"></span></div><small id="rpDiaryFatRemaining">Норма не задана</small></div>
+          <div class="rp-diary-macro"><div><span>Углеводы</span><strong id="rpDiaryCarbs">0 г</strong></div><div class="rp-diary-progress"><span id="rpDiaryCarbsBar"></span></div><small id="rpDiaryCarbsRemaining">Норма не задана</small></div>
+        </div>
+      </section>
+    </div>
+    <section class="rp-diary-panel rp-add-food-panel" aria-labelledby="rpAddFoodTitle">
+      <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Запись питания</span><h3 id="rpAddFoodTitle">Что ты съел?</h3><p>Выбери продукт из каталога, укажи фактический вес и приём пищи.</p></div></div>
+      <div id="rpRecentProducts" class="rp-recent-products" aria-label="Недавно добавленные продукты" hidden></div>
+      <form id="rpFoodForm" class="rp-food-form">
+        <label class="rp-food-name">Продукт<input id="rpFoodProduct" type="text" list="rpFoodProductList" placeholder="Название или штрихкод" autocomplete="off" aria-autocomplete="list" aria-controls="rpProductSuggestions" required><datalist id="rpFoodProductList"></datalist><button id="rpOpenScanner" class="rp-scan-trigger" type="button" aria-haspopup="dialog"><span aria-hidden="true">▦</span> Сканировать штрихкод</button><div id="rpProductSuggestions" class="rp-product-suggestions" role="listbox" aria-label="Подходящие продукты" hidden></div></label>
+        <label>Вес, г<input id="rpFoodGrams" type="number" min="1" max="10000" step="1" value="100" required></label>
+        <label>Состояние<select id="rpFoodState"><option value="raw">Сырой / сухой</option><option value="boiled">Варёный / приготовленный</option></select></label>
+        <label>Приём пищи<select id="rpFoodMeal"><option>Завтрак</option><option>Обед</option><option>Ужин</option><option>Перекус</option></select></label>
+        <button class="rp-diary-primary" type="submit">Добавить в дневник <span>+</span></button>
+      </form><div id="rpBarcodeScanner" class="rp-scanner-modal" role="dialog" aria-modal="true" aria-labelledby="rpScannerTitle" hidden><div class="rp-scanner-backdrop" data-close-scanner></div><section class="rp-scanner-card"><div class="rp-scanner-head"><div><span class="rp-diary-kicker">Быстрое добавление</span><h3 id="rpScannerTitle">Сканер штрихкода</h3></div><button id="rpCloseScanner" class="rp-scanner-close" type="button" aria-label="Закрыть сканер">×</button></div><div class="rp-scanner-view"><video id="rpScannerVideo" playsinline muted aria-label="Изображение с камеры"></video><div class="rp-scanner-frame" aria-hidden="true"></div></div><p id="rpScannerStatus" class="rp-scanner-status" role="status">Наведи камеру на штрихкод упаковки.</p><button id="rpScannerManual" class="rp-diary-secondary rp-scanner-manual" type="button">Ввести штрихкод вручную</button></section></div><p class="rp-diary-status" id="rpFoodStatus" role="status">Расчёт основан на встроенном каталоге. Значения могут отличаться от этикетки конкретного продукта.</p>
+    </section>
+    <section class="rp-diary-panel rp-log-panel" aria-labelledby="rpLogTitle">
+      <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">История за выбранный день</span><h3 id="rpLogTitle">Дневник питания</h3></div><button class="rp-diary-secondary" id="rpClearDiaryBtn" type="button">Очистить этот день</button></div>
+      <div id="rpFoodLog" class="rp-food-log" aria-live="polite"><p class="rp-diary-empty">Пока нет записей. Добавь первый продукт выше.</p></div>
+    </section>
+  </div>
+</section>
+
+
+<section
+    class="recipes-section section"
+    id="recipes"
+>
+
+    <div class="container">
+
+        <div class="section-heading">
+
+            <div>
+                <div class="section-eyebrow">
+                    Когда нужен следующий шаг
+                </div>
+
+                <h2 id="recipesTitle">
+                    Блюда под твою цель
+                </h2>
+
+                <p>
+                    Подбирай идеи, когда не знаешь, что приготовить. Используй рецепты как помощника для своего дневника питания.
+                </p>
+            </div>
+
+            <div class="recipes-count" id="recipesCount">
+                8 рецептов
+            </div>
+
+        </div>
+
+
+        <div class="recipe-discovery-tools">
+<div class="search-box">
 
                 <div class="search-icon">
                     <svg
@@ -114,8 +211,7 @@
                 </button>
 
             </div>
-
-            <button class="ai-generator-trigger" id="aiRecipeGeneratorBtn" type="button">
+<button class="ai-generator-trigger" id="aiRecipeGeneratorBtn" type="button">
                 <span class="ai-generator-trigger-icon">✦</span>
                 <span>
                     <strong>Конструктор рецептов</strong>
@@ -123,8 +219,7 @@
                 </span>
                 <span class="ai-generator-trigger-arrow">→</span>
             </button>
-
-            <div class="popular-searches">
+<div class="popular-searches">
 
                 <span class="popular-label">
                     Популярное
@@ -175,9 +270,7 @@
                 </div>
 
             </div>
-
         </div>
-
 
         <div class="hero-recipe-wrap">
 
@@ -243,88 +336,6 @@
                 </div>
 
             </article>
-
-        </div>
-
-    </div>
-
-</section>
-
-
-<section class="section rp-diary-section" id="dailyDiary">
-  <div class="container">
-    <div class="rp-diary-heading">
-      <div><div class="section-eyebrow">Твой ежедневный контроль</div><h2>Питание под твоим контролем</h2><p>Укажи свою дневную норму, добавляй продукты по весу и следи за КБЖУ в течение дня.</p></div>
-      <div class="rp-diary-date"><label for="rpDiaryDate">День учёта</label><input id="rpDiaryDate" type="date"></div>
-    </div>
-    <div class="rp-diary-layout">
-      <section class="rp-diary-panel" aria-labelledby="rpGoalsTitle">
-        <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Личный профиль</span><h3 id="rpGoalsTitle">Моя дневная норма</h3></div><span class="rp-diary-icon" aria-hidden="true">◎</span></div>
-        <p class="rp-diary-help">Внеси значения, которые подходят именно тебе. RecipePro не будет назначать норму за тебя.</p>
-        <form id="rpGoalsForm" class="rp-goals-form">
-          <label>Калории, ккал<input type="number" id="rpGoalCalories" min="1" max="15000" step="1" placeholder="Например, 2100" required></label>
-          <label>Белки, г<input type="number" id="rpGoalProtein" min="0" max="1000" step="0.1" placeholder="Например, 130" required></label>
-          <label>Жиры, г<input type="number" id="rpGoalFat" min="0" max="1000" step="0.1" placeholder="Например, 70" required></label>
-          <label>Углеводы, г<input type="number" id="rpGoalCarbs" min="0" max="2000" step="0.1" placeholder="Например, 230" required></label>
-          <button class="rp-diary-primary" type="submit">Сохранить мою норму <span>→</span></button>
-        </form><p class="rp-diary-status" id="rpGoalsStatus" role="status">Норма хранится на этом устройстве.</p>
-      </section>
-      <section class="rp-diary-panel" aria-labelledby="rpTodayTitle">
-        <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Сводка за день</span><h3 id="rpTodayTitle">Уже съедено</h3></div><span class="rp-diary-day-label" id="rpDiaryDayLabel">Сегодня</span></div>
-        <div class="rp-diary-calorie-summary"><div><span>Калории</span><strong id="rpDiaryCalories">0</strong><small id="rpDiaryCaloriesRemaining">Сначала укажи дневную норму</small></div><div class="rp-diary-calorie-ring" id="rpDiaryCalorieRing"><span id="rpDiaryCaloriePercent">0%</span></div></div>
-        <div class="rp-diary-macro-list">
-          <div class="rp-diary-macro"><div><span>Белки</span><strong id="rpDiaryProtein">0 г</strong></div><div class="rp-diary-progress"><span id="rpDiaryProteinBar"></span></div><small id="rpDiaryProteinRemaining">Норма не задана</small></div>
-          <div class="rp-diary-macro"><div><span>Жиры</span><strong id="rpDiaryFat">0 г</strong></div><div class="rp-diary-progress"><span id="rpDiaryFatBar"></span></div><small id="rpDiaryFatRemaining">Норма не задана</small></div>
-          <div class="rp-diary-macro"><div><span>Углеводы</span><strong id="rpDiaryCarbs">0 г</strong></div><div class="rp-diary-progress"><span id="rpDiaryCarbsBar"></span></div><small id="rpDiaryCarbsRemaining">Норма не задана</small></div>
-        </div>
-      </section>
-    </div>
-    <section class="rp-diary-panel rp-add-food-panel" aria-labelledby="rpAddFoodTitle">
-      <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Запись питания</span><h3 id="rpAddFoodTitle">Что ты съел?</h3><p>Выбери продукт из каталога, укажи фактический вес и приём пищи.</p></div></div>
-      <div id="rpRecentProducts" class="rp-recent-products" aria-label="Недавно добавленные продукты" hidden></div>
-      <form id="rpFoodForm" class="rp-food-form">
-        <label class="rp-food-name">Продукт<input id="rpFoodProduct" type="text" list="rpFoodProductList" placeholder="Название или штрихкод" autocomplete="off" aria-autocomplete="list" aria-controls="rpProductSuggestions" required><datalist id="rpFoodProductList"></datalist><button id="rpOpenScanner" class="rp-scan-trigger" type="button" aria-haspopup="dialog"><span aria-hidden="true">▦</span> Сканировать штрихкод</button><div id="rpProductSuggestions" class="rp-product-suggestions" role="listbox" aria-label="Подходящие продукты" hidden></div></label>
-        <label>Вес, г<input id="rpFoodGrams" type="number" min="1" max="10000" step="1" value="100" required></label>
-        <label>Состояние<select id="rpFoodState"><option value="raw">Сырой / сухой</option><option value="boiled">Варёный / приготовленный</option></select></label>
-        <label>Приём пищи<select id="rpFoodMeal"><option>Завтрак</option><option>Обед</option><option>Ужин</option><option>Перекус</option></select></label>
-        <button class="rp-diary-primary" type="submit">Добавить в дневник <span>+</span></button>
-      </form><div id="rpBarcodeScanner" class="rp-scanner-modal" role="dialog" aria-modal="true" aria-labelledby="rpScannerTitle" hidden><div class="rp-scanner-backdrop" data-close-scanner></div><section class="rp-scanner-card"><div class="rp-scanner-head"><div><span class="rp-diary-kicker">Быстрое добавление</span><h3 id="rpScannerTitle">Сканер штрихкода</h3></div><button id="rpCloseScanner" class="rp-scanner-close" type="button" aria-label="Закрыть сканер">×</button></div><div class="rp-scanner-view"><video id="rpScannerVideo" playsinline muted aria-label="Изображение с камеры"></video><div class="rp-scanner-frame" aria-hidden="true"></div></div><p id="rpScannerStatus" class="rp-scanner-status" role="status">Наведи камеру на штрихкод упаковки.</p><button id="rpScannerManual" class="rp-diary-secondary rp-scanner-manual" type="button">Ввести штрихкод вручную</button></section></div><p class="rp-diary-status" id="rpFoodStatus" role="status">Расчёт основан на встроенном каталоге. Значения могут отличаться от этикетки конкретного продукта.</p>
-    </section>
-    <section class="rp-diary-panel rp-log-panel" aria-labelledby="rpLogTitle">
-      <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">История за выбранный день</span><h3 id="rpLogTitle">Дневник питания</h3></div><button class="rp-diary-secondary" id="rpClearDiaryBtn" type="button">Очистить этот день</button></div>
-      <div id="rpFoodLog" class="rp-food-log" aria-live="polite"><p class="rp-diary-empty">Пока нет записей. Добавь первый продукт выше.</p></div>
-    </section>
-  </div>
-</section>
-
-
-<section
-    class="recipes-section section"
-    id="recipes"
->
-
-    <div class="container">
-
-        <div class="section-heading">
-
-            <div>
-                <div class="section-eyebrow">
-                    Коллекция RecipePro
-                </div>
-
-                <h2 id="recipesTitle">
-                    Рецепты на каждый день
-                </h2>
-
-                <p>
-                    Простые блюда с понятными ингредиентами
-                    и рассчитанным питанием.
-                </p>
-            </div>
-
-            <div class="recipes-count" id="recipesCount">
-                8 рецептов
-            </div>
 
         </div>
 
@@ -1527,7 +1538,7 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 <nav id="recipeProBottomNav" aria-label="Основная навигация">
     <a href="#" aria-current="page"><span aria-hidden="true">⌂</span><span>Главная</span></a>
     <a href="#dailyDiary"><span aria-hidden="true">◷</span><span>Дневник</span></a>
-    <a href="#recipes"><span aria-hidden="true">♧</span><span>Рецепты</span></a>
+    <a href="#recipes"><span aria-hidden="true">♧</span><span>Идеи</span></a>
     <a href="#rpMealPlanner"><span aria-hidden="true">▦</span><span>План</span></a>
 </nav>
 
