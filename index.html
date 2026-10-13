@@ -26,7 +26,7 @@
         rel="stylesheet"
     >
 
-    <link rel="stylesheet" href="CSS/style.css?v=20261013-community3">
+    <link rel="stylesheet" href="CSS/style.css?v=20261013-clean1">
     <link rel="stylesheet" href="CSS/meal-planner.css?v=20261012-r2">
 </head>
 
@@ -43,17 +43,7 @@
         <nav class="main-nav">
             <a href="#dailyDiary">Дневник</a>
             <a href="#products">Калькулятор</a>
-            <a href="#my-recipes">Мои блюда</a>
         </nav>
-
-        <button
-            class="header-action"
-            id="myRecipesBtn"
-            type="button"
-        >
-            <span>Мой профиль</span>
-            <span class="header-action-arrow">→</span>
-        </button>
 
     </div>
 </header>
@@ -816,90 +806,7 @@
 </section>
 
 
-<section
-    class="my-recipes-section section"
-    id="my-recipes"
->
 
-    <div class="container">
-
-
-        <section class="rp-profile-card" aria-labelledby="rpProfileTitle">
-          <div class="rp-profile-cover"><span class="rp-profile-cover-mark">R</span><span class="rp-profile-cover-label">МОЯ КОЛЛЕКЦИЯ · RECIPEPRO</span></div>
-          <div class="rp-profile-content">
-            <div class="rp-profile-avatar-wrap">
-              <div class="rp-profile-avatar" id="rpProfileAvatar" aria-label="Фото профиля">R</div>
-              <label class="rp-avatar-upload" for="rpProfilePhoto" title="Загрузить фото профиля" aria-label="Загрузить фото профиля">＋</label>
-              <input id="rpProfilePhoto" class="rp-visually-hidden" type="file" accept="image/*">
-            </div>
-            <div class="rp-profile-details">
-              <span class="rp-diary-kicker">Личный профиль</span>
-              <h3 id="rpProfileTitle">Твоя кулинарная история</h3>
-              <p id="rpProfileBioPreview">Сохраняй любимые блюда, записывай авторские рецепты и собирай собственную коллекцию.</p>
-              <div class="rp-profile-stats"><span><strong id="rpProfileRecipeCount">0</strong> блюд</span><span><strong>КБЖУ</strong> каждого блюда</span><span><strong>Лично</strong> на этом устройстве</span></div>
-            </div>
-            <form id="rpProfileForm" class="rp-profile-form">
-              <label>Имя или псевдоним<input id="rpProfileName" type="text" maxlength="50" placeholder="Например, Олег"></label>
-              <label>О себе<textarea id="rpProfileBio" rows="3" maxlength="240" placeholder="Какие блюда ты любишь готовить?"></textarea></label>
-              <label class="rp-public-toggle"><input id="rpProfilePublic" type="checkbox"><span><strong>Публичный профиль</strong><small>Имя, описание и фото будут видны в сообществе.</small></span></label>
-              <button class="rp-diary-primary" type="submit">Сохранить профиль <span>→</span></button>
-              <button class="rp-diary-secondary" id="rpProfileCloudSave" type="button">Сохранить профиль в облако</button>
-              <p id="rpProfileStatus" class="rp-diary-status" role="status">Профиль хранится на этом устройстве.</p>
-            </form>
-          </div>
-        </section>
-
-        <section class="rp-community-panel" id="rpCommunity">
-          <div class="rp-community-heading">
-            <div><span class="rp-diary-kicker">RECIPEPRO COMMUNITY</span><h2>Блюда, которыми делятся</h2><p>Публикуй собственные блюда и открывай идеи других пользователей. Публикация выполняется только по твоему действию.</p></div>
-            <button class="rp-diary-secondary" id="rpCommunityRefresh" type="button">Обновить ленту ↻</button>
-          </div>
-          <div class="rp-community-publish">
-            <div><span class="rp-diary-kicker">Твоя коллекция</span><h3>Поделиться своим блюдом</h3><p>Выбери сохранённое блюдо. Оно появится в общей ленте, а ингредиенты и КБЖУ будут доступны читателям.</p></div>
-            <div class="rp-community-publish-controls"><label for="rpCommunityRecipeSelect">Моё блюдо</label><select id="rpCommunityRecipeSelect"><option value="">Сначала создай своё блюдо</option></select><button class="rp-diary-primary" id="rpCommunityPublish" type="button">Опубликовать выбранное <span>↗</span></button><button class="rp-diary-secondary" id="rpCommunityUnpublish" type="button">Снять публикацию</button></div>
-          </div>
-          <p class="rp-community-status" id="rpCommunityStatus" role="status">Чтобы публиковать блюда, войди в аккаунт через кнопку «Облако» в шапке.</p>
-          <div class="rp-community-feed" id="rpCommunityFeed" aria-live="polite"><div class="rp-community-empty">Здесь появятся блюда сообщества. Нажми «Обновить ленту».</div></div>
-        </section>
-
-        <div class="my-recipes-header">
-
-            <div>
-
-                <div class="section-eyebrow">
-                    Твоя коллекция
-                </div>
-
-                <h2>
-                    Мои блюда
-                </h2>
-
-                <p>
-                    Сохраняй авторские блюда с фотографиями, описанием и рассчитанным КБЖУ.
-                </p>
-
-            </div>
-
-            <button
-                class="primary-button"
-                id="addRecipeBtn"
-                type="button"
-            >
-                <span>+</span>
-                Добавить своё блюдо
-            </button>
-
-        </div>
-
-
-        <div
-            class="my-recipes-grid"
-            id="myRecipesGrid"
-        ></div>
-
-    </div>
-
-</section>
 
 </main>
 
@@ -935,10 +842,6 @@
 
             <a href="#diets">
                 Питание
-            </a>
-
-            <a href="#my-recipes">
-                Мои рецепты
             </a>
 
         </div>
@@ -1721,12 +1624,12 @@
 <script src="JS/nutrition.js?v=20261009-r2"></script>
 <script src="JS/app.js?v=20261012-photos1"></script>
     <script src="JS/food-diary.js?v=20261013-v2"></script>
-    <script src="JS/profile.js?v=20261013-community1"></script>
+    <script src="JS/profile.js?v=20261013-clean1"></script>
 <script src="JS/meal-planner.js?v=20261012-r3"></script>
 <script src="JS/ai-generator.js?v=20261012-offline2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="JS/supabase-config.js"></script>
-<script src="JS/cloud-sync.js?v=20261013-community3"></script>
+<script src="JS/cloud-sync.js?v=20261013-clean1"></script>
 
 
 <script>
@@ -1825,6 +1728,5 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 })();
 </script>
 
-<script src="JS/community.js?v=20261013-community3"></script>
 </body>
 </html>
