@@ -179,3 +179,7 @@ button, a, input, select, textarea { touch-action: manipulation; }
 .rp-scanner-status { min-height:42px; margin:14px 0 10px; color:#52665a; font-size:13px; line-height:1.5; }
 .rp-scanner-manual { width:100%; min-height:46px; }
 @media (max-width:760px) { .rp-scanner-modal { align-items:end; padding:12px; padding-bottom:max(12px,env(safe-area-inset-bottom)); } .rp-scanner-card { width:100%; padding:17px; border-radius:22px; } .rp-scanner-view { min-height:240px; } .rp-scanner-head h3 { font-size:20px; } }
+
+
+/* The diary is the product's main task; recipe discovery remains secondary. */
+@media (max-width:760px) { .hero-grid { display:block; } .hero-content { max-width:none; } .hero h1 { max-width:100%; } .recipe-discovery-tools .search-box { display:flex!important; } .recipe-discovery-tools .ai-generator-trigger { display:flex!important; } .recipe-discovery-tools .popular-searches { display:block!important; } .recipe-discovery-tools .hero-recipe-wrap { display:block; } }
