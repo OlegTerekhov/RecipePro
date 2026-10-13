@@ -26,7 +26,7 @@
         rel="stylesheet"
     >
 
-    <link rel="stylesheet" href="CSS/style.css?v=20261013-clean1">
+    <link rel="stylesheet" href="CSS/style.css?v=20261013-clean2">
     <link rel="stylesheet" href="CSS/meal-planner.css?v=20261012-r2">
 </head>
 
@@ -42,7 +42,6 @@
 
         <nav class="main-nav">
             <a href="#dailyDiary">Дневник</a>
-            <a href="#products">Калькулятор</a>
         </nav>
 
     </div>
@@ -463,208 +462,7 @@
 </section>
 
 
-<section
-    class="products-section section"
-    id="products"
->
 
-    <div class="container">
-
-        <div class="section-heading">
-
-            <div>
-                <div class="section-eyebrow">
-                    Умные продукты
-                </div>
-
-                <h2>
-                    Питательная ценность
-                </h2>
-
-                <p>
-                    RecipePro учитывает продукты в сыром
-                    и приготовленном виде.
-                </p>
-            </div>
-
-        </div>
-
-
-        <div class="nutrition-calculator" id="nutritionCalculator">
-
-            <div class="nutrition-calculator-head">
-                <div>
-                    <span class="nutrition-feature-label">
-                        Калькулятор КБЖУ
-                    </span>
-
-                    <h3>
-                        Посчитай питание продукта
-                    </h3>
-
-                    <p>
-                        Добавь продукты, укажи количество и выбери состояние:
-                        сырое, варёное или жареное.
-                    </p>
-                </div>
-
-                <div class="nutrition-calculator-total">
-                    <span>Всего</span>
-                    <strong id="nutritionTotalCalories">0</strong>
-                    <small>ккал</small>
-                </div>
-            </div>
-
-
-            <div class="nutrition-calculator-controls">
-
-                <div class="nutrition-control">
-                    <label for="nutritionProduct">
-                        Продукт
-                    </label>
-
-                    <input
-                        type="text"
-                        id="nutritionProduct"
-                        list="nutritionProductList"
-                        placeholder="Например, курица"
-                        autocomplete="off"
-                    >
-
-                    <datalist id="nutritionProductList"></datalist>
-                </div>
-
-
-                <div class="nutrition-control nutrition-control-small">
-                    <label for="nutritionAmount">
-                        Количество
-                    </label>
-
-                    <input
-                        type="number"
-                        id="nutritionAmount"
-                        min="1"
-                        step="1"
-                        value="100"
-                    >
-                </div>
-
-
-                <div class="nutrition-control nutrition-control-small">
-                    <label for="nutritionState">
-                        Состояние
-                    </label>
-
-                    <select id="nutritionState">
-                        <option value="raw">
-                            Сырое
-                        </option>
-
-                        <option value="boiled">
-                            Варёное
-                        </option>
-
-                        <option value="fried">
-                            Жареное
-                        </option>
-                    </select>
-                </div>
-
-                <button
-                    class="nutrition-add-button"
-                    id="nutritionAddProduct"
-                    type="button"
-                >
-                    Добавить
-                    <span>+</span>
-                </button>
-
-            </div>
-
-
-            <div
-                class="nutrition-fried-options"
-                id="nutritionFriedOptions"
-                hidden
-            >
-                <label for="nutritionOil">
-                    Масло при жарке
-                </label>
-
-                <div>
-                    <input
-                        type="number"
-                        id="nutritionOil"
-                        min="0"
-                        step="1"
-                        value="10"
-                    >
-
-                    <span>г на 100 г продукта</span>
-                </div>
-
-                <p>
-                    Для жареного блюда RecipePro учитывает указанное количество
-                    масла. Фактическая калорийность зависит от того, сколько
-                    масла реально впиталось.
-                </p>
-            </div>
-
-
-            <div
-                class="nutrition-calculator-list"
-                id="nutritionCalculatorList"
-            ></div>
-
-
-            <div class="nutrition-calculator-result">
-
-                <div class="nutrition-result-main">
-                    <span>Итого</span>
-
-                    <strong id="nutritionResultCalories">
-                        0
-                    </strong>
-
-                    <small>ккал</small>
-                </div>
-
-                <div class="nutrition-result-item">
-                    <strong id="nutritionResultProtein">
-                        0
-                    </strong>
-                    <span>белки, г</span>
-                </div>
-
-                <div class="nutrition-result-item">
-                    <strong id="nutritionResultFat">
-                        0
-                    </strong>
-                    <span>жиры, г</span>
-                </div>
-
-                <div class="nutrition-result-item">
-                    <strong id="nutritionResultCarbs">
-                        0
-                    </strong>
-                    <span>углеводы, г</span>
-                </div>
-            </div>
-
-            <div class="nutrition-calculator-note">
-                <span>i</span>
-                <p>
-                    Расчёт сделан по данным RecipePro. Для варёных продуктов
-                    учитывается изменение веса при приготовлении, для жареных —
-                    ещё и указанное масло. Это расчётная оценка, а не лабораторный анализ.
-                </p>
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
 
 
 <section
