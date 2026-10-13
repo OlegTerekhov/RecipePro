@@ -5,9 +5,9 @@ const path = require("node:path");
 const vm = require("node:vm");
 
 const root = path.resolve(__dirname, "..");
-const context = vm.createContext({ window: {} });
+const context = vm.createContext({ window: {}, document: { readyState: "loading", addEventListener() {} } });
 
-for (const file of ["JS/products.js", "JS/nutrition-engine.js"]) {
+for (const file of ["JS/products.js", "JS/nutrition-engine.js", "JS/food-diary.js"]) {
   const source = fs.readFileSync(path.join(root, file), "utf8");
   vm.runInContext(source, context, { filename: file });
 }
@@ -186,17 +186,10 @@ test("generic fish is not silently mapped to salmon", () => {
   }).known, false);
 });
 
-test("ambiguous phrases are not silently resolved to the first matching product", () => {
-  const chicken = context.window.products["курица"];
-  const rice = context.window.products["рис"];
-  assert.ok(chicken && rice);
-  // The diary resolver is deliberately conservative for phrases containing multiple foods.
-  const phrase = "курица с рисом";
-  const normalized = phrase.toLowerCase().replace(/ё/g, "е").replace(/[^а-яa-z0-9]+/gi, " ").trim();
-  const matchingIds = Object.entries(context.window.products)
-    .filter(([id, product]) => [id, product.name, ...(product.aliases || [])]
-      .map(value => String(value).toLowerCase().replace(/ё/g, "е").replace(/[^а-яa-z0-9]+/gi, " ").trim())
-      .some(name => name.length >= 4 && normalized.includes(name)))
-    .map(([id]) => id);
-  assert.ok(matchingIds.length > 1, "fixture must contain more than one food match");
+test("diary product matching rejects generic and ambiguous phrases", () => {
+  const resolver = context.window.recipeProFoodDiary.findProduct;
+  assert.equal(resolver("рыба"), null);
+  assert.equal(resolver("курица с рисом"), null);
+  assert.equal(resolver("курица").id, "курица");
+  assert.equal(resolver("курица 100 г").id, "курица");
 });
