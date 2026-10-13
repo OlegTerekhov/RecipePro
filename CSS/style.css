@@ -5668,3 +5668,22 @@ body.rp-community-dialog-open { overflow: hidden; }
   .rp-community-author-hero { align-items: flex-start; gap: 13px; }
   .rp-community-author-hero > img, .rp-community-author-hero > .rp-community-author-initial { flex-basis: 58px; width: 58px; height: 58px; }
 }
+
+
+/* Product direction: the food diary is the primary action; recipes are a supporting tool. */
+.hero-grid { grid-template-columns: minmax(0, 1fr); gap: 0; }
+.hero-content { max-width: 900px; }
+.hero h1 { max-width: 850px; }
+.hero-actions { display:flex; flex-wrap:wrap; align-items:center; gap:14px; margin-top:28px; }
+.hero-primary-link, .hero-secondary-link { display:inline-flex; align-items:center; justify-content:center; gap:12px; min-height:48px; padding:0 20px; border-radius:999px; text-decoration:none; font-size:13px; font-weight:700; transition:transform .18s ease, background .18s ease; }
+.hero-primary-link { background:var(--green-900); color:#fff; box-shadow:0 8px 22px rgba(24,56,46,.15); }
+.hero-primary-link:hover { background:var(--green-800); transform:translateY(-1px); }
+.hero-secondary-link { color:var(--green-900); border:1px solid var(--line); background:rgba(255,255,255,.55); }
+.hero-secondary-link:hover { background:#fff; }
+.recipe-discovery-tools { display:grid; grid-template-columns:minmax(0,1fr); gap:14px; margin:26px 0 34px; }
+.recipe-discovery-tools .search-box { width:100%; max-width:760px; }
+.recipe-discovery-tools .ai-generator-trigger { width:100%; max-width:760px; }
+.recipe-discovery-tools .popular-searches { margin-top:0; }
+.recipe-discovery-tools + .hero-recipe-wrap { max-width:520px; margin:0 0 34px; }
+@media (min-width:761px) { .hero { padding-top:68px; padding-bottom:62px; } .hero-content { padding:12px 0; } .hero h1 { font-size:clamp(54px,5.3vw,78px); } }
+@media (max-width:760px) { .hero { padding-top:26px; padding-bottom:24px; } .hero-content { padding:0; } .hero-actions { gap:10px; margin-top:20px; } .hero-primary-link,.hero-secondary-link { min-height:46px; padding:0 16px; font-size:12px; } .recipe-discovery-tools { margin:20px 0 26px; } .recipe-discovery-tools .search-box { display:flex!important; } .recipe-discovery-tools .ai-generator-trigger { display:flex!important; } .recipe-discovery-tools .popular-searches { display:block!important; } }
