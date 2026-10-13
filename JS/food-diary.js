@@ -29,19 +29,14 @@ return [...starts,...includes.filter(x=>!starts.some(y=>y.id===x.id))].slice(0,6
 }
 function renderProductSuggestions(){
 const input=$("rpFoodProduct"),host=$("rpProductSuggestions");if(!input||!host)return;
+if(searchTimer)clearTimeout(searchTimer);
+const request=++searchRequest;
 const q=input.value.trim();if(!q){host.hidden=true;host.innerHTML="";return;}
 const matches=productMatches(q);
 host.innerHTML=matches.map(({id,product})=>'<button type="button" class="rp-product-suggestion" role="option" data-product-id="'+escapeHtml(id)+'"><span>'+escapeHtml(product.name)+'</span><small>'+fmt(product.raw?.kcal||0,0)+' ккал · '+fmt(product.raw?.protein||0)+' г белка / 100 г · RecipePro</small></button>').join("");
-if(matches.length)host.hidden=false;
-if(q.length>=3&&!/^\\d{8,14}$/.test(q)){
-if(searchTimer)clearTimeout(searchTimer);
-const request=++searchRequest;
-searchTimer=setTimeout(()=>searchOpenFoodFacts(q,request),450);
-}else if(/^\\d{8,14}$/.test(q)){
-if(searchTimer)clearTimeout(searchTimer);
-const request=++searchRequest;
-searchTimer=setTimeout(()=>searchOpenFoodFacts(q,request),250);
-}
+host.hidden=!matches.length;
+if(q.length>=3&&!/^\d{8,14}$/.test(q))searchTimer=setTimeout(()=>searchOpenFoodFacts(q,request),450);
+else if(/^\d{8,14}$/.test(q))searchTimer=setTimeout(()=>searchOpenFoodFacts(q,request),250);
 }
 function offProductToRecord(item){
 const n=item?.nutriments||{},kcal=Number(n["energy-kcal_100g"]??n["energy-kcal"]??(Number(n["energy-kj_100g"]??n["energy-kj"]??0)/4.184));
@@ -86,9 +81,11 @@ return result.slice(0,5);
 }
 function renderRecentProducts(){
 const host=$("rpRecentProducts");if(!host)return;
-const recent=recentProducts();host.innerHTML=recent.map(item=>'<button type="button" class="rp-recent-product" data-recent-product="'+escapeHtml(item.id)+'" data-grams="'+Number(item.grams||100)+'" data-state="'+(item.state==="boiled"?"boiled":"raw")+'" data-meal="'+escapeHtml(item.meal||"Обед")+'">'+escapeHtml(item.name)+'<small>'+fmt(item.grams||100,0)+' г</small></button>').join("");
+const recent=recentProducts();
+host.innerHTML=recent.map(item=>'<button type="button" class="rp-recent-product" data-recent-product="'+escapeHtml(item.id)+'" data-snapshot="'+(item.productSnapshot?escapeHtml(encodeURIComponent(JSON.stringify(item.productSnapshot))):"")+'" data-grams="'+Number(item.grams||100)+'" data-state="'+(item.state==="boiled"?"boiled":"raw")+'" data-meal="'+escapeHtml(item.meal||"Обед")+'">'+escapeHtml(item.name)+'<small>'+fmt(item.grams||100,0)+' г</small></button>').join("");
 host.hidden=!recent.length;
-}function diary(){return read(STORE,{});}function date(){return $("rpDiaryDate").value||today();}function entries(){const d=diary();return Array.isArray(d[date()])?d[date()]:[];}
+}
+function diary(){return read(STORE,{});}function date(){return $("rpDiaryDate").value||today();}function entries(){const d=diary();return Array.isArray(d[date()])?d[date()]:[];}
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
 function renderLog(list){const host=$("rpFoodLog");if(!list.length){host.innerHTML='<p class="rp-diary-empty">Пока нет записей. Добавь первый продукт выше.</p>';return;}
 host.innerHTML=["Завтрак","Обед","Ужин","Перекус"].map(meal=>{const group=list.filter(e=>e.meal===meal);if(!group.length)return"";return '<div class="rp-food-meal-group"><h4>'+meal+'</h4>'+group.map(e=>'<article class="rp-food-log-row"><div class="rp-food-log-name"><strong>'+escapeHtml(e.name)+'</strong><span>'+fmt(e.grams,0)+' г · '+(e.state==="boiled"?"приготовленный вес":"сырой / сухой вес")+'</span></div><div class="rp-food-log-kcal"><strong>'+fmt(e.calories,0)+'</strong><span>ккал</span></div><div class="rp-food-log-macros"><span>Б '+fmt(e.protein)+'</span><span>Ж '+fmt(e.fat)+'</span><span>У '+fmt(e.carbs)+'</span></div><button type="button" class="rp-food-delete" data-delete-entry="'+escapeHtml(e.id)+'" aria-label="Удалить '+escapeHtml(e.name)+'">×</button></article>').join("")+'</div>';}).join("");}
@@ -133,7 +130,7 @@ suggestions.addEventListener("click",e=>{const b=e.target.closest("[data-product
 $("rpRecentProducts").addEventListener("click",e=>{const b=e.target.closest("[data-recent-product]");if(!b)return;if(b.dataset.recentProduct.startsWith("off:")&&b.dataset.snapshot){const p=JSON.parse(decodeURIComponent(b.dataset.snapshot));externalProducts.set(p.id,p);}chooseProduct(b.dataset.recentProduct);$("rpFoodGrams").value=b.dataset.grams||100;$("rpFoodState").value=b.dataset.state||"raw";$("rpFoodMeal").value=b.dataset.meal||"Обед";$("rpFoodGrams").focus();});
 document.addEventListener("click",e=>{if(!e.target.closest(".rp-food-name"))suggestions.hidden=true;});
 $("rpGoalsForm").addEventListener("submit",e=>{e.preventDefault();const g={calories:Number($("rpGoalCalories").value),protein:Number($("rpGoalProtein").value),fat:Number($("rpGoalFat").value),carbs:Number($("rpGoalCarbs").value)};if(Object.values(g).some(v=>!Number.isFinite(v)||v<0)||g.calories<=0){$("rpGoalsStatus").textContent="Калории должны быть больше нуля, остальные значения — не меньше нуля.";return;}localStorage.setItem(GOALS,JSON.stringify(g));$("rpGoalsStatus").textContent="Твоя норма сохранена на этом устройстве.";render();});
-$("rpFoodForm").addEventListener("submit",e=>{e.preventDefault();const found=selectedExternalProduct&&norm(selectedExternalProduct.name)===norm($("rpFoodProduct").value)?{id:selectedExternalProduct.id,product:selectedExternalProduct}:findProduct($("rpFoodProduct").value),grams=Number($("rpFoodGrams").value);if(!found){$("rpFoodStatus").textContent="Не нашёл этот продукт в каталоге. Выбери название из подсказок — так расчёт не будет выдуманным.";return;}if(!Number.isFinite(grams)||grams<=0||grams>10000){$("rpFoodStatus").textContent="Укажи вес от 1 до 10 000 г.";return;}const state=$("rpFoodState").value,values=calc(found.product,grams,state),id=window.crypto&&crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);const list=entries();list.push({id,productId:found.id,name:found.product.name,grams,state,meal:$("rpFoodMeal").value,...values,...(found.id.startsWith("off:")?{productSnapshot:found.product,nutritionSource:"Open Food Facts"}:{}),createdAt:new Date().toISOString()});save(list);$("rpFoodProduct").value="";selectedExternalProduct=null;$("rpProductSuggestions").hidden=true;$("rpFoodGrams").value="100";$("rpFoodStatus").textContent="Добавлено: "+found.product.name+". Значения рассчитаны по каталогу RecipePro.";});
+$("rpFoodForm").addEventListener("submit",e=>{e.preventDefault();const found=selectedExternalProduct&&norm(selectedExternalProduct.name)===norm($("rpFoodProduct").value)?{id:selectedExternalProduct.id,product:selectedExternalProduct}:findProduct($("rpFoodProduct").value),grams=Number($("rpFoodGrams").value);if(!found){$("rpFoodStatus").textContent="Не нашёл этот продукт в каталоге. Выбери название из подсказок — так расчёт не будет выдуманным.";return;}if(!Number.isFinite(grams)||grams<=0||grams>10000){$("rpFoodStatus").textContent="Укажи вес от 1 до 10 000 г.";return;}const state=$("rpFoodState").value,values=calc(found.product,grams,state),id=window.crypto&&crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);const list=entries();list.push({id,productId:found.id,name:found.product.name,grams,state,meal:$("rpFoodMeal").value,...values,...(found.id.startsWith("off:")?{productSnapshot:found.product,nutritionSource:"Open Food Facts"}:{}),createdAt:new Date().toISOString()});save(list);$("rpFoodProduct").value="";selectedExternalProduct=null;$("rpProductSuggestions").hidden=true;$("rpFoodGrams").value="100";$("rpFoodStatus").textContent="Добавлено: "+found.product.name+". Источник КБЖУ: "+(found.id.startsWith("off:")?"Open Food Facts — сверь с упаковкой.":"каталог RecipePro.");});
 $("rpFoodLog").addEventListener("click",e=>{const b=e.target.closest("[data-delete-entry]");if(b)save(entries().filter(x=>String(x.id)!==b.dataset.deleteEntry));});
 $("rpDiaryDate").addEventListener("change",render);$("rpClearDiaryBtn").addEventListener("click",()=>{if(entries().length&&confirm("Удалить все записи питания за выбранный день?"))save([]);});render();}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
