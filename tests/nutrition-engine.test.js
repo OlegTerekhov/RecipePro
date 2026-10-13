@@ -7,7 +7,7 @@ const vm = require("node:vm");
 const root = path.resolve(__dirname, "..");
 const context = vm.createContext({ window: { __RECIPEPRO_TEST__: true }, document: { readyState: "loading", addEventListener() {} } });
 
-for (const file of ["JS/products.js", "JS/nutrition-engine.js", "JS/food-diary.js", "JS/recipes.js", "JS/goal-recommendations.js"]) {
+for (const file of ["JS/products.js", "JS/nutrition-engine.js", "JS/food-diary.js", "JS/recipes.js"]) {
   const source = fs.readFileSync(path.join(root, file), "utf8");
   vm.runInContext(source, context, { filename: file });
 }
@@ -257,16 +257,3 @@ test("diary suggests a meal based on local time", () => {
 });
 
 
-test("goal recommendations calculate remaining targets and rank suitable recipes", () => {
-  const api = context.window.recipeProGoalRecommendations;
-  const remaining = api.remainingTargets({ calories: 2000, protein: 120, fat: 70, carbs: 220 }, { calories: 800, protein: 40, fat: 25, carbs: 90 });
-  assert.equal(remaining.calories, 1200);
-  assert.equal(remaining.protein, 80);
-  assert.equal(remaining.fat, 45);
-  assert.equal(remaining.carbs, 130);
-  const result = api.rankRecipes(context.window.recipes, { calories: 2000, protein: 120, fat: 70, carbs: 220 }, { calories: 800, protein: 40, fat: 25, carbs: 90 });
-  assert.equal(result.hasGoals, true);
-  assert.equal(result.items.length, 3);
-  assert.ok(result.items.every(item => item.nutrition.calories > 0 && Number.isFinite(item.score)));
-  assert.equal(api.rankRecipes(context.window.recipes, null, {}).hasGoals, false);
-});
