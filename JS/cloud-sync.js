@@ -450,7 +450,7 @@
             const { db, user } = await communityClient();
             if (!recipe || !recipe.id || !String(recipe.title || "").trim()) throw new Error("Не удалось определить блюдо для публикации.");
             const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
-            const nutrition = recipe.nutrition && typeof recipe.nutrition === "object" ? recipe.nutrition : {};
+            const nutrition = { ...(recipe.nutrition && typeof recipe.nutrition === "object" ? recipe.nutrition : {}), servings: Math.max(1, Number(recipe.servings || 1)) };
             let imagePath = null;
             if (typeof recipe.image === "string" && recipe.image.startsWith("data:image/")) {
                 imagePath = await uploadCommunityImage(recipe.image, "recipes", user.id);
