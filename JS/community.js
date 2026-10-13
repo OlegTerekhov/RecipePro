@@ -58,7 +58,9 @@
     const names = ingredients.slice(0, 5).map(item => {
       if (typeof item === "string") return item;
       if (!item || typeof item !== "object") return "";
-      const name = item.name || item.title || item.productName || item.product || "";
+      const productId = item.product || item.productId || "";
+      const product = window.products && productId ? window.products[productId] : null;
+      const name = item.name || item.title || item.productName || (product && product.name) || productId;
       const amount = item.amount ?? item.grams ?? item.quantity ?? "";
       const unit = item.unit || "г";
       return name ? String(name) + (amount !== "" ? " — " + amount + " " + unit : "") : "";
@@ -124,6 +126,25 @@
       if (button) button.disabled = false;
     }
   }
+  async function unpublishSelected() {
+    const select = $("rpCommunityRecipeSelect");
+    const button = $("rpCommunityUnpublish");
+    const recipe = readRecipes().find(item => String(item.id) === String(select && select.value));
+    if (!recipe) { status("Выбери блюдо, публикацию которого нужно снять.", true); return; }
+    if (button) button.disabled = true;
+    try {
+      await api().unpublishRecipe(recipe.id);
+      const published = new Set(readPublished().map(String));
+      published.delete(String(recipe.id));
+      localStorage.setItem(PUBLISHED_KEY, JSON.stringify([...published]));
+      status("Публикация «" + (recipe.title || "Блюдо") + "» снята.", false);
+      await refreshFeed();
+    } catch (error) {
+      status(error && error.message ? error.message : "Не удалось снять публикацию.", true);
+    } finally {
+      if (button) button.disabled = false;
+    }
+  }
   async function saveCloudProfile() {
     const button = $("rpProfileCloudSave");
     if (!api()) { status("Облачный модуль ещё загружается.", true); return; }
@@ -150,6 +171,7 @@
     if (grid) new MutationObserver(refreshRecipeSelect).observe(grid, { childList: true, subtree: true });
     $("rpCommunityRefresh")?.addEventListener("click", refreshFeed);
     $("rpCommunityPublish")?.addEventListener("click", publishSelected);
+    $("rpCommunityUnpublish")?.addEventListener("click", unpublishSelected);
     $("rpProfileCloudSave")?.addEventListener("click", saveCloudProfile);
     refreshFeed();
     window.addEventListener("online", refreshFeed);
