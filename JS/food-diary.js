@@ -23,7 +23,28 @@ $("rpDiaryCaloriesRemaining").textContent=cg?(total.calories>=cg?"На "+fmt(tot
 [["Protein","protein"],["Fat","fat"],["Carbs","carbs"]].forEach(([label,key])=>{const target=Number(g[key]||0),value=total[key];$("rpDiary"+label+"Bar").style.width=target?Math.min(100,value/target*100)+"%":"0%";$("rpDiary"+label+"Remaining").textContent=target?(value>=target?"Норма достигнута · +"+fmt(value-target)+" г":"Осталось "+fmt(target-value)+" г"):"Норма не задана";});
 if(g.calories!==undefined){$("rpGoalCalories").value=g.calories;$("rpGoalProtein").value=g.protein;$("rpGoalFat").value=g.fat;$("rpGoalCarbs").value=g.carbs;}renderLog(list);}
 function save(list){const d=diary();d[date()]=list;try{localStorage.setItem(STORE,JSON.stringify(d));render();}catch(_){$("rpFoodStatus").textContent="Не удалось сохранить данные. Возможно, память браузера заполнена.";}}
-function init(){if(!$("rpFoodForm")||!window.products)return;$("rpDiaryDate").value=today();
+function importRecipeIngredients(event){
+const detail=event.detail||{},items=Array.isArray(detail.ingredients)?detail.ingredients:[];
+const list=entries(),meal=$("rpFoodMeal").value||"Обед";let added=0,skipped=0;
+items.forEach(item=>{
+if(!item||typeof item!=="object"){skipped++;return;}
+const unit=String(item.unit||"г").trim().toLowerCase();
+const grams=Number(item.amount??item.grams??item.quantity??0);
+if(!["г","гр","грамм","грамма","граммов","g","gram","grams"].includes(unit)||!Number.isFinite(grams)||grams<=0){skipped++;return;}
+const lookup=item.product||item.productId||item.name||item.title||item.productName||"";
+const found=findProduct(lookup);
+if(!found){skipped++;return;}
+const state=String(item.state||"raw").toLowerCase();
+const cooked=["boiled","cooked","приготовленный","готовый"].includes(state)?"boiled":"raw";
+const values=calc(found.product,grams,cooked);
+const id=window.crypto&&crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);
+list.push({id,productId:found.id,name:found.product.name,grams,state:cooked,meal,...values,createdAt:new Date().toISOString(),sourceRecipe:String(detail.title||"Блюдо из сообщества")});
+added++;
+});
+if(added){save(list);$("rpFoodStatus").textContent="Добавлено в дневник ингредиентов: "+added+". Проверь запись и при необходимости скорректируй вес."+(skipped?" Пропущено неподдерживаемых или неизвестных ингредиентов: "+skipped+".":"");}
+else $("rpFoodStatus").textContent="Не удалось добавить ингредиенты: нужны известные продукты из каталога и количество в граммах."+(skipped?" Пропущено: "+skipped+".":"");
+}
+function init(){if(!$("rpFoodForm")||!window.products)return;$("rpDiaryDate").value=today();window.addEventListener("recipepro:import-ingredients",importRecipeIngredients);
 const options=$("rpFoodProductList");Object.values(window.products).forEach(p=>{[p.name,...(p.aliases||[]).slice(0,3)].forEach(name=>{const o=document.createElement("option");o.value=name;options.appendChild(o);});});
 $("rpGoalsForm").addEventListener("submit",e=>{e.preventDefault();const g={calories:Number($("rpGoalCalories").value),protein:Number($("rpGoalProtein").value),fat:Number($("rpGoalFat").value),carbs:Number($("rpGoalCarbs").value)};if(Object.values(g).some(v=>!Number.isFinite(v)||v<0)||g.calories<=0){$("rpGoalsStatus").textContent="Калории должны быть больше нуля, остальные значения — не меньше нуля.";return;}localStorage.setItem(GOALS,JSON.stringify(g));$("rpGoalsStatus").textContent="Твоя норма сохранена на этом устройстве.";render();});
 $("rpFoodForm").addEventListener("submit",e=>{e.preventDefault();const found=findProduct($("rpFoodProduct").value),grams=Number($("rpFoodGrams").value);if(!found){$("rpFoodStatus").textContent="Не нашёл этот продукт в каталоге. Выбери название из подсказок — так расчёт не будет выдуманным.";return;}if(!Number.isFinite(grams)||grams<=0||grams>10000){$("rpFoodStatus").textContent="Укажи вес от 1 до 10 000 г.";return;}const state=$("rpFoodState").value,values=calc(found.product,grams,state),id=window.crypto&&crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);const list=entries();list.push({id,productId:found.id,name:found.product.name,grams,state,meal:$("rpFoodMeal").value,...values,createdAt:new Date().toISOString()});save(list);$("rpFoodProduct").value="";$("rpFoodGrams").value="100";$("rpFoodStatus").textContent="Добавлено: "+found.product.name+". Значения рассчитаны по каталогу RecipePro.";});
