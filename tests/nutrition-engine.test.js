@@ -242,3 +242,16 @@ test("oatmeal with banana and milk is not mislabeled as a low-calorie recipe", (
   const recipe = context.window.recipes.find(item => item.id === "oatmeal-banana");
   assert.ok(!recipe.filters.includes("calories"));
 });
+
+
+test("diary suggests a meal based on local time", () => {
+  const meal = context.window.recipeProFoodDiary.defaultMealForHour;
+  assert.equal(meal(4), "Перекус");
+  assert.equal(meal(5), "Завтрак");
+  assert.equal(meal(10), "Завтрак");
+  assert.equal(meal(11), "Обед");
+  assert.equal(meal(15), "Обед");
+  assert.equal(meal(16), "Ужин");
+  assert.equal(meal(21), "Ужин");
+  assert.equal(meal(22), "Перекус");
+});
