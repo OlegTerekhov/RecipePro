@@ -183,3 +183,5 @@ button, a, input, select, textarea { touch-action: manipulation; }
 
 /* The diary is the product's main task; recipe discovery remains secondary. */
 @media (max-width:760px) { .hero-grid { display:block; } .hero-content { max-width:none; } .hero h1 { max-width:100%; } .recipe-discovery-tools .search-box { display:flex!important; } .recipe-discovery-tools .ai-generator-trigger { display:flex!important; } .recipe-discovery-tools .popular-searches { display:block!important; } .recipe-discovery-tools .hero-recipe-wrap { display:block; } }
+
+@media (max-width:760px) { .recipes-section .hero-recipe-wrap { display:block!important; max-width:100%; margin:0 0 28px; } }
