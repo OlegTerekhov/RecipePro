@@ -127,3 +127,117 @@ $$;
 
 revoke all on function public.recipepro_consume_ai_quota(uuid, integer, integer) from public, anon, authenticated;
 grant execute on function public.recipepro_consume_ai_quota(uuid, integer, integer) to service_role;
+
+
+-- Public community: profile fields are separate from private account data.
+create table if not exists public.recipepro_public_profiles (
+    user_id uuid primary key references auth.users(id) on delete cascade,
+    username text,
+    display_name text not null default '',
+    bio text not null default '',
+    avatar_path text,
+    is_public boolean not null default true,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+    constraint recipepro_public_profiles_username_length check (username is null or char_length(username) between 3 and 24),
+    constraint recipepro_public_profiles_display_name_length check (char_length(display_name) <= 50),
+    constraint recipepro_public_profiles_bio_length check (char_length(bio) <= 240)
+);
+
+create unique index if not exists recipepro_public_profiles_username_unique
+    on public.recipepro_public_profiles (lower(username))
+    where username is not null and username <> '';
+
+create table if not exists public.recipepro_public_recipes (
+    id uuid primary key default gen_random_uuid(),
+    user_id uuid not null references auth.users(id) on delete cascade,
+    source_id text,
+    title text not null,
+    description text not null default '',
+    image_path text,
+    ingredients jsonb not null default '[]'::jsonb,
+    nutrition jsonb not null default '{}'::jsonb,
+    is_published boolean not null default false,
+    created_at timestamptz not null default now(),
+    updated_at timestamptz not null default now(),
+    constraint recipepro_public_recipes_title_length check (char_length(title) between 1 and 120),
+    constraint recipepro_public_recipes_description_length check (char_length(description) <= 3000),
+    constraint recipepro_public_recipes_ingredients_array check (jsonb_typeof(ingredients) = 'array'),
+    constraint recipepro_public_recipes_nutrition_object check (jsonb_typeof(nutrition) = 'object')
+);
+
+create unique index if not exists recipepro_public_recipes_owner_source_unique
+    on public.recipepro_public_recipes (user_id, source_id);
+create index if not exists recipepro_public_recipes_feed_idx
+    on public.recipepro_public_recipes (is_published, created_at desc);
+create index if not exists recipepro_public_recipes_owner_idx
+    on public.recipepro_public_recipes (user_id, updated_at desc);
+
+alter table public.recipepro_public_profiles enable row level security;
+alter table public.recipepro_public_recipes enable row level security;
+
+drop policy if exists "Public profiles are visible to everyone" on public.recipepro_public_profiles;
+create policy "Public profiles are visible to everyone"
+    on public.recipepro_public_profiles for select to anon, authenticated
+    using (is_public = true or (select auth.uid()) = user_id);
+drop policy if exists "Users insert their own public profile" on public.recipepro_public_profiles;
+create policy "Users insert their own public profile"
+    on public.recipepro_public_profiles for insert to authenticated
+    with check ((select auth.uid()) = user_id);
+drop policy if exists "Users update their own public profile" on public.recipepro_public_profiles;
+create policy "Users update their own public profile"
+    on public.recipepro_public_profiles for update to authenticated
+    using ((select auth.uid()) = user_id)
+    with check ((select auth.uid()) = user_id);
+drop policy if exists "Users delete their own public profile" on public.recipepro_public_profiles;
+create policy "Users delete their own public profile"
+    on public.recipepro_public_profiles for delete to authenticated
+    using ((select auth.uid()) = user_id);
+
+drop policy if exists "Published recipes are visible to everyone" on public.recipepro_public_recipes;
+create policy "Published recipes are visible to everyone"
+    on public.recipepro_public_recipes for select to anon, authenticated
+    using (is_published = true or (select auth.uid()) = user_id);
+drop policy if exists "Users create their own public recipes" on public.recipepro_public_recipes;
+create policy "Users create their own public recipes"
+    on public.recipepro_public_recipes for insert to authenticated
+    with check ((select auth.uid()) = user_id);
+drop policy if exists "Users update their own public recipes" on public.recipepro_public_recipes;
+create policy "Users update their own public recipes"
+    on public.recipepro_public_recipes for update to authenticated
+    using ((select auth.uid()) = user_id)
+    with check ((select auth.uid()) = user_id);
+drop policy if exists "Users delete their own public recipes" on public.recipepro_public_recipes;
+create policy "Users delete their own public recipes"
+    on public.recipepro_public_recipes for delete to authenticated
+    using ((select auth.uid()) = user_id);
+
+grant select on public.recipepro_public_profiles to anon, authenticated;
+grant insert, update, delete on public.recipepro_public_profiles to authenticated;
+grant select on public.recipepro_public_recipes to anon, authenticated;
+grant insert, update, delete on public.recipepro_public_recipes to authenticated;
+
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('recipepro-public-media', 'recipepro-public-media', true, 5242880, array['image/jpeg','image/png','image/webp'])
+on conflict (id) do update
+set public = excluded.public,
+    file_size_limit = excluded.file_size_limit,
+    allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists "RecipePro users upload media to their own folder" on storage.objects;
+create policy "RecipePro users upload media to their own folder"
+    on storage.objects for insert to authenticated
+    with check (bucket_id = 'recipepro-public-media' and (storage.foldername(name))[1] = (select auth.uid())::text);
+drop policy if exists "RecipePro users view their own media objects" on storage.objects;
+create policy "RecipePro users view their own media objects"
+    on storage.objects for select to authenticated
+    using (bucket_id = 'recipepro-public-media' and (storage.foldername(name))[1] = (select auth.uid())::text);
+drop policy if exists "RecipePro users update their own media objects" on storage.objects;
+create policy "RecipePro users update their own media objects"
+    on storage.objects for update to authenticated
+    using (bucket_id = 'recipepro-public-media' and (storage.foldername(name))[1] = (select auth.uid())::text)
+    with check (bucket_id = 'recipepro-public-media' and (storage.foldername(name))[1] = (select auth.uid())::text);
+drop policy if exists "RecipePro users delete their own media objects" on storage.objects;
+create policy "RecipePro users delete their own media objects"
+    on storage.objects for delete to authenticated
+    using (bucket_id = 'recipepro-public-media' and (storage.foldername(name))[1] = (select auth.uid())::text);
