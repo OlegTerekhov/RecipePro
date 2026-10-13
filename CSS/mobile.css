@@ -192,3 +192,8 @@ button, a, input, select, textarea { touch-action: manipulation; }
 .rp-portion-shortcuts button { min-height:34px; min-width:48px; padding:0 10px; border:1px solid #deded5; border-radius:999px; background:#fff; color:#33483d; font:inherit; font-size:12px; cursor:pointer; }
 .rp-portion-shortcuts button[aria-pressed="true"] { border-color:#294d3d; background:#e8efe9; color:#20372f; font-weight:700; }
 .rp-portion-shortcuts button:focus-visible { outline:2px solid #294d3d; outline-offset:2px; }
+
+
+/* Clear feedback when a daily nutrition target is exceeded */
+.rp-diary-goal-warnings{margin-top:15px;padding:12px 14px;border:1px solid transparent;border-radius:12px;font-size:12px;line-height:1.55;font-weight:650}
+.rp-diary-goal-warnings.has-overage{border-color:#efc9be;background:#fff2ee;color:#963f2e}
