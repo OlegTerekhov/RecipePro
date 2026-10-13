@@ -28,7 +28,7 @@
 
     <link rel="stylesheet" href="CSS/style.css?v=20261013-diary-focus1">
     <link rel="stylesheet" href="CSS/meal-planner.css?v=20261012-r2">
-    <link rel="stylesheet" href="CSS/mobile.css?v=20261013-diary-focus1">
+    <link rel="stylesheet" href="CSS/mobile.css?v=20261013-goal-recommendations1">
 </head>
 
 <body>
@@ -118,6 +118,11 @@
         </div>
       </section>
     </div>
+    <section class="rp-recommendations-panel" aria-labelledby="rpRecommendationsTitle">
+      <div class="rp-recommendations-head"><div><span class="rp-diary-kicker">Следующий шаг</span><h3 id="rpRecommendationsTitle">Что съесть дальше</h3><p>Идеи из каталога с учётом дневной нормы и уже записанного питания. Значения рассчитаны на одну порцию.</p></div></div>
+      <p class="rp-recommendations-context" id="rpRecommendationContext" aria-live="polite">Считаем остаток на выбранный день…</p>
+      <div id="rpGoalRecommendations" class="rp-recommendations-grid" aria-live="polite"></div>
+    </section>
     <section class="rp-diary-panel rp-add-food-panel" aria-labelledby="rpAddFoodTitle">
       <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Запись питания</span><h3 id="rpAddFoodTitle">Что ты съел?</h3><p>Выбери продукт из каталога, укажи фактический вес и приём пищи.</p></div></div>
       <div id="rpRecentProducts" class="rp-recent-products" aria-label="Недавно добавленные продукты" hidden></div>
@@ -1429,7 +1434,8 @@
 <script src="JS/nutrition-engine.js?v=20261009-r5"></script>
 <script src="JS/nutrition.js?v=20261009-r2"></script>
 <script src="JS/app.js?v=20261012-photos1"></script>
-    <script src="JS/food-diary.js?v=20261013-quick-add1"></script>
+    <script src="JS/food-diary.js?v=20261013-goal-recommendations1"></script>
+    <script src="JS/goal-recommendations.js?v=20261013-goal-recommendations1"></script>
     <script src="JS/profile.js?v=20261013-clean1"></script>
     <script src="JS/backup.js?v=20261013-diary-backup1"></script>
 <script src="JS/meal-planner.js?v=20261012-r3"></script>
