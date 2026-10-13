@@ -47,6 +47,7 @@ added++;
 if(added){save(list);$("rpFoodStatus").textContent="Добавлено в дневник ингредиентов: "+added+". Проверь запись и при необходимости скорректируй вес."+(skipped?" Пропущено неподдерживаемых или неизвестных ингредиентов: "+skipped+".":"");}
 else $("rpFoodStatus").textContent="Не удалось добавить ингредиенты: нужны известные продукты из каталога и количество в граммах."+(skipped?" Пропущено: "+skipped+".":"");
 }
+window.recipeProFoodDiary = { findProduct };
 function init(){if(!$("rpFoodForm")||!window.products)return;$("rpDiaryDate").value=today();window.addEventListener("recipepro:import-ingredients",importRecipeIngredients);
 const options=$("rpFoodProductList");Object.values(window.products).forEach(p=>{[p.name,...(p.aliases||[]).slice(0,3)].forEach(name=>{const o=document.createElement("option");o.value=name;options.appendChild(o);});});
 $("rpGoalsForm").addEventListener("submit",e=>{e.preventDefault();const g={calories:Number($("rpGoalCalories").value),protein:Number($("rpGoalProtein").value),fat:Number($("rpGoalFat").value),carbs:Number($("rpGoalCarbs").value)};if(Object.values(g).some(v=>!Number.isFinite(v)||v<0)||g.calories<=0){$("rpGoalsStatus").textContent="Калории должны быть больше нуля, остальные значения — не меньше нуля.";return;}localStorage.setItem(GOALS,JSON.stringify(g));$("rpGoalsStatus").textContent="Твоя норма сохранена на этом устройстве.";render();});
