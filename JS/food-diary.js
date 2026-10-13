@@ -9,7 +9,10 @@ function norm(v){return String(v||"").toLowerCase().replace(/ё/g,"е").replace(
 function findProduct(value){const q=norm(value);if(!q||!window.products)return null;const all=Object.entries(window.products);
 for(const [id,p] of all)if(norm(id)===q||norm(p.name)===q)return{id,product:p};
 for(const [id,p] of all)if((p.aliases||[]).some(a=>norm(a)===q))return{id,product:p};
-for(const [id,p] of all){const names=[id,p.name,...(p.aliases||[])].map(norm).filter(n=>n.length>=3);if(names.some(n=>n.includes(q)||q.includes(n)))return{id,product:p};}return null;}
+if(q.length<4)return null;
+const matches=new Map();
+for(const [id,p] of all){const names=[id,p.name,...(p.aliases||[])].map(norm).filter(n=>n.length>=4);if(names.some(n=>q.includes(n)))matches.set(id,{id,product:p});}
+return matches.size===1?[...matches.values()][0]:null;}
 function calc(p,grams,state){const engine=window.recipeProNutritionEngine;if(engine&&typeof engine.calculateIngredient==="function"){const result=engine.calculateIngredient({product:p,amount:grams,state:state==="boiled"?"boiled":"raw"});return{calories:result.calories,protein:result.protein,fat:result.fat,carbs:result.carbs};}const raw=p.raw||{},ratio=Number(p.cookedWeightRatio);let basis=Number(grams);if(state==="boiled"&&Number.isFinite(ratio)&&ratio>0)basis/=ratio;const f=basis/100;return{calories:Number(raw.kcal||0)*f,protein:Number(raw.protein||0)*f,fat:Number(raw.fat||0)*f,carbs:Number(raw.carbs||0)*f};}
 function goals(){return read(GOALS,null);}function diary(){return read(STORE,{});}function date(){return $("rpDiaryDate").value||today();}function entries(){const d=diary();return Array.isArray(d[date()])?d[date()]:[];}
 function escapeHtml(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
