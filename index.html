@@ -26,7 +26,7 @@
         rel="stylesheet"
     >
 
-    <link rel="stylesheet" href="CSS/style.css?v=20261013-diary1">
+    <link rel="stylesheet" href="CSS/style.css?v=20261013-profile1">
     <link rel="stylesheet" href="CSS/meal-planner.css?v=20261012-r2">
 </head>
 
@@ -823,6 +823,30 @@
 
     <div class="container">
 
+
+        <section class="rp-profile-card" aria-labelledby="rpProfileTitle">
+          <div class="rp-profile-cover"><span class="rp-profile-cover-mark">R</span><span class="rp-profile-cover-label">МОЯ КОЛЛЕКЦИЯ · RECIPEPRO</span></div>
+          <div class="rp-profile-content">
+            <div class="rp-profile-avatar-wrap">
+              <div class="rp-profile-avatar" id="rpProfileAvatar" aria-label="Фото профиля">R</div>
+              <label class="rp-avatar-upload" for="rpProfilePhoto" title="Загрузить фото профиля" aria-label="Загрузить фото профиля">＋</label>
+              <input id="rpProfilePhoto" class="rp-visually-hidden" type="file" accept="image/*">
+            </div>
+            <div class="rp-profile-details">
+              <span class="rp-diary-kicker">Личный профиль</span>
+              <h3 id="rpProfileTitle">Твоя кулинарная история</h3>
+              <p id="rpProfileBioPreview">Сохраняй любимые блюда, записывай авторские рецепты и собирай собственную коллекцию.</p>
+              <div class="rp-profile-stats"><span><strong id="rpProfileRecipeCount">0</strong> блюд</span><span><strong>КБЖУ</strong> каждого блюда</span><span><strong>Лично</strong> на этом устройстве</span></div>
+            </div>
+            <form id="rpProfileForm" class="rp-profile-form">
+              <label>Имя или псевдоним<input id="rpProfileName" type="text" maxlength="50" placeholder="Например, Олег"></label>
+              <label>О себе<textarea id="rpProfileBio" rows="3" maxlength="240" placeholder="Какие блюда ты любишь готовить?"></textarea></label>
+              <button class="rp-diary-primary" type="submit">Сохранить профиль <span>→</span></button>
+              <p id="rpProfileStatus" class="rp-diary-status" role="status">Профиль хранится на этом устройстве.</p>
+            </form>
+          </div>
+        </section>
+
         <div class="my-recipes-header">
 
             <div>
@@ -832,12 +856,11 @@
                 </div>
 
                 <h2>
-                    Мои рецепты
+                    Мои блюда
                 </h2>
 
                 <p>
-                    Сохраняй свои блюда и создавай
-                    собственную кулинарную коллекцию.
+                    Сохраняй авторские блюда с фотографиями, описанием и рассчитанным КБЖУ.
                 </p>
 
             </div>
@@ -848,7 +871,7 @@
                 type="button"
             >
                 <span>+</span>
-                Создать рецепт
+                Добавить своё блюдо
             </button>
 
         </div>
@@ -1284,6 +1307,14 @@
                         </div>
 
 
+                        <div class="rp-recipe-photo-field">
+                          <label for="rpRecipePhoto">Фотография блюда <span>необязательно</span></label>
+                          <input id="rpRecipePhoto" type="file" accept="image/*">
+                          <p>Добавь своё фото. Оно будет аккуратно уменьшено для хранения и карточки блюда.</p>
+                          <div class="rp-recipe-photo-preview" id="rpRecipePhotoPreview" hidden><img id="rpRecipePhotoPreviewImg" alt="Предпросмотр фотографии блюда"><button type="button" id="rpRecipePhotoRemove">Убрать фото</button></div>
+                          <p id="rpRecipePhotoStatus" role="status" class="rp-diary-status"></p>
+                        </div>
+
                         <div class="form-two-columns">
 
                             <div class="field">
@@ -1675,6 +1706,7 @@
 <script src="JS/nutrition.js?v=20261009-r2"></script>
 <script src="JS/app.js?v=20261012-photos1"></script>
     <script src="JS/food-diary.js?v=20261013-v1"></script>
+    <script src="JS/profile.js?v=20261013-v1"></script>
 <script src="JS/meal-planner.js?v=20261012-r3"></script>
 <script src="JS/ai-generator.js?v=20261012-offline2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
