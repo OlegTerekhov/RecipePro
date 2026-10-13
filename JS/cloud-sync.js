@@ -381,6 +381,121 @@
         return result;
     };
 
+ 
+    // A narrow public API for community features. Authentication/session and the client remain private.
+    async function communityClient() {
+        if (!configured) throw new Error("Облачное хранилище не настроено.");
+        await initializeCloudClient();
+        const { data, error } = await client.auth.getSession();
+        if (error) throw error;
+        if (!data?.session?.user) throw new Error("Сначала войди в аккаунт через кнопку «Облако» в шапке.");
+        return { db: client, user: data.session.user };
+    }
+
+    async function uploadCommunityImage(dataUrl, folder, userId) {
+        if (!dataUrl || !/^data:image\/(jpeg|png|webp);base64,/i.test(dataUrl)) return null;
+        const response = await fetch(dataUrl);
+        const blob = await response.blob();
+        if (blob.size > 5 * 1024 * 1024) throw new Error("Фото после сжатия должно быть меньше 5 МБ.");
+        const path = userId + "/" + folder + "/" + crypto.randomUUID() + ".jpg";
+        const { error } = await client.storage.from("recipepro-public-media").upload(path, blob, {
+            contentType: blob.type || "image/jpeg",
+            upsert: false,
+            cacheControl: "31536000"
+        });
+        if (error) throw error;
+        return client.storage.from("recipepro-public-media").getPublicUrl(path).data.publicUrl;
+    }
+
+    window.recipeProCloudAPI = {
+        async getSession() {
+            if (!configured) return { user: null };
+            await initializeCloudClient();
+            const { data, error } = await client.auth.getSession();
+            if (error) throw error;
+            return { user: data?.session?.user || null };
+        },
+        async savePublicProfile(profile) {
+            const { db, user } = await communityClient();
+            const current = await db.from("recipepro_public_profiles").select("avatar_path").eq("user_id", user.id).maybeSingle();
+            if (current.error) throw current.error;
+            let avatarPath = current.data?.avatar_path || null;
+            if (profile.photo && profile.photo.startsWith("data:image/")) {
+                avatarPath = await uploadCommunityImage(profile.photo, "profile", user.id);
+            } else if (!profile.photo) {
+                avatarPath = null;
+            }
+            const username = String(user.user_metadata?.username || "").trim().toLowerCase() || null;
+            const result = await db.from("recipepro_public_profiles").upsert({
+                user_id: user.id,
+                username,
+                display_name: String(profile.name || "").trim().slice(0, 50),
+                bio: String(profile.bio || "").trim().slice(0, 240),
+                avatar_path: avatarPath,
+                is_public: profile.isPublic === true,
+                updated_at: new Date().toISOString()
+            }, { onConflict: "user_id" });
+            if (result.error) throw result.error;
+            return { userId: user.id, isPublic: profile.isPublic === true };
+        },
+        async publishRecipe(recipe) {
+            const { db, user } = await communityClient();
+            if (!recipe || !recipe.id || !String(recipe.title || "").trim()) throw new Error("Не удалось определить блюдо для публикации.");
+            const ingredients = Array.isArray(recipe.ingredients) ? recipe.ingredients : [];
+            const nutrition = recipe.nutrition && typeof recipe.nutrition === "object" ? recipe.nutrition : {};
+            let imagePath = null;
+            if (typeof recipe.image === "string" && recipe.image.startsWith("data:image/")) {
+                imagePath = await uploadCommunityImage(recipe.image, "recipes", user.id);
+            } else if (typeof recipe.image === "string" && /^https:\/\//i.test(recipe.image)) {
+                imagePath = recipe.image;
+            }
+            const payload = {
+                user_id: user.id,
+                source_id: String(recipe.id).slice(0, 120),
+                title: String(recipe.title).trim().slice(0, 120),
+                description: String(recipe.description || "").trim().slice(0, 3000),
+                image_path: imagePath,
+                ingredients,
+                nutrition,
+                is_published: true,
+                updated_at: new Date().toISOString()
+            };
+            const result = await db.from("recipepro_public_recipes")
+                .upsert(payload, { onConflict: "user_id,source_id" })
+                .select("id,title,is_published")
+                .single();
+            if (result.error) throw result.error;
+            return result.data;
+        },
+        async unpublishRecipe(sourceId) {
+            const { db, user } = await communityClient();
+            const result = await db.from("recipepro_public_recipes")
+                .update({ is_published: false, updated_at: new Date().toISOString() })
+                .eq("user_id", user.id).eq("source_id", String(sourceId));
+            if (result.error) throw result.error;
+        },
+        async listFeed() {
+            if (!configured) throw new Error("Облачное хранилище не настроено.");
+            await initializeCloudClient();
+            const result = await client.from("recipepro_public_recipes")
+                .select("id,user_id,title,description,image_path,ingredients,nutrition,created_at")
+                .eq("is_published", true).order("created_at", { ascending: false }).limit(30);
+            if (result.error) throw result.error;
+            const rows = result.data || [];
+            const ids = [...new Set(rows.map(row => row.user_id))];
+            let profiles = [];
+            if (ids.length) {
+                const profileResult = await client.from("recipepro_public_profiles")
+                    .select("user_id,username,display_name,bio,avatar_path")
+                    .eq("is_public", true).in("user_id", ids);
+                if (profileResult.error) throw profileResult.error;
+                profiles = profileResult.data || [];
+            }
+            const byUser = new Map(profiles.map(profile => [profile.user_id, profile]));
+            return rows.map(row => ({ ...row, profile: byUser.get(row.user_id) || null }));
+        }
+    };
+
     function createDialog() {
         if (overlay) return;
         ensureStyles();
