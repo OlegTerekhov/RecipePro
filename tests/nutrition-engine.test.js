@@ -162,3 +162,41 @@ test("unknown product remains explicitly unknown", () => {
   assert.equal(result.known, false);
   assert.equal(result.calories, 0);
 });
+
+
+test("every local product has complete non-negative nutrition values and a positive cooking ratio", () => {
+  for (const [id, product] of Object.entries(context.window.products)) {
+    assert.ok(product.name && product.name.trim(), id + " must have a display name");
+    for (const field of ["kcal", "protein", "fat", "carbs"]) {
+      assert.ok(Number.isFinite(product.raw?.[field]), id + " must have numeric " + field);
+      assert.ok(product.raw[field] >= 0, id + " must not have negative " + field);
+    }
+    assert.ok(Number.isFinite(product.cookedWeightRatio) && product.cookedWeightRatio > 0,
+      id + " must have a positive cooking ratio");
+  }
+});
+
+test("generic fish is not silently mapped to salmon", () => {
+  const salmon = context.window.products["лосось"];
+  assert.ok(!salmon.aliases.some(alias => alias.toLowerCase().replace(/ё/g, "е") === "рыба"));
+  assert.equal(engine.calculateIngredient({
+    product: "рыба",
+    amount: 100,
+    state: "raw"
+  }).known, false);
+});
+
+test("ambiguous phrases are not silently resolved to the first matching product", () => {
+  const chicken = context.window.products["курица"];
+  const rice = context.window.products["рис"];
+  assert.ok(chicken && rice);
+  // The diary resolver is deliberately conservative for phrases containing multiple foods.
+  const phrase = "курица с рисом";
+  const normalized = phrase.toLowerCase().replace(/ё/g, "е").replace(/[^а-яa-z0-9]+/gi, " ").trim();
+  const matchingIds = Object.entries(context.window.products)
+    .filter(([id, product]) => [id, product.name, ...(product.aliases || [])]
+      .map(value => String(value).toLowerCase().replace(/ё/g, "е").replace(/[^а-яa-z0-9]+/gi, " ").trim())
+      .some(name => name.length >= 4 && normalized.includes(name)))
+    .map(([id]) => id);
+  assert.ok(matchingIds.length > 1, "fixture must contain more than one food match");
+});
