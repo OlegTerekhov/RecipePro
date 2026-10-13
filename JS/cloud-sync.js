@@ -415,6 +415,14 @@
             if (error) throw error;
             return { user: data?.session?.user || null };
         },
+        async getOwnProfile() {
+            const { db, user } = await communityClient();
+            const result = await db.from("recipepro_public_profiles")
+                .select("username,display_name,bio,avatar_path,is_public,updated_at")
+                .eq("user_id", user.id).maybeSingle();
+            if (result.error) throw result.error;
+            return result.data || null;
+        },
         async savePublicProfile(profile) {
             const { db, user } = await communityClient();
             const current = await db.from("recipepro_public_profiles").select("avatar_path").eq("user_id", user.id).maybeSingle();
