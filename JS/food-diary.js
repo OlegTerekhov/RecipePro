@@ -1,12 +1,14 @@
 (function () {
 "use strict";
 const STORE="recipepro_food_diary_v1", GOALS="recipepro_nutrition_goals_v1";
+const externalProducts=new Map();
+let searchRequest=0,searchTimer=null;
 const $=id=>document.getElementById(id);
 const fmt=(n,d=1)=>Number(Number(n||0).toFixed(d)).toLocaleString("ru-RU",{maximumFractionDigits:d});
 const today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");};
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback;}catch(_){return fallback;}}
 function norm(v){return String(v||"").toLowerCase().replace(/ё/g,"е").replace(/[^а-яa-z0-9]+/gi," ").trim();}
-function findProduct(value){const q=norm(value);if(!q||!window.products)return null;const all=Object.entries(window.products);
+function findProduct(value){const q=norm(value);if(!q||!window.products)return null;const external=[...externalProducts.values()].find(p=>norm(p.name)===q||norm(p.id)===q);if(external)return{id:external.id,product:external};const all=Object.entries(window.products);
 for(const [id,p] of all)if(norm(id)===q||norm(p.name)===q)return{id,product:p};
 for(const [id,p] of all)if((p.aliases||[]).some(a=>norm(a)===q))return{id,product:p};
 if(q.length<4||/(?:^|\s)(?:с|и|плюс)(?:\s|$)/.test(q))return null;
@@ -28,13 +30,58 @@ return [...starts,...includes.filter(x=>!starts.some(y=>y.id===x.id))].slice(0,6
 function renderProductSuggestions(){
 const input=$("rpFoodProduct"),host=$("rpProductSuggestions");if(!input||!host)return;
 const q=input.value.trim();if(!q){host.hidden=true;host.innerHTML="";return;}
-const matches=productMatches(q);if(!matches.length){host.hidden=true;host.innerHTML="";return;}
-host.innerHTML=matches.map(({id,product})=>'<button type="button" class="rp-product-suggestion" role="option" data-product-id="'+escapeHtml(id)+'"><span>'+escapeHtml(product.name)+'</span><small>'+fmt(product.raw?.kcal||0,0)+' ккал · '+fmt(product.raw?.protein||0)+' г белка / 100 г</small></button>').join("");
-host.hidden=false;
+const matches=productMatches(q);
+host.innerHTML=matches.map(({id,product})=>'<button type="button" class="rp-product-suggestion" role="option" data-product-id="'+escapeHtml(id)+'"><span>'+escapeHtml(product.name)+'</span><small>'+fmt(product.raw?.kcal||0,0)+' ккал · '+fmt(product.raw?.protein||0)+' г белка / 100 г · RecipePro</small></button>').join("");
+if(matches.length)host.hidden=false;
+if(q.length>=3&&!/^\\d{8,14}$/.test(q)){
+if(searchTimer)clearTimeout(searchTimer);
+const request=++searchRequest;
+searchTimer=setTimeout(()=>searchOpenFoodFacts(q,request),450);
+}else if(/^\\d{8,14}$/.test(q)){
+if(searchTimer)clearTimeout(searchTimer);
+const request=++searchRequest;
+searchTimer=setTimeout(()=>searchOpenFoodFacts(q,request),250);
+}
+}
+function offProductToRecord(item){
+const n=item?.nutriments||{},kcal=Number(n["energy-kcal_100g"]??n["energy-kcal"]??(Number(n["energy-kj_100g"]??n["energy-kj"]??0)/4.184));
+const protein=Number(n.proteins_100g??n.proteins),fat=Number(n.fat_100g??n.fat),carbs=Number(n.carbohydrates_100g??n.carbohydrates);
+if(!item||!item.code||!item.product_name||![kcal,protein,fat,carbs].every(v=>Number.isFinite(v)&&v>=0)||kcal>1000||protein>100||fat>100||carbs>100)return null;
+const brand=String(item.brands||"").split(",")[0].trim();
+const name=String(item.product_name).trim()+(brand?" · "+brand:"");
+return{id:"off:"+String(item.code),name,brand,barcode:String(item.code),raw:{kcal,protein,fat,carbs},cookedWeightRatio:1,category:"packaged",nutritionSource:"Open Food Facts",sourceUrl:"https://world.openfoodfacts.org/product/"+encodeURIComponent(String(item.code))};
+}
+function mergeExternalResults(products,request){
+if(request!==searchRequest)return;
+const host=$("rpProductSuggestions"),input=$("rpFoodProduct");if(!host||!input||!input.value.trim())return;
+const existing=new Set(productMatches(input.value).map(x=>x.id));
+const remote=[];
+for(const item of products||[]){const p=offProductToRecord(item);if(!p||existing.has(p.id))continue;externalProducts.set(p.id,p);remote.push(p);if(remote.length>=5)break;}
+const local=productMatches(input.value).map(({id,product})=>'<button type="button" class="rp-product-suggestion" role="option" data-product-id="'+escapeHtml(id)+'"><span>'+escapeHtml(product.name)+'</span><small>'+fmt(product.raw?.kcal||0,0)+' ккал · '+fmt(product.raw?.protein||0)+' г белка / 100 г · RecipePro</small></button>').join("");
+const external=remote.map(p=>'<button type="button" class="rp-product-suggestion rp-product-suggestion-external" role="option" data-product-id="'+escapeHtml(p.id)+'"><span>'+escapeHtml(p.name)+'</span><small>'+fmt(p.raw.kcal,0)+' ккал · Б '+fmt(p.raw.protein)+' · Ж '+fmt(p.raw.fat)+' · У '+fmt(p.raw.carbs)+' / 100 г</small><small>Open Food Facts · данные упаковки, если указаны</small></button>').join("");
+if(local||external){host.innerHTML=local+external;host.hidden=false;}
+if(!local&&!external){host.innerHTML='<div class="rp-product-search-note">В каталоге ничего не найдено. Попробуй название с упаковки или штрихкод.</div>';host.hidden=false;}
+}
+async function searchOpenFoodFacts(query,request){
+const host=$("rpProductSuggestions");if(!host)return;
+const isBarcode=/^\\d{8,14}$/.test(query.replace(/\\s/g,""));
+const url=isBarcode
+?"https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(query.replace(/\\s/g,""))+"?fields=code,product_name,brands,nutriments"
+:"https://world.openfoodfacts.org/cgi/search.pl?search_terms="+encodeURIComponent(query)+"&search_simple=1&action=process&json=1&page_size=6&fields=code,product_name,brands,nutriments";
+try{
+const response=await fetch(url,{headers:{Accept:"application/json"},signal:AbortSignal.timeout(6500)});
+if(!response.ok)throw new Error("HTTP "+response.status);
+const data=await response.json();
+const products=isBarcode?(data.status===1&&data.product?[data.product]:[]):(Array.isArray(data.products)?data.products:[]);
+mergeExternalResults(products,request);
+}catch(_){
+if(request!==searchRequest)return;
+if(!productMatches(query).length){host.innerHTML='<div class="rp-product-search-note">Внешняя база сейчас недоступна. Можно выбрать продукт из каталога RecipePro.</div>';host.hidden=false;}
+}
 }
 function recentProducts(){
 const all=diary(),seen=new Set(),result=[];
-Object.keys(all).sort().reverse().forEach(day=>{(all[day]||[]).slice().reverse().forEach(entry=>{if(entry.productId&&!seen.has(entry.productId)&&window.products?.[entry.productId]){seen.add(entry.productId);result.push({id:entry.productId,name:window.products[entry.productId].name,grams:entry.grams,state:entry.state,meal:entry.meal});}});});
+Object.keys(all).sort().reverse().forEach(day=>{(all[day]||[]).slice().reverse().forEach(entry=>{if(entry.productId&&!seen.has(entry.productId)&&(window.products?.[entry.productId]||entry.productSnapshot)){seen.add(entry.productId);result.push({id:entry.productId,name:window.products?.[entry.productId]?.name||entry.productSnapshot?.name||entry.name,grams:entry.grams,state:entry.state,meal:entry.meal,productSnapshot:entry.productSnapshot});}});});
 return result.slice(0,5);
 }
 function renderRecentProducts(){
@@ -78,15 +125,15 @@ if (window.__RECIPEPRO_TEST__) window.recipeProFoodDiary = { findProduct };
 function init(){if(!$("rpFoodForm")||!window.products)return;$("rpDiaryDate").value=today();window.addEventListener("recipepro:import-ingredients",importRecipeIngredients);
 const options=$("rpFoodProductList");Object.values(window.products).forEach(p=>{[p.name,...(p.aliases||[]).slice(0,3)].forEach(name=>{const o=document.createElement("option");o.value=name;options.appendChild(o);});});
 const productInput=$("rpFoodProduct"),suggestions=$("rpProductSuggestions");
-productInput.addEventListener("input",renderProductSuggestions);
+productInput.addEventListener("input",()=>{selectedExternalProduct=null;renderProductSuggestions();});
 productInput.addEventListener("focus",renderProductSuggestions);
 productInput.addEventListener("keydown",e=>{if(e.key==="Escape"){suggestions.hidden=true;return;}if(e.key==="Enter"&&!suggestions.hidden){const first=suggestions.querySelector("[data-product-id]");if(first){e.preventDefault();chooseProduct(first.dataset.productId);}}});
-function chooseProduct(id){const p=window.products[id];if(!p)return;productInput.value=p.name;suggestions.hidden=true;suggestions.innerHTML="";$("rpFoodGrams").focus();$("rpFoodStatus").textContent="Выбран продукт из каталога. Укажи вес и добавь запись.";}
+let selectedExternalProduct=null;function chooseProduct(id){const p=window.products[id]||externalProducts.get(id);if(!p)return;selectedExternalProduct=externalProducts.has(id)?p:null;productInput.value=p.name;suggestions.hidden=true;suggestions.innerHTML="";$("rpFoodGrams").focus();$("rpFoodStatus").textContent=selectedExternalProduct?"Выбран продукт из Open Food Facts. Проверь значения на упаковке и укажи вес.":"Выбран продукт из каталога RecipePro. Укажи вес и добавь запись."; }
 suggestions.addEventListener("click",e=>{const b=e.target.closest("[data-product-id]");if(b)chooseProduct(b.dataset.productId);});
-$("rpRecentProducts").addEventListener("click",e=>{const b=e.target.closest("[data-recent-product]");if(!b)return;chooseProduct(b.dataset.recentProduct);$("rpFoodGrams").value=b.dataset.grams||100;$("rpFoodState").value=b.dataset.state||"raw";$("rpFoodMeal").value=b.dataset.meal||"Обед";$("rpFoodGrams").focus();});
+$("rpRecentProducts").addEventListener("click",e=>{const b=e.target.closest("[data-recent-product]");if(!b)return;if(b.dataset.recentProduct.startsWith("off:")&&b.dataset.snapshot){const p=JSON.parse(decodeURIComponent(b.dataset.snapshot));externalProducts.set(p.id,p);}chooseProduct(b.dataset.recentProduct);$("rpFoodGrams").value=b.dataset.grams||100;$("rpFoodState").value=b.dataset.state||"raw";$("rpFoodMeal").value=b.dataset.meal||"Обед";$("rpFoodGrams").focus();});
 document.addEventListener("click",e=>{if(!e.target.closest(".rp-food-name"))suggestions.hidden=true;});
 $("rpGoalsForm").addEventListener("submit",e=>{e.preventDefault();const g={calories:Number($("rpGoalCalories").value),protein:Number($("rpGoalProtein").value),fat:Number($("rpGoalFat").value),carbs:Number($("rpGoalCarbs").value)};if(Object.values(g).some(v=>!Number.isFinite(v)||v<0)||g.calories<=0){$("rpGoalsStatus").textContent="Калории должны быть больше нуля, остальные значения — не меньше нуля.";return;}localStorage.setItem(GOALS,JSON.stringify(g));$("rpGoalsStatus").textContent="Твоя норма сохранена на этом устройстве.";render();});
-$("rpFoodForm").addEventListener("submit",e=>{e.preventDefault();const found=findProduct($("rpFoodProduct").value),grams=Number($("rpFoodGrams").value);if(!found){$("rpFoodStatus").textContent="Не нашёл этот продукт в каталоге. Выбери название из подсказок — так расчёт не будет выдуманным.";return;}if(!Number.isFinite(grams)||grams<=0||grams>10000){$("rpFoodStatus").textContent="Укажи вес от 1 до 10 000 г.";return;}const state=$("rpFoodState").value,values=calc(found.product,grams,state),id=window.crypto&&crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);const list=entries();list.push({id,productId:found.id,name:found.product.name,grams,state,meal:$("rpFoodMeal").value,...values,createdAt:new Date().toISOString()});save(list);$("rpFoodProduct").value="";$("rpProductSuggestions").hidden=true;$("rpFoodGrams").value="100";$("rpFoodStatus").textContent="Добавлено: "+found.product.name+". Значения рассчитаны по каталогу RecipePro.";});
+$("rpFoodForm").addEventListener("submit",e=>{e.preventDefault();const found=selectedExternalProduct&&norm(selectedExternalProduct.name)===norm($("rpFoodProduct").value)?{id:selectedExternalProduct.id,product:selectedExternalProduct}:findProduct($("rpFoodProduct").value),grams=Number($("rpFoodGrams").value);if(!found){$("rpFoodStatus").textContent="Не нашёл этот продукт в каталоге. Выбери название из подсказок — так расчёт не будет выдуманным.";return;}if(!Number.isFinite(grams)||grams<=0||grams>10000){$("rpFoodStatus").textContent="Укажи вес от 1 до 10 000 г.";return;}const state=$("rpFoodState").value,values=calc(found.product,grams,state),id=window.crypto&&crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);const list=entries();list.push({id,productId:found.id,name:found.product.name,grams,state,meal:$("rpFoodMeal").value,...values,...(found.id.startsWith("off:")?{productSnapshot:found.product,nutritionSource:"Open Food Facts"}:{}),createdAt:new Date().toISOString()});save(list);$("rpFoodProduct").value="";selectedExternalProduct=null;$("rpProductSuggestions").hidden=true;$("rpFoodGrams").value="100";$("rpFoodStatus").textContent="Добавлено: "+found.product.name+". Значения рассчитаны по каталогу RecipePro.";});
 $("rpFoodLog").addEventListener("click",e=>{const b=e.target.closest("[data-delete-entry]");if(b)save(entries().filter(x=>String(x.id)!==b.dataset.deleteEntry));});
 $("rpDiaryDate").addEventListener("change",render);$("rpClearDiaryBtn").addEventListener("click",()=>{if(entries().length&&confirm("Удалить все записи питания за выбранный день?"))save([]);});render();}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",init,{once:true});else init();
