@@ -841,10 +841,25 @@
             <form id="rpProfileForm" class="rp-profile-form">
               <label>Имя или псевдоним<input id="rpProfileName" type="text" maxlength="50" placeholder="Например, Олег"></label>
               <label>О себе<textarea id="rpProfileBio" rows="3" maxlength="240" placeholder="Какие блюда ты любишь готовить?"></textarea></label>
+              <label class="rp-public-toggle"><input id="rpProfilePublic" type="checkbox"><span><strong>Публичный профиль</strong><small>Имя, описание и фото будут видны в сообществе.</small></span></label>
               <button class="rp-diary-primary" type="submit">Сохранить профиль <span>→</span></button>
+              <button class="rp-diary-secondary" id="rpProfileCloudSave" type="button">Сохранить профиль в облако</button>
               <p id="rpProfileStatus" class="rp-diary-status" role="status">Профиль хранится на этом устройстве.</p>
             </form>
           </div>
+        </section>
+
+        <section class="rp-community-panel" id="rpCommunity">
+          <div class="rp-community-heading">
+            <div><span class="rp-diary-kicker">RECIPEPRO COMMUNITY</span><h2>Блюда, которыми делятся</h2><p>Публикуй собственные блюда и открывай идеи других пользователей. Публикация выполняется только по твоему действию.</p></div>
+            <button class="rp-diary-secondary" id="rpCommunityRefresh" type="button">Обновить ленту ↻</button>
+          </div>
+          <div class="rp-community-publish">
+            <div><span class="rp-diary-kicker">Твоя коллекция</span><h3>Поделиться своим блюдом</h3><p>Выбери сохранённое блюдо. Оно появится в общей ленте, а ингредиенты и КБЖУ будут доступны читателям.</p></div>
+            <div class="rp-community-publish-controls"><label for="rpCommunityRecipeSelect">Моё блюдо</label><select id="rpCommunityRecipeSelect"><option value="">Сначала создай своё блюдо</option></select><button class="rp-diary-primary" id="rpCommunityPublish" type="button">Опубликовать выбранное <span>↗</span></button></div>
+          </div>
+          <p class="rp-community-status" id="rpCommunityStatus" role="status">Чтобы публиковать блюда, войди в аккаунт через кнопку «Облако» в шапке.</p>
+          <div class="rp-community-feed" id="rpCommunityFeed" aria-live="polite"><div class="rp-community-empty">Здесь появятся блюда сообщества. Нажми «Обновить ленту».</div></div>
         </section>
 
         <div class="my-recipes-header">
@@ -1706,7 +1721,7 @@
 <script src="JS/nutrition.js?v=20261009-r2"></script>
 <script src="JS/app.js?v=20261012-photos1"></script>
     <script src="JS/food-diary.js?v=20261013-v1"></script>
-    <script src="JS/profile.js?v=20261013-v1"></script>
+    <script src="JS/profile.js?v=20261013-community1"></script>
 <script src="JS/meal-planner.js?v=20261012-r3"></script>
 <script src="JS/ai-generator.js?v=20261012-offline2"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1810,5 +1825,6 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 })();
 </script>
 
+<script src="JS/community.js?v=20261013-community1"></script>
 </body>
 </html>
