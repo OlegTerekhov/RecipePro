@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "recipepro-shell-v90";
+const CACHE_NAME = "recipepro-shell-v91";
 const CORE_SHELL = ["./", "./index.html"];
 const APP_ASSETS = [
     "./CSS/style.css", "./CSS/preferences.css", "./JS/preferences.js", "./CSS/meal-planner.css", "./CSS/mobile.css", "./JS/calendar.js", "./JS/meal-planner.js", "./JS/backup.js", "./JS/products.js", "./JS/product-resolver.js",
@@ -58,13 +58,10 @@ self.addEventListener("install", event => {
 });
 
 self.addEventListener("activate", event => {
-    event.waitUntil(
-        caches.keys()
-            .then(keys => Promise.all(keys
-                .filter(key => key.startsWith("recipepro-") && key !== CACHE_NAME)
-                .map(key => caches.delete(key))))
-            .then(() => self.clients.claim())
-    );
+    // Keep older shell caches during activation. Existing iOS home-screen clients can
+    // briefly remain controlled by the previous worker; deleting its cache immediately
+    // can make its next asset request fail and break cloud sync until a full reinstall.
+    event.waitUntil(self.clients.claim());
 });
 
 self.addEventListener("fetch", event => {
