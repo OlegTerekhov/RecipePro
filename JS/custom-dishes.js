@@ -86,6 +86,18 @@ function loadDish(d){
  $("rpCustomDishPanel").scrollIntoView({behavior:"smooth",block:"start"});
 }
 function recalculate(){renderResult();}
+function newDish(){
+ editingDishId=null;
+ $("rpCustomDishName").value="";
+ $("rpCustomDishIngredients").innerHTML="";
+ addIngredientRow({productId:products()[0]?.[0],grams:100,state:"raw"});
+ $("rpCustomDishFinishedWeight").value="";
+ $("rpCustomDishPortionWeight").value="250";
+ $("rpCustomDishMeal").value=$("rpFoodMeal")?.value||"Обед";
+ $("rpCustomDishStatus").textContent="Новое блюдо. Добавь ингредиенты и укажи итоговый вес после приготовления.";
+ recalculate();
+ $("rpCustomDishName").focus();
+}
 function saveDish(){
  try{
   const d=currentDish();editingDishId=String(d.id);const list=read(STORE,[]),next=[d,...list.filter(x=>String(x.id)!==String(d.id)&&x.name!==d.name)].slice(0,100);
@@ -114,6 +126,7 @@ function init(){
  $("rpCustomDishIngredients").addEventListener("click",e=>{if(e.target.closest("[data-remove-dish-ingredient]")){e.target.closest(".rp-custom-dish-ingredient").remove();recalculate();}});
  ["rpCustomDishName","rpCustomDishFinishedWeight","rpCustomDishPortionWeight","rpCustomDishMeal"].forEach(id=>$(id).addEventListener("input",recalculate));
  $("rpSaveCustomDish").addEventListener("click",saveDish);
+ $("rpNewCustomDish").addEventListener("click",newDish);
  $("rpCustomDishForm").addEventListener("submit",addPortion);
  $("rpSavedCustomDishes").addEventListener("click",e=>{
   const load=e.target.closest("[data-load-custom-dish]");if(load){const d=savedDishes().find(x=>String(x.id)===load.dataset.loadCustomDish);if(d)loadDish(d);return;}
