@@ -114,7 +114,7 @@
       <form id="rpFoodForm" class="rp-food-form">
         <label class="rp-food-name">Продукт<input id="rpFoodProduct" type="text" list="rpFoodProductList" placeholder="Название или штрихкод" autocomplete="off" aria-autocomplete="list" aria-controls="rpProductSuggestions" required><datalist id="rpFoodProductList"></datalist><button id="rpOpenScanner" class="rp-scan-trigger" type="button" aria-haspopup="dialog"><span aria-hidden="true">▦</span> Сканировать штрихкод</button><div id="rpProductSuggestions" class="rp-product-suggestions" role="listbox" aria-label="Подходящие продукты" hidden></div></label>
         <label class="rp-food-grams-field">Вес, г<input id="rpFoodGrams" type="number" min="1" max="10000" step="1" value="100" required><span class="rp-portion-shortcuts" role="group" aria-label="Быстрый выбор веса"><button type="button" data-grams-shortcut="50">50 г</button><button type="button" data-grams-shortcut="100" aria-pressed="true">100 г</button><button type="button" data-grams-shortcut="150">150 г</button><button type="button" data-grams-shortcut="200">200 г</button></span></label>
-        <label>Состояние<select id="rpFoodState"><option value="raw">Сырой / сухой</option><option value="boiled">Варёный / приготовленный</option></select></label>
+        <label>Состояние<select id="rpFoodState"><option value="raw">Сырой / сухой</option><option value="boiled">Варёный / приготовленный</option><option value="fried">Жареный</option></select></label>
         <label>Приём пищи<select id="rpFoodMeal"><option>Завтрак</option><option>Обед</option><option>Ужин</option><option>Перекус</option></select></label>
         <button class="rp-diary-primary" type="submit">Добавить в дневник <span>+</span></button>
       </form><div id="rpBarcodeScanner" class="rp-scanner-modal" role="dialog" aria-modal="true" aria-labelledby="rpScannerTitle" hidden><div class="rp-scanner-backdrop" data-close-scanner></div><section class="rp-scanner-card"><div class="rp-scanner-head"><div><span class="rp-diary-kicker">Быстрое добавление</span><h3 id="rpScannerTitle">Сканер штрихкода</h3></div><button id="rpCloseScanner" class="rp-scanner-close" type="button" aria-label="Закрыть сканер">×</button></div><div class="rp-scanner-view"><video id="rpScannerVideo" playsinline muted aria-label="Изображение с камеры"></video><div class="rp-scanner-frame" aria-hidden="true"></div></div><p id="rpScannerStatus" class="rp-scanner-status" role="status">Наведи камеру на штрихкод упаковки.</p><button id="rpScannerManual" class="rp-diary-secondary rp-scanner-manual" type="button">Ввести штрихкод вручную</button></section></div><p class="rp-diary-status" id="rpFoodStatus" role="status">Расчёт основан на встроенном каталоге. Значения могут отличаться от этикетки конкретного продукта.</p>
@@ -1453,10 +1453,10 @@
 <script src="JS/recipe-engine.js?v=20261009-r1"></script>
 <script src="JS/recipe-builder.js?v=20261012-r1"></script>
 <script src="JS/recommendation-engine.js?v=20261009-r4"></script>
-<script src="JS/nutrition-engine.js?v=20261009-r5"></script>
+<script src="JS/nutrition-engine.js?v=20261014-fried-oil1"></script>
 <script src="JS/nutrition.js?v=20261009-r2"></script>
 <script src="JS/app.js?v=20261012-photos1"></script>
-    <script src="JS/food-diary.js?v=20261013-goal-recommendations1"></script>
+    <script src="JS/food-diary.js?v=20261014-fried-state1"></script>
 <script src="JS/calendar.js?v=20261014-four-tabs2"></script>
     <script src="JS/profile.js?v=20261013-clean1"></script>
     <script src="JS/backup.js?v=20261013-diary-backup1"></script>
