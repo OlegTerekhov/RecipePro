@@ -15,6 +15,7 @@
     let clientInitPromise = null;
     let currentUser = null;
     let syncingUserId = null;
+    let lastSyncedUserId = null;
     let isApplyingCloudData = false;
     let saveTimer = null;
     let overlay = null;
@@ -656,8 +657,14 @@
             initializeCloudClient().catch(error => {
                 setStatus("Не удалось подключить облако. Проверь интернет и попробуй ещё раз. " + (error?.message || ""), "error");
             });
-        } else if (currentUser) setStatus("Вход выполнен: " + (currentUser.user_metadata?.username || currentUser.email || "аккаунт"), "success");
-        else setStatus("Войди или создай аккаунт по логину и паролю.", "neutral");
+        } else if (currentUser && syncingUserId === currentUser.id) {
+            setStatus("Вход выполнен: " + (currentUser.user_metadata?.username || currentUser.email || "аккаунт") + ". Загружаем данные…", "neutral");
+        } else if (currentUser && lastSyncedUserId === currentUser.id) {
+            setStatus("Синхронизация завершена. Аккаунт: " + (currentUser.user_metadata?.username || currentUser.email || "подключён"), "success");
+        } else if (currentUser) {
+            setStatus("Вход выполнен: " + (currentUser.user_metadata?.username || currentUser.email || "аккаунт") + ". Проверяем синхронизацию…", "neutral");
+            handleSession(currentUser);
+        } else setStatus("Войди или создай аккаунт по логину и паролю.", "neutral");
     }
 
     function closeDialog() {
@@ -753,6 +760,7 @@
         if (passwordInput && user) passwordInput.value = "";
 
         if (!user) {
+            lastSyncedUserId = null;
             if (previousId) setStatus("Вы вышли. Локальные рецепты сохранены на этом устройстве.", "neutral");
             else setStatus("Войди или создай аккаунт по логину и паролю.", "neutral");
             return;
@@ -768,8 +776,10 @@
             const merged = mergeSnapshot(result.data || { recipes: [], favorites: [] }, user);
             await uploadSnapshot(merged, user);
             saveBaseline(merged, user);
+            lastSyncedUserId = user.id;
             setStatus("Синхронизация завершена. Аккаунт: " + (user.user_metadata?.username || user.email || "подключён"), "success");
         } catch (error) {
+            lastSyncedUserId = null;
             setStatus("Ошибка облачной синхронизации: " + (error?.message || "проверь таблицу и политики RLS"), "error");
         } finally {
             if (syncingUserId === user.id) syncingUserId = null;
