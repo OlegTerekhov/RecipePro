@@ -83,7 +83,7 @@ return result.slice(0,5);
 function renderRecentProducts(){
 const host=$("rpRecentProducts");if(!host)return;
 const recent=recentProducts();
-host.innerHTML=recent.map(item=>'<button type="button" class="rp-recent-product" data-recent-product="'+escapeHtml(item.id)+'" data-snapshot="'+(item.productSnapshot?escapeHtml(encodeURIComponent(JSON.stringify(item.productSnapshot))):"")+'" data-grams="'+Number(item.grams||100)+'" data-state="'+(item.state==="boiled"?"boiled":"raw")+'" data-meal="'+escapeHtml(item.meal||"Обед")+'">'+escapeHtml(item.name)+'<small>'+fmt(item.grams||100,0)+' г</small></button>').join("");
+host.innerHTML=recent.map(item=>'<button type="button" class="rp-recent-product" data-recent-product="'+escapeHtml(item.id)+'" data-snapshot="'+(item.productSnapshot?escapeHtml(encodeURIComponent(JSON.stringify(item.productSnapshot))):"")+'" data-grams="'+Number(item.grams||100)+'" data-state="'+(["boiled","fried"].includes(item.state)?item.state:"raw")+'" data-meal="'+escapeHtml(item.meal||"Обед")+'">'+escapeHtml(item.name)+'<small>'+fmt(item.grams||100,0)+' г</small></button>').join("");
 host.hidden=!recent.length;
 }
 function diary(){return read(STORE,{});}function date(){return $("rpDiaryDate").value||today();}function entries(){const d=diary();return Array.isArray(d[date()])?d[date()]:[];}
