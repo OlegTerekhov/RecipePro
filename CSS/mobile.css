@@ -324,8 +324,6 @@ main > #rpSettingsPanel { min-height: calc(100svh - 82px); }
   body { padding-bottom: calc(var(--rp-mobile-nav-height, 66px) + env(safe-area-inset-bottom, 0px) + 10px); }
   main > #rpSettingsPanel { min-height: calc(100svh - var(--rp-mobile-nav-height, 66px) - env(safe-area-inset-bottom, 0px)); padding-top: 22px; padding-bottom: 28px; }
 }
-@media (prefers-color-scheme: dark) {
-  body[data-theme="dark"] #recipeProBottomNav { background: rgba(17,25,21,.97); border-color: rgba(70,85,76,.8); }
-  body[data-theme="dark"] #recipeProBottomNav a { color: #a8b5ac; }
-  body[data-theme="dark"] #recipeProBottomNav a[aria-current="page"] { background: #273b30; color: #f4f6f1; }
-}
+body[data-theme="dark"] #recipeProBottomNav { background: rgba(17,25,21,.97); border-color: rgba(70,85,76,.8); }
+body[data-theme="dark"] #recipeProBottomNav a { color: #a8b5ac; }
+body[data-theme="dark"] #recipeProBottomNav a[aria-current="page"] { background: #273b30; color: #f4f6f1; }
