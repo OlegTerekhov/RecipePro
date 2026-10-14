@@ -197,3 +197,60 @@ button, a, input, select, textarea { touch-action: manipulation; }
 /* Clear feedback when a daily nutrition target is exceeded */
 .rp-diary-goal-warnings{margin-top:15px;padding:12px 14px;border:1px solid transparent;border-radius:12px;font-size:12px;line-height:1.55;font-weight:650}
 .rp-diary-goal-warnings.has-overage{border-color:#efc9be;background:#fff2ee;color:#963f2e}
+
+
+/* Calendar and personal-goal screens: premium, touch-first visual system. */
+.rp-section-intro{max-width:720px;margin:0 auto 26px;text-align:center}
+.rp-section-intro h2{margin:7px 0 10px;color:var(--green-950);font:600 clamp(30px,4vw,44px)/1.08 var(--serif);letter-spacing:-.035em}
+.rp-section-intro p{max-width:590px;margin:0 auto;color:var(--text-soft);font-size:14px;line-height:1.7}
+.rp-ideas-section,.rp-calendar-section{background:transparent}
+.rp-goals-feature{max-width:820px;margin:0 auto}
+.rp-goals-feature .rp-goals-form{grid-template-columns:repeat(2,minmax(0,1fr))}
+.rp-calendar-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.85fr);gap:18px;max-width:1080px;margin:0 auto}
+.rp-calendar-card{min-width:0;padding:24px;border:1px solid var(--line);border-radius:24px;background:var(--surface);box-shadow:var(--shadow-sm)}
+.rp-calendar-monthbar{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;align-items:center;gap:8px;margin-bottom:22px}
+.rp-calendar-monthbar h3{margin:0;color:var(--text);font:600 22px/1.2 var(--serif);text-align:center;text-transform:capitalize}
+.rp-calendar-monthbar button{width:44px;height:44px;border:1px solid var(--line);border-radius:14px;background:var(--surface-soft);color:var(--text);font-size:27px;line-height:1;cursor:pointer}
+.rp-calendar-weekdays,.rp-calendar-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+.rp-calendar-weekdays{margin-bottom:8px}
+.rp-calendar-weekdays span{padding:4px 0;color:var(--text-soft);font-size:11px;font-weight:700;text-align:center}
+.rp-calendar-day{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-width:0;min-height:60px;padding:5px 1px;border:1px solid transparent;border-radius:13px;background:transparent;color:var(--text);font-size:13px;cursor:pointer}
+.rp-calendar-day:hover{background:var(--surface-soft)}
+.rp-calendar-day.is-selected{border-color:var(--green-600);background:var(--green-100);color:var(--green-950);font-weight:800}
+.rp-calendar-day.is-today:not(.is-selected){border-color:var(--line)}
+.rp-calendar-day.is-outside{opacity:.35}
+.rp-calendar-day .rp-calendar-dot{width:5px;height:5px;border-radius:50%;background:var(--green-600)}
+.rp-calendar-day:not(.has-entries) .rp-calendar-dot{visibility:hidden}
+.rp-calendar-legend{display:flex;align-items:center;gap:8px;margin:18px 0 0;color:var(--text-soft);font-size:11px}
+.rp-calendar-legend span{width:7px;height:7px;border-radius:50%;background:var(--green-600)}
+.rp-calendar-detail{display:flex;flex-direction:column;align-items:flex-start}
+.rp-calendar-detail h3{margin:6px 0 12px;color:var(--text);font:600 24px/1.2 var(--serif);text-transform:capitalize}
+.rp-calendar-calories{display:flex;align-items:baseline;gap:9px;margin:0 0 18px}
+.rp-calendar-calories strong{color:var(--text);font-size:clamp(42px,5vw,58px);font-weight:700;line-height:1;letter-spacing:-.05em}
+.rp-calendar-calories span{color:var(--text-soft);font-size:13px}
+.rp-calendar-macros{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;margin-bottom:16px}
+.rp-calendar-macros>div{display:flex;flex-direction:column;gap:5px;min-width:0;padding:12px 10px;border:1px solid var(--line-soft);border-radius:13px;background:var(--surface-soft)}
+.rp-calendar-macros span{color:var(--text-soft);font-size:11px}
+.rp-calendar-macros strong{color:var(--text);font-size:15px}
+.rp-calendar-entries{flex:1;width:100%;margin:0 0 18px;color:var(--text-soft);font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.rp-calendar-detail .rp-diary-primary{width:100%;margin-top:auto}
+body[data-theme="dark"] .rp-calendar-card{background:var(--surface);border-color:var(--line)}
+body[data-theme="dark"] .rp-calendar-day.is-selected{background:#263c2e}
+body[data-theme="dark"] .rp-calendar-monthbar button{background:var(--surface-soft);color:var(--text);border-color:var(--line)}
+@media(max-width:760px){
+  .rp-section-intro{margin-bottom:18px;text-align:left}
+  .rp-section-intro h2{font-size:30px}
+  .rp-section-intro p{font-size:12px;line-height:1.6}
+  .rp-goals-feature{padding:17px}
+  .rp-calendar-layout{grid-template-columns:minmax(0,1fr);gap:12px}
+  .rp-calendar-card{padding:16px;border-radius:19px}
+  .rp-calendar-monthbar{grid-template-columns:40px minmax(0,1fr) 40px;margin-bottom:15px}
+  .rp-calendar-monthbar button{width:40px;height:40px}
+  .rp-calendar-monthbar h3{font-size:20px}
+  .rp-calendar-weekdays,.rp-calendar-days{gap:3px}
+  .rp-calendar-day{min-height:48px;border-radius:10px;font-size:12px}
+  .rp-calendar-macros{gap:6px}
+  .rp-calendar-macros>div{padding:10px 7px}
+  .rp-calendar-macros strong{font-size:14px}
+  .rp-calendar-detail .rp-diary-primary{min-height:50px}
+}
