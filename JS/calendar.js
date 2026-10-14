@@ -1,6 +1,7 @@
 (() => {
   "use strict";
   const STORE = "recipepro_food_diary_v1";
+  const GOALS = "recipepro_nutrition_goals_v1";
   const $ = id => document.getElementById(id);
   const todayKey = () => {
     const d = new Date();
@@ -16,6 +17,44 @@
     catch { return {}; }
   };
   const fmt = (n, digits=0) => Number(Number(n||0).toFixed(digits)).toLocaleString("ru-RU",{maximumFractionDigits:digits});
+  const readGoals = () => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(GOALS) || "{}");
+      return { calories: 2500, protein: 140, fat: 80, carbs: 150, ...saved };
+    } catch {
+      return { calories: 2500, protein: 140, fat: 80, carbs: 150 };
+    }
+  };
+  function renderGoalCheck(total) {
+    const host = $("rpCalendarGoalCheck");
+    if (!host) return;
+    const goals = readGoals();
+    const rows = [
+      ["Калории", "calories", "ккал", 0],
+      ["Белки", "protein", "г", 1],
+      ["Жиры", "fat", "г", 1],
+      ["Углеводы", "carbs", "г", 1]
+    ];
+    host.innerHTML = rows.map(([label, key, unit, digits]) => {
+      const target = Number(goals[key] || 0);
+      const value = Number(total[key] || 0);
+      let status = "Норма не задана";
+      let className = "is-unset";
+      if (target > 0) {
+        if (value > target) {
+          status = "Перебор " + fmt(value - target, digits) + " " + unit;
+          className = "is-over";
+        } else if (value === target) {
+          status = "Цель достигнута";
+          className = "is-met";
+        } else {
+          status = "Осталось " + fmt(target - value, digits) + " " + unit;
+          className = "is-under";
+        }
+      }
+      return '<div class="rp-calendar-goal-row ' + className + '"><span>' + label + '</span><strong>' + status + '</strong></div>';
+    }).join("");
+  }
   const monthLabel = d => new Intl.DateTimeFormat("ru-RU",{month:"long",year:"numeric"}).format(d);
   const dayLabel = d => new Intl.DateTimeFormat("ru-RU",{day:"numeric",month:"long",year:"numeric"}).format(d);
   let month = new Date(new Date().getFullYear(),new Date().getMonth(),1,12);
@@ -37,6 +76,7 @@
     $("rpCalendarProtein").textContent = fmt(total.protein)+" г";
     $("rpCalendarFat").textContent = fmt(total.fat)+" г";
     $("rpCalendarCarbs").textContent = fmt(total.carbs)+" г";
+    renderGoalCheck(total);
     const names = total.rows.map(e => String(e.name||"Продукт")+" — "+fmt(e.grams,0)+" г").slice(0,8);
     $("rpCalendarEntries").textContent = names.length ? names.join(" · ")+(total.rows.length>8?" · и ещё "+(total.rows.length-8):"") : "В этот день пока нет записей.";
   }
@@ -76,7 +116,7 @@
     $("rpCalendarOpenDiary").addEventListener("click",()=>{
       const dateInput=$("rpDiaryDate");
       if(dateInput){dateInput.value=selected;dateInput.dispatchEvent(new Event("change",{bubbles:true}));}
-      location.hash="#dailyDiary";
+      location.hash="#home";
     });
     document.addEventListener("recipepro:diary-updated",render);
     window.addEventListener("storage",event=>{if(event.key===STORE)render();});
