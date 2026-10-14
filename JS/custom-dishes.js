@@ -66,7 +66,7 @@ function readDiaryDishes(){
 }
 function savedDishes(){
  const map=new Map();
- [...read(STORE,[]),...readDiaryDishes()].forEach(d=>{if(d&&d.id&&d.name)map.set(String(d.id),d);});
+ [...readDiaryDishes(),...read(STORE,[])].forEach(d=>{if(d&&d.id&&d.name)map.set(String(d.id),d);});
  return [...map.values()].sort((a,b)=>String(b.updatedAt||"").localeCompare(String(a.updatedAt||"")));
 }
 function renderSaved(){
