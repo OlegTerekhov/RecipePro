@@ -807,7 +807,7 @@
                 // Merge against the newest cloud copy before writing, so an active second device's edits
                 // are not overwritten by a stale local snapshot.
                 const latest = await client.from(TABLE)
-                    .select("recipes,favorites,meal_plan,shopping_list,history,food_diary,nutrition_goals")
+                    .select("recipes,favorites,meal_plan,shopping_list,history,food_diary,nutrition_goals,custom_dishes")
                     .eq("user_id", targetUser.id)
                     .maybeSingle();
                 if (latest.error) throw latest.error;
