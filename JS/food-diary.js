@@ -61,9 +61,9 @@ if(!local&&!external){host.innerHTML='<div class="rp-product-search-note">В к�
 }
 async function searchOpenFoodFacts(query,request){
 const host=$("rpProductSuggestions");if(!host)return;
-const isBarcode=/^\\d{8,14}$/.test(query.replace(/\\s/g,""));
+const isBarcode=/^\d{8,14}$/.test(query.replace(/\s/g,""));
 const url=isBarcode
-?"https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(query.replace(/\\s/g,""))+"?fields=code,product_name,brands,nutriments"
+?"https://world.openfoodfacts.org/api/v2/product/"+encodeURIComponent(query.replace(/\s/g,""))+"?fields=code,product_name,brands,nutriments"
 :"https://world.openfoodfacts.org/cgi/search.pl?search_terms="+encodeURIComponent(query)+"&search_simple=1&action=process&json=1&page_size=6&fields=code,product_name,brands,nutriments";
 try{
 const response=await fetch(url,{headers:{Accept:"application/json"},signal:AbortSignal.timeout(6500)});
