@@ -30,6 +30,7 @@
     <link rel="stylesheet" href="CSS/meal-planner.css?v=20261012-r2">
     <link rel="stylesheet" href="CSS/mobile.css?v=20261014-responsive1">
     <link rel="stylesheet" href="CSS/preferences.css?v=20261013-mobile-theme2">
+    <link rel="stylesheet" href="CSS/custom-dishes.css?v=20261014-v1">
 </head>
 
 <body>
@@ -118,6 +119,23 @@
         <label>Приём пищи<select id="rpFoodMeal"><option>Завтрак</option><option>Обед</option><option>Ужин</option><option>Перекус</option></select></label>
         <button class="rp-diary-primary" type="submit">Добавить в дневник <span>+</span></button>
       </form><div id="rpBarcodeScanner" class="rp-scanner-modal" role="dialog" aria-modal="true" aria-labelledby="rpScannerTitle" hidden><div class="rp-scanner-backdrop" data-close-scanner></div><section class="rp-scanner-card"><div class="rp-scanner-head"><div><span class="rp-diary-kicker">Быстрое добавление</span><h3 id="rpScannerTitle">Сканер штрихкода</h3></div><button id="rpCloseScanner" class="rp-scanner-close" type="button" aria-label="Закрыть сканер">×</button></div><div class="rp-scanner-view"><video id="rpScannerVideo" playsinline muted aria-label="Изображение с камеры"></video><div class="rp-scanner-frame" aria-hidden="true"></div></div><p id="rpScannerStatus" class="rp-scanner-status" role="status">Наведи камеру на штрихкод упаковки.</p><button id="rpScannerManual" class="rp-diary-secondary rp-scanner-manual" type="button">Ввести штрихкод вручную</button></section></div><p class="rp-diary-status" id="rpFoodStatus" role="status">Расчёт основан на встроенном каталоге. Значения могут отличаться от этикетки конкретного продукта.</p>
+    </section>
+    <section class="rp-diary-panel rp-custom-dish-panel" id="rpCustomDishPanel" aria-labelledby="rpCustomDishTitle">
+      <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Салаты · гарниры · супы</span><h3 id="rpCustomDishTitle">Рассчитать своё блюдо</h3><p>Добавь ингредиенты, укажи вес готового блюда — RecipePro рассчитает КБЖУ на 100 г и на порцию.</p></div></div>
+      <form id="rpCustomDishForm" class="rp-custom-dish-form">
+        <label class="rp-custom-dish-name">Название блюда<input id="rpCustomDishName" type="text" maxlength="100" placeholder="Например, домашний борщ" required></label>
+        <div id="rpCustomDishIngredients" class="rp-custom-dish-ingredients" aria-label="Ингредиенты"></div>
+        <div class="rp-custom-dish-actions"><button type="button" class="rp-diary-secondary" id="rpAddDishIngredient">+ Добавить ингредиент</button></div>
+        <div class="rp-custom-dish-weight-grid">
+          <label>Вес готового блюда, г<input id="rpCustomDishFinishedWeight" type="number" min="1" max="50000" step="1" placeholder="Вес всей кастрюли или миски" required></label>
+          <label>Вес порции, г<input id="rpCustomDishPortionWeight" type="number" min="1" max="10000" step="1" value="250" required></label>
+        </div>
+        <label>Приём пищи<select id="rpCustomDishMeal"><option>Завтрак</option><option>Обед</option><option>Ужин</option><option>Перекус</option></select></label>
+        <div id="rpCustomDishResult" class="rp-custom-dish-result" aria-live="polite"><p>Добавь ингредиенты, чтобы увидеть расчёт.</p></div>
+        <div class="rp-custom-dish-buttons"><button class="rp-diary-secondary" id="rpSaveCustomDish" type="button">Сохранить блюдо</button><button class="rp-diary-primary" type="submit">Добавить порцию в дневник <span>+</span></button></div>
+        <p id="rpCustomDishStatus" class="rp-diary-status" role="status">КБЖУ рассчитывается по каталогу RecipePro. Учитывай масло, соусы и другие добавки отдельными ингредиентами.</p>
+      </form>
+      <div class="rp-saved-dishes-wrap"><h4>Мои блюда</h4><div id="rpSavedCustomDishes" class="rp-saved-custom-dishes"><p class="rp-diary-empty">Пока нет сохранённых блюд.</p></div></div>
     </section>
     <section class="rp-diary-panel rp-log-panel" aria-labelledby="rpLogTitle">
       <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">История за выбранный день</span><h3 id="rpLogTitle">Дневник питания</h3></div><button class="rp-diary-secondary" id="rpClearDiaryBtn" type="button">Очистить этот день</button></div>
@@ -1457,6 +1475,7 @@
 <script src="JS/nutrition.js?v=20261009-r2"></script>
 <script src="JS/app.js?v=20261012-photos1"></script>
     <script src="JS/food-diary.js?v=20261014-nutrition-data1"></script>
+    <script src="JS/custom-dishes.js?v=20261014-v1"></script>
 <script src="JS/calendar.js?v=20261014-four-tabs2"></script>
     <script src="JS/profile.js?v=20261013-clean1"></script>
     <script src="JS/backup.js?v=20261013-diary-backup1"></script>
