@@ -108,19 +108,7 @@
       <div><div class="section-eyebrow">Твой ежедневный контроль</div><h2>Питание под твоим контролем</h2><p>Укажи свою дневную норму, добавляй продукты по весу и следи за КБЖУ в течение дня.</p></div>
       <div class="rp-diary-date"><label for="rpDiaryDate">День учёта</label><input id="rpDiaryDate" type="date"></div>
     </div>
-    <div class="rp-diary-layout">
-      
-      <section class="rp-diary-panel" aria-labelledby="rpTodayTitle">
-        <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Сводка за день</span><h3 id="rpTodayTitle">Уже съедено</h3></div><span class="rp-diary-day-label" id="rpDiaryDayLabel">Сегодня</span></div>
-        <div class="rp-diary-calorie-summary"><div><span>Калории</span><strong id="rpDiaryCalories">0</strong><small id="rpDiaryCaloriesRemaining">Сначала укажи дневную норму</small></div><div class="rp-diary-calorie-ring" id="rpDiaryCalorieRing"><span id="rpDiaryCaloriePercent">0%</span></div></div>
-        <div class="rp-diary-macro-list">
-          <div class="rp-diary-macro"><div><span>Белки</span><strong id="rpDiaryProtein">0 г</strong></div><div class="rp-diary-progress"><span id="rpDiaryProteinBar"></span></div><small id="rpDiaryProteinRemaining">Норма не задана</small></div>
-          <div class="rp-diary-macro"><div><span>Жиры</span><strong id="rpDiaryFat">0 г</strong></div><div class="rp-diary-progress"><span id="rpDiaryFatBar"></span></div><small id="rpDiaryFatRemaining">Норма не задана</small></div>
-          <div class="rp-diary-macro"><div><span>Углеводы</span><strong id="rpDiaryCarbs">0 г</strong></div><div class="rp-diary-progress"><span id="rpDiaryCarbsBar"></span></div><small id="rpDiaryCarbsRemaining">Норма не задана</small></div>
-        </div>
-        <div id="rpDiaryGoalWarnings" class="rp-diary-goal-warnings" role="status" aria-live="polite" hidden></div>
-      </section>
-    </div>
+    <div class="rp-diary-layout"></div>
     <section class="rp-diary-panel rp-add-food-panel" aria-labelledby="rpAddFoodTitle">
       <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Запись питания</span><h3 id="rpAddFoodTitle">Что ты съел?</h3><p>Выбери продукт из каталога, укажи фактический вес и приём пищи.</p></div></div>
       <div id="rpRecentProducts" class="rp-recent-products" aria-label="Недавно добавленные продукты" hidden></div>
@@ -141,12 +129,17 @@
 
 
 <section class="section rp-ideas-section" id="rpIdeasSection">
-  <div class="container">
-    <div class="rp-section-intro">
-      <span class="rp-diary-kicker">Твои настройки</span>
-      <h2>Идеи и личные цели</h2>
-      <p>Задай собственную дневную норму КБЖУ. RecipePro будет сравнивать с ней записи из дневника — без навязанных рекомендаций.</p>
-    </div>
+  <div class="container rp-ideas-container">
+      <section class="rp-diary-panel" aria-labelledby="rpTodayTitle">
+        <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Сводка за день</span><h3 id="rpTodayTitle">Уже съедено</h3></div><span class="rp-diary-day-label" id="rpDiaryDayLabel">Сегодня</span></div>
+        <div class="rp-diary-calorie-summary"><div><span>Калории</span><strong id="rpDiaryCalories">0</strong><small id="rpDiaryCaloriesRemaining">Сначала укажи дневную норму</small></div><div class="rp-diary-calorie-ring" id="rpDiaryCalorieRing"><span id="rpDiaryCaloriePercent">0%</span></div></div>
+        <div class="rp-diary-macro-list">
+          <div class="rp-diary-macro"><div><span>Белки</span><strong id="rpDiaryProtein">0 г</strong></div><div class="rp-diary-progress"><span id="rpDiaryProteinBar"></span></div><small id="rpDiaryProteinRemaining">Норма не задана</small></div>
+          <div class="rp-diary-macro"><div><span>Жиры</span><strong id="rpDiaryFat">0 г</strong></div><div class="rp-diary-progress"><span id="rpDiaryFatBar"></span></div><small id="rpDiaryFatRemaining">Норма не задана</small></div>
+          <div class="rp-diary-macro"><div><span>Углеводы</span><strong id="rpDiaryCarbs">0 г</strong></div><div class="rp-diary-progress"><span id="rpDiaryCarbsBar"></span></div><small id="rpDiaryCarbsRemaining">Норма не задана</small></div>
+        </div>
+        <div id="rpDiaryGoalWarnings" class="rp-diary-goal-warnings" role="status" aria-live="polite" hidden></div>
+      </section>
     <section class="rp-diary-panel rp-goals-feature" id="rpGoalsPanel" aria-labelledby="rpGoalsTitle">
         <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Личный профиль</span><h3 id="rpGoalsTitle">Моя дневная норма</h3></div><span class="rp-diary-icon" aria-hidden="true">◎</span></div>
         <p class="rp-diary-help">Внеси значения, которые подходят именно тебе. RecipePro не будет назначать норму за тебя.</p>
@@ -1618,8 +1611,7 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
     const requested = location.hash || "#home";
     const activeHash = pages.has(requested) ? requested : "#home";
     const activePage = pages.get(activeHash);
-    pages.forEach((page, hash) => {
-      if (!page) return;
+    main.querySelectorAll(":scope > section").forEach(page => {
       const active = page === activePage;
       page.classList.toggle("rp-page-hidden", !active);
       page.setAttribute("aria-hidden", active ? "false" : "true");
