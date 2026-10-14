@@ -270,10 +270,10 @@ main > #home, main > #dailyDiary, main > #rpIdeasSection, main > #rpCalendarPane
 
 
 /* Ideas is a focused single-card screen; keep goal editing available in the DOM but out of view. */
-#rpIdeasSection .rp-ideas-container { width: min(100% - 32px, 720px); margin-inline: auto; display: flex; align-items: flex-start; justify-content: center; padding-top: clamp(24px, 7vh, 72px); }
+#rpIdeasSection .rp-ideas-container { width: min(calc(100% - 32px), 720px); margin-inline: auto; display: flex; align-items: flex-start; justify-content: center; padding-top: clamp(24px, 7vh, 72px); }
 #rpIdeasSection .rp-ideas-summary { width: 100%; max-width: 620px; margin: 0; }
 #rpIdeasSection #rpGoalsPanel { display: none !important; }
 @media (max-width: 760px) {
-  #rpIdeasSection .rp-ideas-container { width: min(100% - 28px, 620px); padding-top: 18px; }
+  #rpIdeasSection .rp-ideas-container { width: min(calc(100% - 28px), 620px); padding-top: 18px; }
   #rpIdeasSection .rp-ideas-summary { border-radius: 22px; }
 }
