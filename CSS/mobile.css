@@ -254,3 +254,16 @@ body[data-theme="dark"] .rp-calendar-monthbar button{background:var(--surface-so
   .rp-calendar-macros strong{font-size:14px}
   .rp-calendar-detail .rp-diary-primary{min-height:50px}
 }
+
+
+/* Real page-like navigation: show only the selected main screen. */
+main > .rp-page-hidden { display: none !important; }
+main > #home, main > #dailyDiary, main > #rpIdeasSection, main > #rpCalendarPanel { min-height: calc(100svh - 72px); }
+@media (max-width: 760px) {
+  main > #home, main > #dailyDiary, main > #rpIdeasSection, main > #rpCalendarPanel {
+    min-height: calc(100svh - var(--rp-mobile-nav-height) - env(safe-area-inset-bottom, 0px));
+    padding-top: 22px;
+    padding-bottom: 28px;
+  }
+  main > #home { padding-top: 0; }
+}
