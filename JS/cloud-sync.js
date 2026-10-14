@@ -846,17 +846,16 @@
             if (!currentUser || currentUser.id !== targetUser.id) return;
 
             try {
-                const snapshot = {
-                    recipes: readArray(STORAGE_KEYS.recipes),
-                    favorites: readArray(STORAGE_KEYS.favorites),
-                    plan: readObject(STORAGE_KEYS.plan),
-                    shopping: readArray(STORAGE_KEYS.shopping),
-                    history: readArray(STORAGE_KEYS.history),
-                    diary: readObject(STORAGE_KEYS.diary),
-                    goals: readObject(STORAGE_KEYS.goals)
-                };
-                await uploadSnapshot(snapshot, targetUser);
-                saveBaseline(snapshot, targetUser);
+                // Merge against the newest cloud copy before writing, so an active second device's edits
+                // are not overwritten by a stale local snapshot.
+                const latest = await client.from(TABLE)
+                    .select("recipes,favorites,meal_plan,shopping_list,history,food_diary,nutrition_goals")
+                    .eq("user_id", targetUser.id)
+                    .maybeSingle();
+                if (latest.error) throw latest.error;
+                const mergedSnapshot = mergeSnapshot(latest.data || { recipes: [], favorites: [] }, targetUser);
+                await uploadSnapshot(mergedSnapshot, targetUser);
+                saveBaseline(mergedSnapshot, targetUser);
                 if (currentUser?.id === targetUser.id) {
                     setStatus("Изменения сохранены в облако.", "success");
                 }
