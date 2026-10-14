@@ -330,6 +330,21 @@
         }
     }
 
+    function updateAuthControls(user) {
+        const actions = document.querySelector(".recipepro-cloud-actions");
+        const signInButton = document.getElementById("recipeProCloudSignIn");
+        const registerButton = document.getElementById("recipeProCloudRegister");
+        const signOutButton = document.getElementById("recipeProCloudSignOut");
+        if (signInButton) signInButton.hidden = Boolean(user);
+        if (registerButton) registerButton.hidden = Boolean(user);
+        if (signOutButton) signOutButton.hidden = !user;
+        if (actions) {
+            actions.hidden = false;
+            actions.style.display = "flex";
+            actions.style.visibility = "visible";
+        }
+    }
+
     function ensureStyles() {
         if (document.getElementById("recipeProCloudStyles")) return;
         const style = document.createElement("style");
@@ -651,6 +666,7 @@
     function openDialog() {
         createDialog();
         overlay.classList.add("is-open");
+        updateAuthControls(currentUser);
         if (!configured) setStatus("Облако ещё не настроено", "neutral");
         else if (!client) {
             setStatus("Подключаем облачный модуль…", "neutral");
@@ -752,10 +768,8 @@
         const signOutButton = document.getElementById("recipeProCloudSignOut");
         const usernameInput = document.getElementById("recipeProCloudUsername");
         const passwordInput = document.getElementById("recipeProCloudPassword");
-        if (signInButton) signInButton.hidden = Boolean(user);
-        if (registerButton) registerButton.hidden = Boolean(user);
+        updateAuthControls(user);
         if (legacy && user) legacy.hidden = true;
-        if (signOutButton) signOutButton.hidden = !user;
         if (usernameInput && user?.user_metadata?.username) usernameInput.value = user.user_metadata.username;
         if (passwordInput && user) passwordInput.value = "";
 
