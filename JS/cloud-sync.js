@@ -53,6 +53,7 @@
         } finally {
             isApplyingCloudData = false;
         }
+        document.dispatchEvent(new CustomEvent("recipepro:diary-updated"));
     }
 
     function itemKey(item, index) {
