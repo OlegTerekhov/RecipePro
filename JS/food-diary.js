@@ -17,7 +17,7 @@ for(const [id,p] of all){const names=[id,p.name,...(p.aliases||[])].map(norm).fi
 return matches.size===1?[...matches.values()][0]:null;}
 function calc(p,grams,state){const engine=window.recipeProNutritionEngine;if(engine&&typeof engine.calculateIngredient==="function"){const result=engine.calculateIngredient({product:p,amount:grams,state:state==="boiled"?"boiled":"raw"});return{calories:result.calories,protein:result.protein,fat:result.fat,carbs:result.carbs};}const raw=p.raw||{},ratio=Number(p.cookedWeightRatio);let basis=Number(grams);if(state==="boiled"&&Number.isFinite(ratio)&&ratio>0)basis/=ratio;const f=basis/100;return{calories:Number(raw.kcal||0)*f,protein:Number(raw.protein||0)*f,fat:Number(raw.fat||0)*f,carbs:Number(raw.carbs||0)*f};}
 function defaultMealForHour(hour){if(hour>=5&&hour<11)return'Завтрак';if(hour>=11&&hour<16)return'Обед';if(hour>=16&&hour<22)return'Ужин';return'Перекус';}
-function goals(){return read(GOALS,null);}
+function goals(){return read(GOALS,{calories:2500,protein:140,fat:80,carbs:150});}
 function productMatches(value){
 const q=norm(value);if(!q||!window.products)return[];
 const all=Object.entries(window.products).map(([id,product])=>({id,product}));
