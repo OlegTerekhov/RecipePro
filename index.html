@@ -1604,6 +1604,47 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 
 <script>
 (() => {
+  const nav = document.getElementById("recipeProBottomNav");
+  const main = document.querySelector("main");
+  if (!nav || !main) return;
+  const links = [...nav.querySelectorAll("a")];
+  const pages = new Map([
+    ["#home", document.getElementById("home")],
+    ["#dailyDiary", document.getElementById("dailyDiary")],
+    ["#rpIdeasSection", document.getElementById("rpIdeasSection")],
+    ["#rpCalendarPanel", document.getElementById("rpCalendarPanel")]
+  ]);
+  function route() {
+    const requested = location.hash || "#home";
+    const activeHash = pages.has(requested) ? requested : "#home";
+    const activePage = pages.get(activeHash);
+    pages.forEach((page, hash) => {
+      if (!page) return;
+      const active = page === activePage;
+      page.classList.toggle("rp-page-hidden", !active);
+      page.setAttribute("aria-hidden", active ? "false" : "true");
+    });
+    links.forEach(link => {
+      if (link.getAttribute("href") === activeHash) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    });
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }
+  links.forEach(link => link.addEventListener("click", event => {
+    const href = link.getAttribute("href");
+    if (!pages.has(href)) return;
+    event.preventDefault();
+    if (location.hash === href) route();
+    else location.hash = href;
+  }));
+  window.addEventListener("hashchange", route);
+  window.addEventListener("pageshow", route);
+  route();
+})();
+</script>
+
+<script>
+(() => {
     const nav = document.getElementById("recipeProBottomNav");
     if (!nav) return;
     const links = [...nav.querySelectorAll("a")];
