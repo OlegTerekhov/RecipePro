@@ -793,7 +793,7 @@
             syncStage = "Чтение данных из облака";
             setStatus("Синхронизация: " + syncStage + "…", "neutral");
             const readController = new AbortController();
-            const readTimer = window.setTimeout(() => readController.abort(), 15000);
+            const readTimer = window.setTimeout(() => readController.abort(), 30000);
             let result;
             try {
                 result = await client.from(TABLE).select("recipes,favorites,meal_plan,shopping_list,history,food_diary,nutrition_goals,custom_dishes")
@@ -813,9 +813,11 @@
             setStatus("Синхронизация завершена. Аккаунт: " + (user.user_metadata?.username || user.email || "подключён"), "success");
         } catch (error) {
             lastSyncedUserId = null;
-            const detail = error?.name === "AbortError"
-                ? "облачный запрос не ответил за 15 секунд. Проверь подключение и повтори попытку."
-                : (error?.message || "проверь таблицу и политики RLS");
+            const errorText = String(error?.message || error || "");
+            const wasAborted = error?.name === "AbortError" || /aborterror|fetch is aborted|aborted/i.test(errorText);
+            const detail = wasAborted
+                ? "запрос был прерван по тайм-ауту или сетью. Проверь доступ телефона к Supabase; данные не удалены."
+                : (errorText || "проверь таблицу и политики RLS");
             setStatus("Ошибка синхронизации (" + syncStage + "): " + detail, "error");
         } finally {
             if (syncingUserId === user.id) syncingUserId = null;
@@ -825,7 +827,7 @@
     async function uploadSnapshot(snapshot, user = currentUser) {
         if (!client || !user || isApplyingCloudData) return;
         const controller = new AbortController();
-        const timer = window.setTimeout(() => controller.abort(), 15000);
+        const timer = window.setTimeout(() => controller.abort(), 30000);
         let result;
         try {
             result = await client.from(TABLE).upsert({
