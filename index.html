@@ -28,7 +28,7 @@
 
     <link rel="stylesheet" href="CSS/style.css?v=20261014-luxe1">
     <link rel="stylesheet" href="CSS/meal-planner.css?v=20261012-r2">
-    <link rel="stylesheet" href="CSS/mobile.css?v=20261014-responsive1">
+    <link rel="stylesheet" href="CSS/mobile.css?v=20261014-ideas-nav1">
     <link rel="stylesheet" href="CSS/preferences.css?v=20261013-mobile-theme2">
     <link rel="stylesheet" href="CSS/custom-dishes.css?v=20261014-v2">
 </head>
@@ -44,8 +44,8 @@
         </a>
 
         <nav class="main-nav">
-            <a href="#home">Главная</a>
-            <a href="#dailyDiary">Сегодня</a>
+            <a href="#home">Дневник</a>
+            <a href="#rpIdeasSection">Идеи</a>
         </nav>
         <div class="rp-preferences" aria-label="Настройки внешнего вида и языка">
             <button id="rpThemeToggle" class="rp-preference-button" type="button" aria-pressed="false" title="Включить тёмную тему">
@@ -85,7 +85,7 @@
                 Добавляй продукты за секунды, контролируй калории и БЖУ и понимай, сколько ещё осталось до твоей дневной цели.
             </p>
 
-            <div class="hero-actions"><a class="hero-primary-link" href="#dailyDiary">Записать питание <span aria-hidden="true">→</span></a><a class="hero-secondary-link" href="#recipes">Подобрать блюдо</a></div>
+            <div class="hero-actions"><a class="hero-primary-link" href="#home">Записать питание <span aria-hidden="true">→</span></a><a class="hero-secondary-link" href="#recipes">Подобрать блюдо</a></div>
 
             
 
@@ -1585,7 +1585,7 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 
 <nav id="recipeProBottomNav" aria-label="Основная навигация">
     <a href="#home" aria-current="page"><span aria-hidden="true">⌂</span><span>Главная</span></a>
-    <a href="#dailyDiary"><span aria-hidden="true">◷</span><span>Сегодня</span></a>
+    <a href="#rpIdeasSection"><span aria-hidden="true">✦</span><span>Идеи</span></a>
     <a href="#rpCalendarPanel"><span aria-hidden="true">▦</span><span>Календарь</span></a>
     <a href="#rpSettingsPanel"><span aria-hidden="true">⚙</span><span>Настройка</span></a>
 </nav>
@@ -1599,6 +1599,7 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
   const pages = new Map([
     ["#home", document.getElementById("dailyDiary")],
     ["#dailyDiary", document.getElementById("rpIdeasSection")],
+    ["#rpIdeasSection", document.getElementById("rpIdeasSection")],
     ["#rpCalendarPanel", document.getElementById("rpCalendarPanel")],
     ["#rpSettingsPanel", document.getElementById("rpSettingsPanel")]
   ]);
@@ -1606,7 +1607,7 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
     const requested = location.hash || "#home";
     const activeHash = pages.has(requested) ? requested : "#home";
     const activePage = pages.get(activeHash);
-    if (activeHash === "#dailyDiary") {
+    if (activeHash === "#dailyDiary" || activeHash === "#rpIdeasSection") {
       const dateInput = document.getElementById("rpDiaryDate");
       if (dateInput) {
         const now = new Date();
