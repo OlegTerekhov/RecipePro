@@ -593,8 +593,8 @@
             '<div class="recipepro-cloud-dialog" role="dialog" aria-modal="true" aria-labelledby="recipeProCloudTitle">',
             '<button class="recipepro-cloud-close" type="button" aria-label="Закрыть">×</button>',
             '<div class="recipepro-cloud-kicker">RECIPEPRO / CLOUD</div>',
-            '<h2 id="recipeProCloudTitle">Твои рецепты — с тобой</h2>',
-            '<p class="recipepro-cloud-description">Сохраняй избранное и собственные рецепты в облаке, чтобы они были доступны после входа на другом устройстве.</p>',
+            '<h2 id="recipeProCloudTitle">Твой профиль — с тобой</h2>',
+            '<p class="recipepro-cloud-description">Входи на любом устройстве по своему логину и паролю. Дневник питания, дневные цели и сохранённые данные будут доступны после синхронизации.</p>',
             '<div id="recipeProCloudSetup"></div>',
             '<div id="recipeProCloudAccount">',
             '<div class="recipepro-cloud-field"><label class="recipepro-cloud-label" for="recipeProCloudUsername">Логин</label><input class="recipepro-cloud-password" id="recipeProCloudUsername" type="text" autocomplete="username" autocapitalize="none" maxlength="24" placeholder="например, oleg_1995"></div>',
@@ -603,10 +603,8 @@
             '<div class="recipepro-cloud-actions">',
             '<button class="recipepro-cloud-primary" id="recipeProCloudSignIn" type="button">Войти</button>',
             '<button id="recipeProCloudRegister" type="button">Создать аккаунт</button>',
-            '<button class="recipepro-cloud-secondary" id="recipeProCloudLegacyToggle" type="button">Старый вход по почте</button>',
             '<button id="recipeProCloudSignOut" type="button" hidden>Выйти</button>',
             '</div>',
-            '<div class="recipepro-cloud-legacy" id="recipeProCloudLegacy" hidden><label class="recipepro-cloud-label" for="recipeProCloudEmail">Почта старого аккаунта</label><input class="recipepro-cloud-email" id="recipeProCloudEmail" type="email" autocomplete="email" placeholder="you@example.com"><div class="recipepro-cloud-actions"><button id="recipeProCloudLegacySignIn" class="recipepro-cloud-primary" type="button">Отправить ссылку для входа</button></div></div>',
             '</div>',
             '<p class="recipepro-cloud-footnote">Логин и пароль не требуют почты. Запиши их в надёжном месте: восстановление пароля без почты пока не предусмотрено.</p>',
             '</div>'
@@ -620,12 +618,6 @@
         });
         overlay.querySelector("#recipeProCloudSignIn").addEventListener("click", signInWithUsername);
         overlay.querySelector("#recipeProCloudRegister").addEventListener("click", registerWithUsername);
-        overlay.querySelector("#recipeProCloudLegacyToggle").addEventListener("click", () => {
-            const legacy = document.getElementById("recipeProCloudLegacy");
-            legacy.hidden = !legacy.hidden;
-            if (!legacy.hidden) document.getElementById("recipeProCloudEmail").focus();
-        });
-        overlay.querySelector("#recipeProCloudLegacySignIn").addEventListener("click", sendSignInLink);
         overlay.querySelector("#recipeProCloudSignOut").addEventListener("click", signOut);
         document.addEventListener("keydown", event => {
             if (event.key === "Escape") closeDialog();
@@ -735,63 +727,18 @@
         }
     }
 
-    async function sendSignInLink() {
-        if (!client) return;
-        const emailInput = document.getElementById("recipeProCloudEmail");
-        const email = emailInput.value.trim();
-        const button = document.getElementById("recipeProCloudLegacySignIn");
-        if (!email || !emailInput.checkValidity()) {
-            emailInput.reportValidity();
-            return;
-        }
-        const cooldownKey = "recipepro_magic_link_last_request";
-        const lastRequest = Number(localStorage.getItem(cooldownKey) || 0);
-        const remaining = 60 - Math.floor((Date.now() - lastRequest) / 1000);
-        if (remaining > 0) {
-            setStatus("Подожди " + remaining + " сек. перед повторным запросом письма.", "error");
-            return;
-        }
-        button.disabled = true;
-        setStatus("Отправляем ссылку для входа…", "neutral");
-        try {
-            const result = await client.auth.signInWithOtp({
-                email,
-                options: { shouldCreateUser: false, emailRedirectTo: "https://olegterekhov.github.io/RecipePro/" }
-            });
-            if (result.error) throw result.error;
-            localStorage.setItem(cooldownKey, String(Date.now()));
-            setStatus("Письмо отправлено, если адрес зарегистрирован. Открой ссылку один раз на этом устройстве. Не открывай ссылку повторно.", "success");
-        } catch (error) {
-            const message = error?.message || "неизвестная ошибка";
-            if (/rate limit|too many|429|over_email_send_rate_limit/i.test(message)) {
-                setStatus("Почтовый лимит Supabase ещё действует. Не запрашивай новые письма; попробуем позже.", "error");
-            } else if (/user not found|signup is disabled/i.test(message)) {
-                setStatus("Не удалось отправить ссылку для этого аккаунта. Проверь адрес и настройки авторизации Supabase.", "error");
-            } else {
-                setStatus("Не удалось отправить ссылку: " + message, "error");
-            }
-        } finally {
-            button.disabled = false;
-        }
-    }
-
     async function handleSession(user) {
         const previousId = currentUser?.id || null;
         currentUser = user;
         const signInButton = document.getElementById("recipeProCloudSignIn");
         const registerButton = document.getElementById("recipeProCloudRegister");
-        const legacyToggle = document.getElementById("recipeProCloudLegacyToggle");
-        const legacy = document.getElementById("recipeProCloudLegacy");
         const signOutButton = document.getElementById("recipeProCloudSignOut");
-        const emailInput = document.getElementById("recipeProCloudEmail");
         const usernameInput = document.getElementById("recipeProCloudUsername");
         const passwordInput = document.getElementById("recipeProCloudPassword");
         if (signInButton) signInButton.hidden = Boolean(user);
         if (registerButton) registerButton.hidden = Boolean(user);
-        if (legacyToggle) legacyToggle.hidden = Boolean(user);
         if (legacy && user) legacy.hidden = true;
         if (signOutButton) signOutButton.hidden = !user;
-        if (emailInput && user?.email && !user.email.endsWith("@users.recipepro.invalid")) emailInput.value = user.email;
         if (usernameInput && user?.user_metadata?.username) usernameInput.value = user.user_metadata.username;
         if (passwordInput && user) passwordInput.value = "";
 
