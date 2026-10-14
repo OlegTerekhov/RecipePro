@@ -406,12 +406,14 @@ body[data-theme="dark"] #recipeProBottomNav a[aria-current="page"] { background:
 :root {
   --rp-safe-bottom: env(safe-area-inset-bottom, 0px);
 }
-*, *::before, *::after { box-sizing: border-box; }
-img, video, canvas, svg { max-width: 100%; }
-input, select, textarea, button { max-width: 100%; }
-.container, main, section, article, form, fieldset { min-width: 0; }
-h1, h2, h3, h4, p, label, small, strong, span { overflow-wrap: anywhere; }
-button, a, input, select, textarea { scroll-margin-block: 90px; }
+@media (max-width: 1100px) {
+  *, *::before, *::after { box-sizing: border-box; }
+  img, video, canvas, svg { max-width: 100%; }
+  input, select, textarea, button { max-width: 100%; }
+  .container, main, section, article, form, fieldset { min-width: 0; }
+  h1, h2, h3, h4, p, label, small, strong, span { overflow-wrap: anywhere; }
+  button, a, input, select, textarea { scroll-margin-block: 90px; }
+}
 :where(button, a, input, select, textarea):focus-visible {
   outline: 2px solid var(--green-600, #47765b);
   outline-offset: 3px;
