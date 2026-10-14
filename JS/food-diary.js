@@ -41,8 +41,10 @@ if(q.length>=3&&!/^\d{8,14}$/.test(q))searchTimer=setTimeout(()=>searchOpenFoodF
 else if(/^\d{8,14}$/.test(q))searchTimer=setTimeout(()=>searchOpenFoodFacts(q,request),250);
 }
 function offProductToRecord(item){
-const n=item?.nutriments||{},kcal=Number(n["energy-kcal_100g"]??n["energy-kcal"]??(Number(n["energy-kj_100g"]??n["energy-kj"]??0)/4.184));
-const protein=Number(n.proteins_100g??n.proteins),fat=Number(n.fat_100g??n.fat),carbs=Number(n.carbohydrates_100g??n.carbohydrates);
+const n=item?.nutriments||{};
+const kcalValue=n["energy-kcal_100g"],kjValue=n["energy-kj_100g"];
+const kcal=kcalValue!==undefined&&kcalValue!==null&&kcalValue!==""?Number(kcalValue):kjValue!==undefined&&kjValue!==null&&kjValue!==""?Number(kjValue)/4.184:NaN;
+const protein=Number(n.proteins_100g),fat=Number(n.fat_100g),carbs=Number(n.carbohydrates_100g);
 if(!item||!item.code||!item.product_name||![kcal,protein,fat,carbs].every(v=>Number.isFinite(v)&&v>=0)||kcal>1000||protein>100||fat>100||carbs>100)return null;
 const brand=String(item.brands||"").split(",")[0].trim();
 const name=String(item.product_name).trim()+(brand?" · "+brand:"");
