@@ -2,7 +2,7 @@
 
 (function () {
     const CONFIG = window.RECIPEPRO_SUPABASE_CONFIG || {};
-    const STORAGE_KEYS = { recipes: "recipepro_user_recipes", favorites: "recipepro_favorites", plan: "recipepro_meal_plan", shopping: "recipepro_shopping_list", history: "recipepro_recipe_history", diary: "recipepro_food_diary_v1", goals: "recipepro_nutrition_goals_v1" };
+    const STORAGE_KEYS = { recipes: "recipepro_user_recipes", favorites: "recipepro_favorites", plan: "recipepro_meal_plan", shopping: "recipepro_shopping_list", history: "recipepro_recipe_history", diary: "recipepro_food_diary_v1", goals: "recipepro_nutrition_goals_v1", customDishes: "recipepro_custom_dishes_v1" };
     const TABLE = "recipepro_user_data";
     const OWNER_KEY = "recipepro_cloud_owner";
     const ACCOUNT_CACHE_PREFIX = "recipepro_account_cache_";
@@ -40,7 +40,7 @@
         }
     }
 
-    function setLocalSnapshot(recipes, favorites, plan = {}, shopping = [], history = [], diary = {}, goals = {}) {
+    function setLocalSnapshot(recipes, favorites, plan = {}, shopping = [], history = [], diary = {}, goals = {}, customDishes = []) {
         isApplyingCloudData = true;
         try {
             nativeSetItem.call(localStorage, STORAGE_KEYS.recipes, JSON.stringify(recipes));
@@ -50,6 +50,7 @@
             nativeSetItem.call(localStorage, STORAGE_KEYS.history, JSON.stringify(history));
             nativeSetItem.call(localStorage, STORAGE_KEYS.diary, JSON.stringify(diary));
             nativeSetItem.call(localStorage, STORAGE_KEYS.goals, JSON.stringify(goals));
+            nativeSetItem.call(localStorage, STORAGE_KEYS.customDishes, JSON.stringify(customDishes));
         } finally {
             isApplyingCloudData = false;
         }
@@ -125,6 +126,8 @@
             // Older baselines predate the meal planner. Bootstrap once to preserve both devices' data.
             if (!value.plan || typeof value.plan !== "object" || Array.isArray(value.plan) || !Array.isArray(value.shopping) || !Array.isArray(value.history)) return null;
             if (!value.diary || typeof value.diary !== "object" || Array.isArray(value.diary) || !value.goals || typeof value.goals !== "object" || Array.isArray(value.goals)) return null;
+            if (value.customDishes !== undefined && !Array.isArray(value.customDishes)) return null;
+            value.customDishes = Array.isArray(value.customDishes) ? value.customDishes : [];
             return value;
         } catch {
             return null;
@@ -140,7 +143,8 @@
             shopping: snapshot.shopping,
             history: snapshot.history,
             diary: snapshot.diary,
-            goals: snapshot.goals
+            goals: snapshot.goals,
+            customDishes: snapshot.customDishes
         }));
     }
 
@@ -234,7 +238,8 @@
             shopping: readArray(STORAGE_KEYS.shopping),
             history: readArray(STORAGE_KEYS.history),
             diary: readObject(STORAGE_KEYS.diary),
-            goals: readObject(STORAGE_KEYS.goals)
+            goals: readObject(STORAGE_KEYS.goals),
+            customDishes: readArray(STORAGE_KEYS.customDishes)
         };
         const cloud = {
             recipes: Array.isArray(cloudData?.recipes) ? cloudData.recipes : [],
@@ -243,7 +248,8 @@
             shopping: Array.isArray(cloudData?.shopping_list) ? cloudData.shopping_list : [],
             history: Array.isArray(cloudData?.history) ? cloudData.history : [],
             diary: cloudData?.food_diary && typeof cloudData.food_diary === "object" && !Array.isArray(cloudData.food_diary) ? cloudData.food_diary : {},
-            goals: cloudData?.nutrition_goals && typeof cloudData.nutrition_goals === "object" && !Array.isArray(cloudData.nutrition_goals) ? cloudData.nutrition_goals : {}
+            goals: cloudData?.nutrition_goals && typeof cloudData.nutrition_goals === "object" && !Array.isArray(cloudData.nutrition_goals) ? cloudData.nutrition_goals : {},
+            customDishes: Array.isArray(cloudData?.custom_dishes) ? cloudData.custom_dishes : []
         };
         const baseline = readBaseline(user.id);
 
@@ -255,7 +261,8 @@
             shopping: mergeThreeWay(baseline.shopping, local.shopping, cloud.shopping),
             history: mergeThreeWay(baseline.history, local.history, cloud.history),
             diary: mergeDiaryThreeWay(baseline.diary, local.diary, cloud.diary),
-            goals: mergeGoalsThreeWay(baseline.goals, local.goals, cloud.goals)
+            goals: mergeGoalsThreeWay(baseline.goals, local.goals, cloud.goals),
+            customDishes: mergeThreeWay(baseline.customDishes || [], local.customDishes, cloud.customDishes)
         } : {
             recipes: mergeById(local.recipes, cloud.recipes),
             favorites: mergeById(local.favorites, cloud.favorites),
@@ -263,10 +270,11 @@
             shopping: mergeById(local.shopping, cloud.shopping),
             history: mergeById(local.history, cloud.history).sort((a, b) => new Date(b.viewedAt || 0) - new Date(a.viewedAt || 0)).slice(0, 12),
             diary: mergeDiaryUnion(local.diary, cloud.diary),
-            goals: { ...cloud.goals, ...local.goals }
+            goals: { ...cloud.goals, ...local.goals },
+            customDishes: mergeById(local.customDishes, cloud.customDishes)
         };
 
-        setLocalSnapshot(snapshot.recipes, snapshot.favorites, snapshot.plan, snapshot.shopping, snapshot.history, snapshot.diary, snapshot.goals);
+        setLocalSnapshot(snapshot.recipes, snapshot.favorites, snapshot.plan, snapshot.shopping, snapshot.history, snapshot.diary, snapshot.goals, snapshot.customDishes);
         return snapshot;
     }
 
@@ -280,11 +288,12 @@
                 shopping: readArray(STORAGE_KEYS.shopping),
                 history: readArray(STORAGE_KEYS.history),
                 diary: readObject(STORAGE_KEYS.diary),
-                goals: readObject(STORAGE_KEYS.goals)
+                goals: readObject(STORAGE_KEYS.goals),
+                customDishes: readArray(STORAGE_KEYS.customDishes)
             };
             nativeSetItem.call(localStorage, ACCOUNT_CACHE_PREFIX + previousOwner, JSON.stringify(previousSnapshot));
 
-            let nextSnapshot = { recipes: [], favorites: [], plan: {}, shopping: [], history: [], diary: {}, goals: {} };
+            let nextSnapshot = { recipes: [], favorites: [], plan: {}, shopping: [], history: [], diary: {}, goals: {}, customDishes: [] };
             try {
                 const cached = JSON.parse(localStorage.getItem(ACCOUNT_CACHE_PREFIX + user.id) || "null");
                 if (cached && typeof cached === "object") {
@@ -295,13 +304,14 @@
                         shopping: Array.isArray(cached.shopping) ? cached.shopping : [],
                         history: Array.isArray(cached.history) ? cached.history : [],
                         diary: cached.diary && typeof cached.diary === "object" && !Array.isArray(cached.diary) ? cached.diary : {},
-                        goals: cached.goals && typeof cached.goals === "object" && !Array.isArray(cached.goals) ? cached.goals : {}
+                        goals: cached.goals && typeof cached.goals === "object" && !Array.isArray(cached.goals) ? cached.goals : {},
+                        customDishes: Array.isArray(cached.customDishes) ? cached.customDishes : []
                     };
                 }
             } catch {
-                nextSnapshot = { recipes: [], favorites: [], plan: {}, shopping: [], history: [], diary: {}, goals: {} };
+                nextSnapshot = { recipes: [], favorites: [], plan: {}, shopping: [], history: [], diary: {}, goals: {}, customDishes: [] };
             }
-            setLocalSnapshot(nextSnapshot.recipes, nextSnapshot.favorites, nextSnapshot.plan, nextSnapshot.shopping, nextSnapshot.history, nextSnapshot.diary, nextSnapshot.goals);
+            setLocalSnapshot(nextSnapshot.recipes, nextSnapshot.favorites, nextSnapshot.plan, nextSnapshot.shopping, nextSnapshot.history, nextSnapshot.diary, nextSnapshot.goals, nextSnapshot.customDishes);
         }
         nativeSetItem.call(localStorage, OWNER_KEY, user.id);
     }
@@ -753,7 +763,7 @@
         setStatus("Загружаем данные из облака…", "neutral");
         try {
             prepareLocalForUser(user);
-            const result = await client.from(TABLE).select("recipes,favorites,meal_plan,shopping_list,history,food_diary,nutrition_goals").eq("user_id", user.id).maybeSingle();
+            const result = await client.from(TABLE).select("recipes,favorites,meal_plan,shopping_list,history,food_diary,nutrition_goals,custom_dishes").eq("user_id", user.id).maybeSingle();
             if (result.error) throw result.error;
             const merged = mergeSnapshot(result.data || { recipes: [], favorites: [] }, user);
             await uploadSnapshot(merged, user);
@@ -777,6 +787,7 @@
             history: snapshot.history,
             food_diary: snapshot.diary,
             nutrition_goals: snapshot.goals,
+            custom_dishes: snapshot.customDishes,
             updated_at: new Date().toISOString()
         }, { onConflict: "user_id" });
         if (result.error) throw result.error;
