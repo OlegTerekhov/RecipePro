@@ -780,21 +780,42 @@
             return;
         }
 
-        if (syncingUserId === user.id) return;
+        if (syncingUserId === user.id) {
+            setStatus("Синхронизация уже выполняется. Если статус не изменится за 20 секунд, открой «Облако» ещё раз.", "neutral");
+            return;
+        }
         syncingUserId = user.id;
-        setStatus("Загружаем данные из облака…", "neutral");
+        let syncStage = "Подготовка локальных данных";
+        setStatus("Синхронизация: " + syncStage + "…", "neutral");
         try {
             prepareLocalForUser(user);
-            const result = await client.from(TABLE).select("recipes,favorites,meal_plan,shopping_list,history,food_diary,nutrition_goals,custom_dishes").eq("user_id", user.id).maybeSingle();
+            syncStage = "Чтение данных из облака";
+            setStatus("Синхронизация: " + syncStage + "…", "neutral");
+            const readController = new AbortController();
+            const readTimer = window.setTimeout(() => readController.abort(), 15000);
+            let result;
+            try {
+                result = await client.from(TABLE).select("recipes,favorites,meal_plan,shopping_list,history,food_diary,nutrition_goals,custom_dishes")
+                    .eq("user_id", user.id).abortSignal(readController.signal).maybeSingle();
+            } finally {
+                window.clearTimeout(readTimer);
+            }
             if (result.error) throw result.error;
+            syncStage = "Объединение данных с телефона и облака";
+            setStatus("Синхронизация: " + syncStage + "…", "neutral");
             const merged = mergeSnapshot(result.data || { recipes: [], favorites: [] }, user);
+            syncStage = "Сохранение данных в облако";
+            setStatus("Синхронизация: " + syncStage + "…", "neutral");
             await uploadSnapshot(merged, user);
             saveBaseline(merged, user);
             lastSyncedUserId = user.id;
             setStatus("Синхронизация завершена. Аккаунт: " + (user.user_metadata?.username || user.email || "подключён"), "success");
         } catch (error) {
             lastSyncedUserId = null;
-            setStatus("Ошибка облачной синхронизации: " + (error?.message || "проверь таблицу и политики RLS"), "error");
+            const detail = error?.name === "AbortError"
+                ? "облачный запрос не ответил за 15 секунд. Проверь подключение и повтори попытку."
+                : (error?.message || "проверь таблицу и политики RLS");
+            setStatus("Ошибка синхронизации (" + syncStage + "): " + detail, "error");
         } finally {
             if (syncingUserId === user.id) syncingUserId = null;
         }
@@ -802,18 +823,25 @@
 
     async function uploadSnapshot(snapshot, user = currentUser) {
         if (!client || !user || isApplyingCloudData) return;
-        const result = await client.from(TABLE).upsert({
-            user_id: user.id,
-            recipes: snapshot.recipes,
-            favorites: snapshot.favorites,
-            meal_plan: snapshot.plan,
-            shopping_list: snapshot.shopping,
-            history: snapshot.history,
-            food_diary: snapshot.diary,
-            nutrition_goals: snapshot.goals,
-            custom_dishes: snapshot.customDishes,
-            updated_at: new Date().toISOString()
-        }, { onConflict: "user_id" });
+        const controller = new AbortController();
+        const timer = window.setTimeout(() => controller.abort(), 15000);
+        let result;
+        try {
+            result = await client.from(TABLE).upsert({
+                user_id: user.id,
+                recipes: snapshot.recipes,
+                favorites: snapshot.favorites,
+                meal_plan: snapshot.plan,
+                shopping_list: snapshot.shopping,
+                history: snapshot.history,
+                food_diary: snapshot.diary,
+                nutrition_goals: snapshot.goals,
+                custom_dishes: snapshot.customDishes,
+                updated_at: new Date().toISOString()
+            }, { onConflict: "user_id" }).abortSignal(controller.signal);
+        } finally {
+            window.clearTimeout(timer);
+        }
         if (result.error) throw result.error;
     }
 
