@@ -5716,3 +5716,9 @@ body.rp-community-dialog-open { overflow: hidden; }
   #rpSettingsPanel .rp-goals-form .rp-diary-primary { grid-column: auto; }
   .rp-calendar-goal-row { align-items: flex-start; }
 }
+
+/* Definitively hide the removed legacy footer, including any stale cached HTML. */
+.site-footer,
+footer.site-footer {
+  display: none !important;
+}
