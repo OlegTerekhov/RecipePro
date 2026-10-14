@@ -2,6 +2,7 @@
 "use strict";
 const STORE="recipepro_custom_dishes_v1";
 const DIARY="recipepro_food_diary_v1";
+let editingDishId=null;
 const $=id=>document.getElementById(id);
 const fmt=(n,d=1)=>Number(Number(n||0).toFixed(d)).toLocaleString("ru-RU",{maximumFractionDigits:d});
 const uid=()=>window.crypto?.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(16).slice(2);
@@ -45,7 +46,8 @@ function currentDish(){
  if(!Number.isFinite(finishedWeight)||finishedWeight<=0||finishedWeight>50000)throw new Error("Укажи вес всего готового блюда от 1 до 50 000 г.");
  if(!Number.isFinite(portionWeight)||portionWeight<=0||portionWeight>10000)throw new Error("Укажи вес порции от 1 до 10 000 г.");
  const result=calculate(items,finishedWeight);if(!result)throw new Error("Не удалось рассчитать КБЖУ. Проверь ингредиенты и обнови страницу.");
- return {id:uid(),name,ingredients:items,finishedWeight,portionWeight,meal:$("rpCustomDishMeal").value||"Обед",...result,updatedAt:new Date().toISOString()};
+ if(portionWeight>finishedWeight)throw new Error("Вес порции не может превышать вес всего готового блюда.");
+ return {id:editingDishId||uid(),name,ingredients:items,finishedWeight,portionWeight,meal:$("rpCustomDishMeal").value||"Обед",...result,updatedAt:new Date().toISOString()};
 }
 function renderResult(){
  const host=$("rpCustomDishResult");if(!host)return;
@@ -73,6 +75,7 @@ function renderSaved(){
  host.innerHTML=dishes.length?dishes.map(d=>'<article class="rp-saved-dish"><button type="button" class="rp-saved-dish-load" data-load-custom-dish="'+escapeHtml(d.id)+'"><strong>'+escapeHtml(d.name)+'</strong><span>'+fmt(d.per100?.calories??(d.total?.calories||0)*100/Math.max(1,Number(d.finishedWeight)||1),0)+' ккал / 100 г · '+fmt(d.finishedWeight||0,0)+' г</span></button><button type="button" class="rp-dish-remove-saved" data-delete-custom-dish="'+escapeHtml(d.id)+'" aria-label="Удалить '+escapeHtml(d.name)+'">×</button></article>').join(""):'<p class="rp-diary-empty">Пока нет сохранённых блюд. Рассчитай первое выше.</p>';
 }
 function loadDish(d){
+ editingDishId=String(d.id);
  $("rpCustomDishName").value=d.name||"";
  $("rpCustomDishIngredients").innerHTML="";
  (d.ingredients||[]).forEach(item=>addIngredientRow({productId:item.productId,grams:item.grams,state:item.state}));
@@ -85,7 +88,7 @@ function loadDish(d){
 function recalculate(){renderResult();}
 function saveDish(){
  try{
-  const d=currentDish();const list=read(STORE,[]),next=[d,...list.filter(x=>String(x.id)!==String(d.id)&&x.name!==d.name)].slice(0,100);
+  const d=currentDish();editingDishId=String(d.id);const list=read(STORE,[]),next=[d,...list.filter(x=>String(x.id)!==String(d.id)&&x.name!==d.name)].slice(0,100);
   localStorage.setItem(STORE,JSON.stringify(next));$("rpCustomDishStatus").textContent="Блюдо сохранено на этом устройстве. Добавь порцию в дневник, чтобы запись синхронизировалась с аккаунтом.";renderSaved();
  }catch(error){$("rpCustomDishStatus").textContent=error.message;}
 }
@@ -96,7 +99,7 @@ function addPortion(event){
   const entry={id:uid(),name:d.name,grams:portion,state:"prepared",meal:d.meal,calories:per.calories*factor,protein:per.protein*factor,fat:per.fat*factor,carbs:per.carbs*factor,createdAt:new Date().toISOString(),customDishId:d.id,customDishSnapshot:d};
   const diary=read(DIARY,{}),dateInput=$("rpDiaryDate"),day=dateInput?.value||today();if(!Array.isArray(diary[day]))diary[day]=[];diary[day].push(entry);
   localStorage.setItem(DIARY,JSON.stringify(diary));
-  const saved=read(STORE,[]);localStorage.setItem(STORE,JSON.stringify([d,...saved.filter(x=>x.name!==d.name)].slice(0,100)));
+  const saved=read(STORE,[]);localStorage.setItem(STORE,JSON.stringify([d,...saved.filter(x=>String(x.id)!==String(d.id)&&x.name!==d.name)].slice(0,100)));editingDishId=String(d.id);
   document.dispatchEvent(new CustomEvent("recipepro:diary-updated"));
   $("rpCustomDishStatus").textContent="Добавлено в дневник: "+d.name+" — "+fmt(portion,0)+" г. КБЖУ рассчитано по весу готового блюда.";
   renderSaved();
@@ -114,7 +117,7 @@ function init(){
  $("rpCustomDishForm").addEventListener("submit",addPortion);
  $("rpSavedCustomDishes").addEventListener("click",e=>{
   const load=e.target.closest("[data-load-custom-dish]");if(load){const d=savedDishes().find(x=>String(x.id)===load.dataset.loadCustomDish);if(d)loadDish(d);return;}
-  const del=e.target.closest("[data-delete-custom-dish]");if(del){const id=del.dataset.deleteCustomDish;localStorage.setItem(STORE,JSON.stringify(read(STORE,[]).filter(x=>String(x.id)!==id)));renderSaved();}
+  const del=e.target.closest("[data-delete-custom-dish]");if(del){const id=del.dataset.deleteCustomDish;localStorage.setItem(STORE,JSON.stringify(read(STORE,[]).filter(x=>String(x.id)!==id)));const diary=read(DIARY,{});let changed=false;Object.keys(diary).forEach(day=>{if(Array.isArray(diary[day]))diary[day]=diary[day].map(entry=>{if(String(entry?.customDishSnapshot?.id)!==id)return entry;const copy={...entry};delete copy.customDishSnapshot;changed=true;return copy;});});if(changed)localStorage.setItem(DIARY,JSON.stringify(diary));if(editingDishId===id)editingDishId=null;renderSaved();}
  });
  document.addEventListener("recipepro:diary-updated",renderSaved);
  $("rpCustomDishMeal").value=$("rpFoodMeal")?.value||"Обед";
