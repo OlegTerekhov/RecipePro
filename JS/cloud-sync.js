@@ -769,6 +769,7 @@
         const usernameInput = document.getElementById("recipeProCloudUsername");
         const passwordInput = document.getElementById("recipeProCloudPassword");
         updateAuthControls(user);
+        const legacy = document.getElementById("recipeProCloudLegacy");
         if (legacy && user) legacy.hidden = true;
         if (usernameInput && user?.user_metadata?.username) usernameInput.value = user.user_metadata.username;
         if (passwordInput && user) passwordInput.value = "";
