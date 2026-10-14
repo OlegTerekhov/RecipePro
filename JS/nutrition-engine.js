@@ -68,7 +68,7 @@
         if (row?.pantry === true) return 0;
 
         const id = normalizeProductId(row?.product || row?.productId);
-        if (id === "масло" || id === "cookingoil" || id === "растительное масло") return 0;
+        if (row?.product?.category === "oil" || normalizeProductId(row?.product?.name) === "масло" || id === "масло" || id === "cookingoil" || id === "растительное масло") return 0;
 
         if (row?.oilAmount !== undefined) {
             return Math.max(0, number(row.oilAmount));
