@@ -28,7 +28,7 @@
 
     <link rel="stylesheet" href="CSS/style.css?v=20261013-diary-focus1">
     <link rel="stylesheet" href="CSS/meal-planner.css?v=20261012-r2">
-    <link rel="stylesheet" href="CSS/mobile.css?v=20261013-goal-recommendations1">
+    <link rel="stylesheet" href="CSS/mobile.css?v=20261014-visual-nav1">
     <link rel="stylesheet" href="CSS/preferences.css?v=20261013-mobile-theme2">
 </head>
 
@@ -64,7 +64,7 @@
 
 <main>
 
-<section class="hero">
+<section class="hero" id="home">
 
     <div class="container hero-grid">
 
@@ -109,17 +109,7 @@
       <div class="rp-diary-date"><label for="rpDiaryDate">День учёта</label><input id="rpDiaryDate" type="date"></div>
     </div>
     <div class="rp-diary-layout">
-      <section class="rp-diary-panel" aria-labelledby="rpGoalsTitle">
-        <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Личный профиль</span><h3 id="rpGoalsTitle">Моя дневная норма</h3></div><span class="rp-diary-icon" aria-hidden="true">◎</span></div>
-        <p class="rp-diary-help">Внеси значения, которые подходят именно тебе. RecipePro не будет назначать норму за тебя.</p>
-        <form id="rpGoalsForm" class="rp-goals-form">
-          <label>Калории, ккал<input type="number" id="rpGoalCalories" min="1" max="15000" step="1" placeholder="Например, 2100" required></label>
-          <label>Белки, г<input type="number" id="rpGoalProtein" min="0" max="1000" step="0.1" placeholder="Например, 130" required></label>
-          <label>Жиры, г<input type="number" id="rpGoalFat" min="0" max="1000" step="0.1" placeholder="Например, 70" required></label>
-          <label>Углеводы, г<input type="number" id="rpGoalCarbs" min="0" max="2000" step="0.1" placeholder="Например, 230" required></label>
-          <button class="rp-diary-primary" type="submit">Сохранить мою норму <span>→</span></button>
-        </form><p class="rp-diary-status" id="rpGoalsStatus" role="status">Норма хранится на этом устройстве.</p>
-      </section>
+      
       <section class="rp-diary-panel" aria-labelledby="rpTodayTitle">
         <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Сводка за день</span><h3 id="rpTodayTitle">Уже съедено</h3></div><span class="rp-diary-day-label" id="rpDiaryDayLabel">Сегодня</span></div>
         <div class="rp-diary-calorie-summary"><div><span>Калории</span><strong id="rpDiaryCalories">0</strong><small id="rpDiaryCaloriesRemaining">Сначала укажи дневную норму</small></div><div class="rp-diary-calorie-ring" id="rpDiaryCalorieRing"><span id="rpDiaryCaloriePercent">0%</span></div></div>
@@ -149,6 +139,61 @@
   </div>
 </section>
 
+
+<section class="section rp-ideas-section" id="rpIdeasSection">
+  <div class="container">
+    <div class="rp-section-intro">
+      <span class="rp-diary-kicker">Твои настройки</span>
+      <h2>Идеи и личные цели</h2>
+      <p>Задай собственную дневную норму КБЖУ. RecipePro будет сравнивать с ней записи из дневника — без навязанных рекомендаций.</p>
+    </div>
+    <section class="rp-diary-panel rp-goals-feature" id="rpGoalsPanel" aria-labelledby="rpGoalsTitle">
+        <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Личный профиль</span><h3 id="rpGoalsTitle">Моя дневная норма</h3></div><span class="rp-diary-icon" aria-hidden="true">◎</span></div>
+        <p class="rp-diary-help">Внеси значения, которые подходят именно тебе. RecipePro не будет назначать норму за тебя.</p>
+        <form id="rpGoalsForm" class="rp-goals-form">
+          <label>Калории, ккал<input type="number" id="rpGoalCalories" min="1" max="15000" step="1" placeholder="Например, 2100" required></label>
+          <label>Белки, г<input type="number" id="rpGoalProtein" min="0" max="1000" step="0.1" placeholder="Например, 130" required></label>
+          <label>Жиры, г<input type="number" id="rpGoalFat" min="0" max="1000" step="0.1" placeholder="Например, 70" required></label>
+          <label>Углеводы, г<input type="number" id="rpGoalCarbs" min="0" max="2000" step="0.1" placeholder="Например, 230" required></label>
+          <button class="rp-diary-primary" type="submit">Сохранить мою норму <span>→</span></button>
+        </form><p class="rp-diary-status" id="rpGoalsStatus" role="status">Норма хранится на этом устройстве.</p>
+      </section>
+  </div>
+</section>
+
+<section class="section rp-calendar-section" id="rpCalendarPanel">
+  <div class="container">
+    <div class="rp-section-intro">
+      <span class="rp-diary-kicker">Твоя история</span>
+      <h2>План по дням</h2>
+      <p>Выбери дату в календаре, чтобы посмотреть, сколько калорий, белков, жиров и углеводов ты записал в этот день.</p>
+    </div>
+    <div class="rp-calendar-layout">
+      <section class="rp-calendar-card" aria-label="Календарь питания">
+        <div class="rp-calendar-monthbar">
+          <button type="button" id="rpCalendarPrev" aria-label="Предыдущий месяц">‹</button>
+          <h3 id="rpCalendarMonth">Месяц</h3>
+          <button type="button" id="rpCalendarNext" aria-label="Следующий месяц">›</button>
+        </div>
+        <div class="rp-calendar-weekdays" aria-hidden="true"><span>Пн</span><span>Вт</span><span>Ср</span><span>Чт</span><span>Пт</span><span>Сб</span><span>Вс</span></div>
+        <div class="rp-calendar-days" id="rpCalendarDays" aria-label="Выбери день"></div>
+        <p class="rp-calendar-legend"><span></span> Есть записи в дневнике</p>
+      </section>
+      <section class="rp-calendar-card rp-calendar-detail" aria-live="polite">
+        <span class="rp-diary-kicker">Выбранный день</span>
+        <h3 id="rpCalendarSelectedDate">Сегодня</h3>
+        <div class="rp-calendar-calories"><strong id="rpCalendarCalories">0</strong><span>ккал</span></div>
+        <div class="rp-calendar-macros">
+          <div><span>Белки</span><strong id="rpCalendarProtein">0 г</strong></div>
+          <div><span>Жиры</span><strong id="rpCalendarFat">0 г</strong></div>
+          <div><span>Углеводы</span><strong id="rpCalendarCarbs">0 г</strong></div>
+        </div>
+        <p id="rpCalendarEntries" class="rp-calendar-entries">В этот день пока нет записей.</p>
+        <button type="button" class="rp-diary-primary" id="rpCalendarOpenDiary">Открыть дневник за этот день <span>→</span></button>
+      </section>
+    </div>
+  </div>
+</section>
 
 <section
     class="recipes-section section"
@@ -1443,6 +1488,7 @@
 <script src="JS/nutrition.js?v=20261009-r2"></script>
 <script src="JS/app.js?v=20261012-photos1"></script>
     <script src="JS/food-diary.js?v=20261013-goal-recommendations1"></script>
+<script src="JS/calendar.js?v=20261014-visual-nav1"></script>
     <script src="JS/profile.js?v=20261013-clean1"></script>
     <script src="JS/backup.js?v=20261013-diary-backup1"></script>
 <script src="JS/meal-planner.js?v=20261012-r3"></script>
@@ -1550,10 +1596,10 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 </script>
 
 <nav id="recipeProBottomNav" aria-label="Основная навигация">
-    <a href="#" aria-current="page"><span aria-hidden="true">⌂</span><span>Главная</span></a>
+    <a href="#home" aria-current="page"><span aria-hidden="true">⌂</span><span>Главная</span></a>
     <a href="#dailyDiary"><span aria-hidden="true">◷</span><span>Дневник</span></a>
-    <a href="#recipes"><span aria-hidden="true">♧</span><span>Идеи</span></a>
-    <a href="#rpMealPlanner"><span aria-hidden="true">▦</span><span>План</span></a>
+    <a href="#rpIdeasSection"><span aria-hidden="true">✳</span><span>Идеи</span></a>
+    <a href="#rpCalendarPanel"><span aria-hidden="true">▦</span><span>План</span></a>
 </nav>
 
 <script>
@@ -1562,9 +1608,9 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
     if (!nav) return;
     const links = [...nav.querySelectorAll("a")];
     const updateActive = () => {
-        const hash = location.hash || "#";
+        const hash = location.hash || "#home";
         links.forEach(link => {
-            const active = link.getAttribute("href") === hash;
+            const active = link.getAttribute("href") === hash || (hash === "#" && link.getAttribute("href") === "#home");
             if (active) link.setAttribute("aria-current", "page");
             else link.removeAttribute("aria-current");
         });
