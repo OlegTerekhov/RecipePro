@@ -38,3 +38,4 @@
  .rp-custom-dish-weight-grid { grid-template-columns: minmax(0,1fr); }
  .rp-custom-dish-buttons { grid-template-columns: minmax(0,1fr); }
 }
+.rp-dish-oil-warning { margin: 12px 0 0 !important; padding: 10px 12px; border: 1px solid #d7b16a; border-radius: 12px; color: var(--text, #20372f) !important; background: rgba(215, 177, 106, .13); font-size: 12px !important; line-height: 1.5; }
