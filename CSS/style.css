@@ -5689,3 +5689,9 @@ body.rp-community-dialog-open { overflow: hidden; }
 @media (max-width:760px) { .hero { padding-top:26px; padding-bottom:24px; } .hero-content { padding:0; } .hero-actions { gap:10px; margin-top:20px; } .hero-primary-link,.hero-secondary-link { min-height:46px; padding:0 16px; font-size:12px; } .recipe-discovery-tools { margin:20px 0 26px; } .recipe-discovery-tools .search-box { display:flex!important; } .recipe-discovery-tools .ai-generator-trigger { display:flex!important; } .recipe-discovery-tools .popular-searches { display:block!important; } }
 
 @media (max-width:760px) { .recipes-section .hero-recipe-wrap { display:block!important; max-width:100%; margin:0 0 28px; } }
+
+
+/* В разделе «Идеи» оставляем только сводку за день. */
+#rpIdeasSection #rpGoalsPanel {
+  display: none !important;
+}
