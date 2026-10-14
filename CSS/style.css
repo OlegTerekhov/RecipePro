@@ -5695,3 +5695,24 @@ body.rp-community-dialog-open { overflow: hidden; }
 #rpIdeasSection #rpGoalsPanel {
   display: none !important;
 }
+
+
+/* Four primary RecipePro screens */
+#rpSettingsPanel .rp-settings-container { max-width: 820px; margin-inline: auto; }
+#rpSettingsPanel .rp-settings-goals { width: 100%; max-width: 620px; margin: 0 auto; }
+#rpSettingsPanel .rp-goals-feature { width: 100%; margin: 0; }
+#rpSettingsPanel .rp-goals-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+#rpSettingsPanel .rp-goals-form .rp-diary-primary { grid-column: 1 / -1; }
+.rp-calendar-goal-check { display: grid; gap: 8px; margin: 18px 0; }
+.rp-calendar-goal-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 13px; border: 1px solid var(--line, #e5e8e1); border-radius: 12px; background: var(--card, #fffdf9); font-size: 13px; }
+.rp-calendar-goal-row > span { color: var(--muted, #718079); }
+.rp-calendar-goal-row strong { text-align: right; font-size: 12px; }
+.rp-calendar-goal-row.is-over strong { color: #c15d48; }
+.rp-calendar-goal-row.is-met strong { color: #398265; }
+.rp-calendar-goal-row.is-under strong { color: var(--green-800, #2d5948); }
+.rp-calendar-goal-row.is-unset strong { color: var(--muted, #718079); font-weight: 500; }
+@media (max-width: 540px) {
+  #rpSettingsPanel .rp-goals-form { grid-template-columns: minmax(0, 1fr); }
+  #rpSettingsPanel .rp-goals-form .rp-diary-primary { grid-column: auto; }
+  .rp-calendar-goal-row { align-items: flex-start; }
+}
