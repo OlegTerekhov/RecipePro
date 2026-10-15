@@ -28,7 +28,7 @@
 
 - `JS/products.js`, `JS/product-resolver.js` — каталог продуктов и сопоставление названий.
 - `JS/recipe-engine.js`, `JS/recipe-builder.js`, `JS/recommendation-engine.js` — логика построения и ранжирования рецептов.
-- `JS/nutrition-engine.js`, `JS/nutrition.js` — расчёт пищевой ценности.
+- `JS/nutrition-engine.js` — расчёт пищевой ценности и КБЖУ.
 - `JS/ai-generator.js` — локальная генерация и адаптация рецептов без обращения к внешней модели.
 - `JS/meal-planner.js` — недельный план, список покупок и история.
 - `JS/cloud-sync.js` — вход и синхронизация с Supabase.
