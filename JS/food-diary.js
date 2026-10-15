@@ -8,7 +8,7 @@ const fmt=(n,d=1)=>Number(Number(n||0).toFixed(d)).toLocaleString("ru-RU",{maxim
 const today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");};
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback;}catch(_){return fallback;}}
 function norm(v){return String(v||"").toLowerCase().replace(/ё/g,"е").replace(/[^а-яa-z0-9]+/gi," ").trim();}
-function nutritionSourceLabel(product){const source=product?.nutritionSource;if(source&&typeof source==="object"&&source.database)return String(source.database);if(typeof source==="string"&&/reference estimate|справочн|усреднен/i.test(source))return"Справочная оценка";if(typeof source==="string"&&source.trim())return source.trim();if(product?.source==="Open Food Facts")return"Open Food Facts";return"Справочные данные";}
+function nutritionSourceLabel(product){const source=product?.nutritionSource;const value=source&&typeof source==="object"&&source.database?String(source.database):typeof source==="string"?source:"";if(/reference estimate|справочн|усреднен/i.test(value))return"Справочная оценка";if(value.trim())return value.trim();if(product?.source==="Open Food Facts")return"Open Food Facts";return"Справочные данные";}
 function findProduct(value){const q=norm(value);if(!q||!window.products)return null;const external=[...externalProducts.values()].find(p=>norm(p.name)===q||norm(p.id)===q);if(external)return{id:external.id,product:external};const all=Object.entries(window.products);
 for(const [id,p] of all)if(norm(id)===q||norm(p.name)===q)return{id,product:p};
 for(const [id,p] of all)if((p.aliases||[]).some(a=>norm(a)===q))return{id,product:p};
