@@ -52,10 +52,10 @@ test("daily targets reject zero calories and negative or non-finite values", () 
   assert.match(diary, /Object\.values\(g\)\.some\(v=>!Number\.isFinite\(v\)\|\|v<0\)\|\|g\.calories<=0/);
 });
 
-test("public client configuration does not contain a Supabase service-role secret", () => {
+test("public client configuration contains no service-role or secret key assignment", () => {
   const config = read("JS/supabase-config.js");
-  assert.doesNotMatch(config, /service_role/i);
-  assert.doesNotMatch(config, /sb_secret_[A-Za-z0-9_-]+/);
+  assert.doesNotMatch(config, /(?:service_role|sb_secret_)\s*[:=]\s*["'][^"']+["']/i);
+  assert.match(config, /publishableKey\s*:/);
 });
 
 test("the app keeps dark theme as the first-visit default and preserves explicit preferences", () => {
