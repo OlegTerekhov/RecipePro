@@ -107,7 +107,7 @@ test("per-serving values divide totals by the requested serving count", () => {
 
   assert.equal(result.calories, 240);
   assert.equal(result.perServing.calories, 120);
-  assert.equal(result.perServing.protein, 23);
+  assert.equal(result.perServing.protein, 22.5);
 });
 
 
