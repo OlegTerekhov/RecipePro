@@ -11,7 +11,7 @@ test("food diary and cloud sync use the same persistent storage keys", () => {
   const sync = read("JS/cloud-sync.js");
 
   assert.match(diary, /const STORE\s*=\s*"recipepro_food_diary_v1"/);
-  assert.match(diary, /\\bGOALS\\s*=\\s*"recipepro_nutrition_goals_v1"/);
+  assert.match(diary, /\bGOALS\s*=\s*"recipepro_nutrition_goals_v1"/);
   assert.match(sync, /diary:\s*"recipepro_food_diary_v1"/);
   assert.match(sync, /goals:\s*"recipepro_nutrition_goals_v1"/);
 });
