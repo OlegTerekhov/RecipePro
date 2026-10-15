@@ -8,7 +8,17 @@
     function loadCache() {
         try {
             const data = JSON.parse(localStorage.getItem(CACHE_KEY) || "{}");
-            return data && typeof data === "object" ? data : {};
+            if (!data || typeof data !== "object" || Array.isArray(data)) return {};
+
+            Object.values(data).forEach(entry => {
+                if (!entry || typeof entry !== "object" || !entry.key || !entry.product) return;
+                window.products = window.products || {};
+                if (!window.products[entry.key]) {
+                    window.products[entry.key] = entry.product;
+                }
+            });
+
+            return data;
         } catch {
             return {};
         }
@@ -104,8 +114,17 @@
         if (!clean) return null;
 
         const cacheKey = clean;
-        if (cache[cacheKey] && window.products[cache[cacheKey]]) {
-            return cache[cacheKey];
+        const cached = cache[cacheKey];
+
+        if (cached && typeof cached === "object" && cached.key && cached.product) {
+            window.products = window.products || {};
+            window.products[cached.key] = cached.product;
+            return cached.key;
+        }
+
+        // Compatibility with the previous cache format (query -> product ID).
+        if (typeof cached === "string" && window.products?.[cached]) {
+            return cached;
         }
 
         const url = API +
@@ -150,7 +169,10 @@
             const key = toLocalProduct(usable, query);
             if (!key) return null;
 
-            cache[cacheKey] = key;
+            cache[cacheKey] = {
+                key,
+                product: window.products[key]
+            };
             saveCache();
             return key;
         } catch (error) {
