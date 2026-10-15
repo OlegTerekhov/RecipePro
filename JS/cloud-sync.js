@@ -895,6 +895,17 @@
         }
     }
 
+    // Expose pure merge helpers only to the Node test harness; never enabled in normal app use.
+    if (window.__RECIPEPRO_TEST__ === true) {
+        window.__RECIPEPRO_CLOUD_TEST__ = {
+            mergeThreeWay,
+            mergeDiaryThreeWay,
+            mergeGoalsThreeWay,
+            mergePlanThreeWay
+        };
+        return;
+    }
+
     Storage.prototype.setItem = function (key, value) {
         nativeSetItem.call(this, key, value);
         if (this === window.localStorage && Object.values(STORAGE_KEYS).includes(key)) scheduleSave();
