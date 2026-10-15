@@ -71,8 +71,8 @@ test("delayed cloud saves are bound to the account that scheduled them", () => {
   const sync = read("JS/cloud-sync.js");
   assert.match(sync, /const targetUser = currentUser/);
   assert.match(sync, /currentUser\.id !== targetUser\.id/);
-  assert.match(sync, /uploadSnapshot\(snapshot, targetUser\)/);
-  assert.match(sync, /saveBaseline\(snapshot, targetUser\)/);
+  assert.match(sync, /uploadSnapshot\(mergedSnapshot, targetUser\)/);
+  assert.match(sync, /saveBaseline\(mergedSnapshot, targetUser\)/);
 });
 
 test("recipe builder gives protein-specific cooking temperatures", () => {
