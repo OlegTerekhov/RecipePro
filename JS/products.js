@@ -2018,7 +2018,7 @@ window.products = {
         name: "Гречка варёная",
         category: "grain",
         aliases: ["Гречка варёная"],
-        raw: { kcal: 110, protein: 3.6, fat: 1.1, carbs: 21.3 },
+        raw: { kcal: 92, protein: 3.4, fat: 0.6, carbs: 19.9 },
         cookedWeightRatio: 1,
         nutritionSource: "Справочные усреднённые значения; сверяй с упаковкой для брендовых продуктов"
     },
@@ -2262,8 +2262,8 @@ window.products = {
         name: "Куриная печень",
         category: "meat",
         aliases: ["куриная печень","печень куриная"],
-        raw: { kcal: 119, protein: 16.9, fat: 4.8, carbs: 0.7 },
-        cookedWeightRatio: 0.72,
+        raw: { kcal: 119, protein: 17, fat: 4.8, carbs: 0.7 },
+        cookedWeightRatio: 0.75,
         nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
@@ -2272,7 +2272,7 @@ window.products = {
         category: "meat",
         aliases: ["говяжья печень","печень говяжья"],
         raw: { kcal: 135, protein: 20.4, fat: 3.6, carbs: 3.9 },
-        cookedWeightRatio: 0.72,
+        cookedWeightRatio: 0.75,
         nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
@@ -2397,7 +2397,7 @@ window.products = {
         name: "Молоко 1,5%",
         category: "dairy",
         aliases: ["молоко 1,5%","молоко 1.5"],
-        raw: { kcal: 45, protein: 3, fat: 1.5, carbs: 4.8 },
+        raw: { kcal: 44, protein: 3, fat: 1.5, carbs: 4.7 },
         cookedWeightRatio: 1,
         nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
@@ -2460,7 +2460,7 @@ window.products = {
         name: "Пармезан",
         category: "dairy",
         aliases: ["пармезан"],
-        raw: { kcal: 392, protein: 35.8, fat: 25.8, carbs: 3.2 },
+        raw: { kcal: 431, protein: 38, fat: 29, carbs: 4.1 },
         cookedWeightRatio: 1,
         nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
@@ -2910,7 +2910,7 @@ window.products = {
         name: "Панировочные сухари",
         category: "bakery",
         aliases: ["панировочные сухари"],
-        raw: { kcal: 395, protein: 13.4, fat: 5.3, carbs: 71 },
+        raw: { kcal: 395, protein: 13, fat: 5, carbs: 72 },
         cookedWeightRatio: 1,
         nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
@@ -3414,7 +3414,7 @@ window.products = {
         name: "Макароны варёные",
         category: "grain",
         aliases: ["макароны варёные"],
-        raw: { kcal: 158, protein: 5.8, fat: 0.9, carbs: 30.9 },
+        raw: { kcal: 157, protein: 5.8, fat: 0.9, carbs: 30.9 },
         cookedWeightRatio: 1,
         nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
@@ -4116,7 +4116,7 @@ window.products = {
         name: "Кефир 2,5%",
         category: "dairy",
         aliases: ["кефир 2,5%"],
-        raw: { kcal: 53, protein: 2.9, fat: 2.5, carbs: 4 },
+        raw: { kcal: 53, protein: 3, fat: 2.5, carbs: 4 },
         cookedWeightRatio: 1,
         nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
