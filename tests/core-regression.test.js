@@ -52,6 +52,15 @@ test("daily targets reject zero calories and negative or non-finite values", () 
   assert.match(diary, /Object\.values\(g\)\.some\(v=>!Number\.isFinite\(v\)\|\|v<0\)\|\|g\.calories<=0/);
 });
 
+test("cloud save reads have a timeout and abort signal", () => {
+  const sync = read("JS/cloud-sync.js");
+
+  assert.match(sync, /const readController = new AbortController\(\)/);
+  assert.match(sync, /setTimeout\(\(\) => readController\.abort\(\), 30000\)/);
+  assert.match(sync, /abortSignal\(readController\.signal\)/);
+  assert.match(sync, /clearTimeout\(readTimer\)/);
+});
+
 test("public client configuration contains no service-role or secret key assignment", () => {
   const config = read("JS/supabase-config.js");
   assert.doesNotMatch(config, /(?:service_role|sb_secret_)\s*[:=]\s*["'][^"']+["']/i);
