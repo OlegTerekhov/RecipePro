@@ -1,12 +1,12 @@
 "use strict";
 
-const CACHE_NAME = "recipepro-shell-v91";
+const CACHE_NAME = "recipepro-shell-v92";
 const CORE_SHELL = ["./", "./index.html"];
 const APP_ASSETS = [
     "./CSS/style.css", "./CSS/preferences.css", "./JS/preferences.js", "./CSS/meal-planner.css", "./CSS/mobile.css", "./JS/calendar.js", "./JS/meal-planner.js", "./JS/backup.js", "./JS/products.js", "./JS/product-resolver.js",
     "./JS/recipes.js", "./JS/recipe-intelligence.js", "./JS/ingredient-intelligence.js",
     "./JS/recipe-engine.js", "./JS/recipe-builder.js", "./JS/recommendation-engine.js",
-    "./JS/nutrition-engine.js", "./JS/nutrition.js", "./JS/app.js", "./JS/food-diary.js", "./JS/custom-dishes.js", "./CSS/custom-dishes.css", "./JS/profile.js", "./JS/ai-generator.js",
+    "./JS/nutrition-engine.js", "./JS/app.js", "./JS/food-diary.js", "./JS/custom-dishes.js", "./CSS/custom-dishes.css", "./JS/profile.js", "./JS/ai-generator.js",
     "./JS/supabase-config.js", "./JS/cloud-sync.js", "./manifest.webmanifest", "./icon.svg"
 ];
 const EXTERNAL_ASSETS = ["https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"];
@@ -92,33 +92,28 @@ self.addEventListener("fetch", event => {
     if (url.origin !== self.location.origin) return;
 
     if (request.mode === "navigate") {
+        const cachePromise = caches.open(CACHE_NAME);
+        const indexUrl = new URL("./index.html", self.registration.scope).href;
+        // Refresh in the background, but never make a cached app wait for the network.
+        const updatePromise = cachePromise.then(async cache => {
+            const response = await fetchWithTimeout(request, 1800);
+            if (response.ok) await cache.put(indexUrl, response.clone());
+            return response;
+        }).catch(() => null);
+
+        event.waitUntil(updatePromise.then(() => undefined));
         event.respondWith((async () => {
-            const cache = await caches.open(CACHE_NAME);
-            const indexUrl = new URL("./index.html", self.registration.scope).href;
+            const cache = await cachePromise;
             const cached = await cache.match(indexUrl);
+            if (cached) return cached;
 
-            const networkResponse = fetchWithTimeout(request, 1800).then(async response => {
-                if (response.ok) await cache.put(indexUrl, response.clone());
-                return response;
-            });
+            const response = await updatePromise;
+            if (response && response.ok) return response;
 
-            // A slow or missing network must not leave the installed app on a blank screen.
-            try {
-                return await Promise.race([
-                    networkResponse,
-                    new Promise((_, reject) => setTimeout(() => reject(new Error("Navigation timeout")), 1800))
-                ]);
-            } catch {
-                if (cached) return cached;
-                try {
-                    return await networkResponse;
-                } catch {
-                    return new Response(
-                        "<!doctype html><html lang='ru'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>RecipePro</title><body style='font:16px system-ui;padding:24px;color:#20372f;background:#f7f3ed'><h1>RecipePro</h1><p>Офлайн-версия ещё не сохранена на этом устройстве.</p><p>Подключись к интернету, открой приложение на несколько секунд и повтори попытку.</p></body></html>",
-                        { headers: { "Content-Type": "text/html; charset=utf-8" } }
-                    );
-                }
-            }
+            return new Response(
+                "<!doctype html><html lang='ru'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>RecipePro</title><body style='font:16px system-ui;padding:24px;color:#20372f;background:#f7f3ed'><h1>RecipePro</h1><p>Офлайн-версия ещё не сохранена на этом устройстве.</p><p>Подключись к интернету, открой приложение на несколько секунд и повтори попытку.</p></body></html>",
+                { headers: { "Content-Type": "text/html; charset=utf-8" } }
+            );
         })());
         return;
     }
