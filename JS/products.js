@@ -2992,5 +2992,860 @@ window.products = {
         raw: { kcal: 160, protein: 17, fat: 9, carbs: 2 },
         cookedWeightRatio: 1,
         nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "рис-бурый-сухой": {
+        name: "Рис бурый сухой",
+        category: "grain",
+        aliases: ["рис бурый сухой"],
+        raw: { kcal: 370, protein: 7.9, fat: 2.9, carbs: 77.2 },
+        cookedWeightRatio: 2.8,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "гречка-зеленая-сухая": {
+        name: "Гречка зелёная сухая",
+        category: "grain",
+        aliases: ["гречка зелёная сухая"],
+        raw: { kcal: 343, protein: 13.3, fat: 3.4, carbs: 71.5 },
+        cookedWeightRatio: 2.7,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "булгур-сухой": {
+        name: "Булгур сухой",
+        category: "grain",
+        aliases: ["булгур сухой"],
+        raw: { kcal: 342, protein: 12.3, fat: 1.3, carbs: 75.9 },
+        cookedWeightRatio: 2.7,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "полента-сухая": {
+        name: "Полента сухая",
+        category: "grain",
+        aliases: ["полента сухая"],
+        raw: { kcal: 370, protein: 7, fat: 1.8, carbs: 79 },
+        cookedWeightRatio: 3,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "лапша-рисовая-сухая": {
+        name: "Рисовая лапша сухая",
+        category: "grain",
+        aliases: ["рисовая лапша сухая"],
+        raw: { kcal: 364, protein: 5.9, fat: 1.1, carbs: 80.2 },
+        cookedWeightRatio: 2.5,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "лапша-гречневая-сухая": {
+        name: "Гречневая лапша сухая",
+        category: "grain",
+        aliases: ["гречневая лапша сухая"],
+        raw: { kcal: 336, protein: 14.4, fat: 0.7, carbs: 70 },
+        cookedWeightRatio: 2.4,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "паста-цельнозерновая-сухая": {
+        name: "Макароны цельнозерновые сухие",
+        category: "grain",
+        aliases: ["макароны цельнозерновые сухие"],
+        raw: { kcal: 348, protein: 13, fat: 2.5, carbs: 70 },
+        cookedWeightRatio: 2.4,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "кускус-цельнозерновой": {
+        name: "Кускус цельнозерновой сухой",
+        category: "grain",
+        aliases: ["кускус цельнозерновой сухой"],
+        raw: { kcal: 376, protein: 12.8, fat: 1.9, carbs: 77.4 },
+        cookedWeightRatio: 2.5,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "мука-гречневая": {
+        name: "Мука гречневая",
+        category: "grain",
+        aliases: ["мука гречневая"],
+        raw: { kcal: 335, protein: 12.6, fat: 3.1, carbs: 70.6 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "мука-овсяная": {
+        name: "Мука овсяная",
+        category: "grain",
+        aliases: ["мука овсяная"],
+        raw: { kcal: 404, protein: 14.7, fat: 9.1, carbs: 65.7 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "мука-кокосовая": {
+        name: "Мука кокосовая",
+        category: "nuts",
+        aliases: ["мука кокосовая"],
+        raw: { kcal: 400, protein: 20, fat: 13, carbs: 60 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "пшеничные-зародыши": {
+        name: "Зародыши пшеницы",
+        category: "grain",
+        aliases: ["зародыши пшеницы"],
+        raw: { kcal: 360, protein: 23.2, fat: 9.7, carbs: 51.8 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "эдамаме": {
+        name: "Эдамаме",
+        category: "legume",
+        aliases: ["эдамаме"],
+        raw: { kcal: 121, protein: 12, fat: 5.2, carbs: 8.9 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "нут-консервированный": {
+        name: "Нут консервированный",
+        category: "legume",
+        aliases: ["нут консервированный"],
+        raw: { kcal: 139, protein: 7.1, fat: 2.8, carbs: 22.5 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "чечевица-консервированная": {
+        name: "Чечевица консервированная",
+        category: "legume",
+        aliases: ["чечевица консервированная"],
+        raw: { kcal: 91, protein: 6, fat: 0.4, carbs: 16 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "маш-сухой": {
+        name: "Маш сухой",
+        category: "legume",
+        aliases: ["маш сухой"],
+        raw: { kcal: 347, protein: 23.9, fat: 1.2, carbs: 62.6 },
+        cookedWeightRatio: 2.5,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "люпин-вареный": {
+        name: "Люпин варёный",
+        category: "legume",
+        aliases: ["люпин варёный"],
+        raw: { kcal: 119, protein: 15.6, fat: 2.9, carbs: 9.9 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "фарш-куриный": {
+        name: "Фарш куриный",
+        category: "meat",
+        aliases: ["фарш куриный"],
+        raw: { kcal: 143, protein: 17.4, fat: 8.1, carbs: 0 },
+        cookedWeightRatio: 0.75,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "фарш-индейки": {
+        name: "Фарш индейки",
+        category: "meat",
+        aliases: ["фарш индейки"],
+        raw: { kcal: 150, protein: 17, fat: 8, carbs: 0 },
+        cookedWeightRatio: 0.75,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "бекон-жареный": {
+        name: "Бекон жареный",
+        category: "meat",
+        aliases: ["бекон жареный"],
+        raw: { kcal: 541, protein: 37, fat: 42, carbs: 1.4 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "ветчина-куриная": {
+        name: "Ветчина куриная",
+        category: "meat",
+        aliases: ["ветчина куриная"],
+        raw: { kcal: 126, protein: 18, fat: 5, carbs: 2 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "пастрами-индейка": {
+        name: "Пастрами из индейки",
+        category: "meat",
+        aliases: ["пастрами из индейки"],
+        raw: { kcal: 110, protein: 20, fat: 2.5, carbs: 2 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "колбаса-докторская": {
+        name: "Колбаса варёная докторская",
+        category: "meat",
+        aliases: ["колбаса варёная докторская"],
+        raw: { kcal: 257, protein: 12.8, fat: 22.2, carbs: 1.5 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "сосиски-молочные": {
+        name: "Сосиски молочные",
+        category: "meat",
+        aliases: ["сосиски молочные"],
+        raw: { kcal: 261, protein: 11, fat: 23.9, carbs: 1.6 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "сардельки": {
+        name: "Сардельки",
+        category: "meat",
+        aliases: ["сардельки"],
+        raw: { kcal: 322, protein: 10, fat: 31, carbs: 1.5 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "вареники-картофель": {
+        name: "Вареники с картофелем, варёные",
+        category: "prepared",
+        aliases: ["вареники с картофелем, варёные"],
+        raw: { kcal: 160, protein: 4, fat: 3, carbs: 29 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "голубцы": {
+        name: "Голубцы с мясом и рисом",
+        category: "prepared",
+        aliases: ["голубцы с мясом и рисом"],
+        raw: { kcal: 120, protein: 7, fat: 6, carbs: 10 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "котлета-куриная": {
+        name: "Котлета куриная жареная",
+        category: "prepared",
+        aliases: ["котлета куриная жареная"],
+        raw: { kcal: 220, protein: 18, fat: 12, carbs: 10 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "фалафель": {
+        name: "Фалафель жареный",
+        category: "prepared",
+        aliases: ["фалафель жареный"],
+        raw: { kcal: 333, protein: 13.3, fat: 17.8, carbs: 31.8 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "хумус-классический": {
+        name: "Хумус классический",
+        category: "prepared",
+        aliases: ["хумус классический"],
+        raw: { kcal: 166, protein: 7.9, fat: 9.6, carbs: 14.3 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "гуакамоле": {
+        name: "Гуакамоле",
+        category: "prepared",
+        aliases: ["гуакамоле"],
+        raw: { kcal: 150, protein: 2, fat: 13, carbs: 8 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "салат-коул-слоу": {
+        name: "Салат коул-слоу",
+        category: "prepared",
+        aliases: ["салат коул-слоу"],
+        raw: { kcal: 152, protein: 1, fat: 11, carbs: 12 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "картофель-фри": {
+        name: "Картофель фри",
+        category: "prepared",
+        aliases: ["картофель фри"],
+        raw: { kcal: 312, protein: 3.4, fat: 15, carbs: 41 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "картофельное-пюре": {
+        name: "Картофельное пюре на молоке",
+        category: "prepared",
+        aliases: ["картофельное пюре на молоке"],
+        raw: { kcal: 113, protein: 2, fat: 4.2, carbs: 17 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "картофель-запеченный": {
+        name: "Картофель запечённый",
+        category: "prepared",
+        aliases: ["картофель запечённый"],
+        raw: { kcal: 93, protein: 2.5, fat: 0.1, carbs: 21.2 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "батат-запеченный": {
+        name: "Батат запечённый",
+        category: "prepared",
+        aliases: ["батат запечённый"],
+        raw: { kcal: 90, protein: 2, fat: 0.2, carbs: 20.7 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "рис-вареный": {
+        name: "Рис белый варёный",
+        category: "grain",
+        aliases: ["рис белый варёный"],
+        raw: { kcal: 130, protein: 2.7, fat: 0.3, carbs: 28.2 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "гречка-вареная": {
+        name: "Гречка варёная",
+        category: "grain",
+        aliases: ["гречка варёная"],
+        raw: { kcal: 92, protein: 3.4, fat: 0.6, carbs: 19.9 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "макароны-вареные": {
+        name: "Макароны варёные",
+        category: "grain",
+        aliases: ["макароны варёные"],
+        raw: { kcal: 158, protein: 5.8, fat: 0.9, carbs: 30.9 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "перловка-вареная": {
+        name: "Перловка варёная",
+        category: "grain",
+        aliases: ["перловка варёная"],
+        raw: { kcal: 123, protein: 2.3, fat: 0.4, carbs: 28.2 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "киноа-вареная": {
+        name: "Киноа варёная",
+        category: "grain",
+        aliases: ["киноа варёная"],
+        raw: { kcal: 120, protein: 4.4, fat: 1.9, carbs: 21.3 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "чечевица-вареная": {
+        name: "Чечевица варёная",
+        category: "legume",
+        aliases: ["чечевица варёная"],
+        raw: { kcal: 116, protein: 9, fat: 0.4, carbs: 20.1 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "нут-вареный": {
+        name: "Нут варёный",
+        category: "legume",
+        aliases: ["нут варёный"],
+        raw: { kcal: 164, protein: 8.9, fat: 2.6, carbs: 27.4 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "фасоль-красная-вареная": {
+        name: "Фасоль красная варёная",
+        category: "legume",
+        aliases: ["фасоль красная варёная"],
+        raw: { kcal: 127, protein: 8.7, fat: 0.5, carbs: 22.8 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "фасоль-белая-вареная": {
+        name: "Фасоль белая варёная",
+        category: "legume",
+        aliases: ["фасоль белая варёная"],
+        raw: { kcal: 139, protein: 9.7, fat: 0.4, carbs: 25.1 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "горох-вареный": {
+        name: "Горох варёный",
+        category: "legume",
+        aliases: ["горох варёный"],
+        raw: { kcal: 118, protein: 8.3, fat: 0.4, carbs: 21.1 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "куриная-грудка-вареная": {
+        name: "Куриная грудка варёная",
+        category: "meat",
+        aliases: ["куриная грудка варёная"],
+        raw: { kcal: 165, protein: 31, fat: 3.6, carbs: 0 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "куриная-грудка-запеченная": {
+        name: "Куриная грудка запечённая без кожи",
+        category: "meat",
+        aliases: ["куриная грудка запечённая без кожи"],
+        raw: { kcal: 165, protein: 31, fat: 3.6, carbs: 0 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "индейка-вареная": {
+        name: "Индейка варёная",
+        category: "meat",
+        aliases: ["индейка варёная"],
+        raw: { kcal: 135, protein: 29, fat: 1.8, carbs: 0 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "говядина-вареная": {
+        name: "Говядина варёная постная",
+        category: "meat",
+        aliases: ["говядина варёная постная"],
+        raw: { kcal: 220, protein: 32, fat: 9, carbs: 0 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "лосось-запеченный": {
+        name: "Лосось запечённый",
+        category: "fish",
+        aliases: ["лосось запечённый"],
+        raw: { kcal: 206, protein: 22, fat: 12, carbs: 0 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "треска-вареная": {
+        name: "Треска варёная",
+        category: "fish",
+        aliases: ["треска варёная"],
+        raw: { kcal: 89, protein: 20, fat: 0.7, carbs: 0 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "креветки-вареные": {
+        name: "Креветки варёные",
+        category: "fish",
+        aliases: ["креветки варёные"],
+        raw: { kcal: 99, protein: 24, fat: 0.3, carbs: 0.2 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "яйцо-вареное": {
+        name: "Яйцо куриное варёное",
+        category: "dairy",
+        aliases: ["яйцо куриное варёное"],
+        raw: { kcal: 155, protein: 12.6, fat: 10.6, carbs: 1.1 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "омлет-молоко": {
+        name: "Омлет из яиц с молоком",
+        category: "prepared",
+        aliases: ["омлет из яиц с молоком"],
+        raw: { kcal: 154, protein: 10, fat: 11, carbs: 2 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "сырники-классические": {
+        name: "Сырники классические",
+        category: "prepared",
+        aliases: ["сырники классические"],
+        raw: { kcal: 220, protein: 14, fat: 9, carbs: 20 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "блины-молочные": {
+        name: "Блины на молоке",
+        category: "prepared",
+        aliases: ["блины на молоке"],
+        raw: { kcal: 227, protein: 6.1, fat: 9.7, carbs: 28 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "оладьи": {
+        name: "Оладьи",
+        category: "prepared",
+        aliases: ["оладьи"],
+        raw: { kcal: 230, protein: 6, fat: 10, carbs: 30 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "вафли": {
+        name: "Вафли классические",
+        category: "prepared",
+        aliases: ["вафли классические"],
+        raw: { kcal: 291, protein: 7, fat: 14, carbs: 35 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "мюсли-без-сахара": {
+        name: "Мюсли без сахара",
+        category: "grain",
+        aliases: ["мюсли без сахара"],
+        raw: { kcal: 360, protein: 10, fat: 7, carbs: 64 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "попкорн-без-масла": {
+        name: "Попкорн без масла",
+        category: "snack",
+        aliases: ["попкорн без масла"],
+        raw: { kcal: 387, protein: 12.9, fat: 4.5, carbs: 77.8 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "крекеры-соленые": {
+        name: "Крекеры солёные",
+        category: "snack",
+        aliases: ["крекеры солёные"],
+        raw: { kcal: 430, protein: 9, fat: 14, carbs: 68 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "печенье-овсяное": {
+        name: "Печенье овсяное",
+        category: "snack",
+        aliases: ["печенье овсяное"],
+        raw: { kcal: 450, protein: 6.5, fat: 18, carbs: 68 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "печенье-песочное": {
+        name: "Печенье песочное",
+        category: "snack",
+        aliases: ["печенье песочное"],
+        raw: { kcal: 480, protein: 6, fat: 22, carbs: 68 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "зефир": {
+        name: "Зефир",
+        category: "snack",
+        aliases: ["зефир"],
+        raw: { kcal: 304, protein: 0.8, fat: 0.1, carbs: 78 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "мармелад": {
+        name: "Мармелад",
+        category: "snack",
+        aliases: ["мармелад"],
+        raw: { kcal: 321, protein: 0.1, fat: 0.1, carbs: 79 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "мороженое-ванильное": {
+        name: "Мороженое ванильное",
+        category: "dairy",
+        aliases: ["мороженое ванильное"],
+        raw: { kcal: 207, protein: 3.5, fat: 11, carbs: 24 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "мороженое-сорбет": {
+        name: "Сорбет фруктовый",
+        category: "snack",
+        aliases: ["сорбет фруктовый"],
+        raw: { kcal: 130, protein: 0.5, fat: 0.2, carbs: 32 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "йогурт-питьевой": {
+        name: "Йогурт питьевой сладкий",
+        category: "dairy",
+        aliases: ["йогурт питьевой сладкий"],
+        raw: { kcal: 82, protein: 3, fat: 2, carbs: 12 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "молоко-соевое": {
+        name: "Молоко соевое без сахара",
+        category: "dairy",
+        aliases: ["молоко соевое без сахара"],
+        raw: { kcal: 33, protein: 3.3, fat: 1.8, carbs: 0.7 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "молоко-овсяное": {
+        name: "Молоко овсяное без сахара",
+        category: "dairy",
+        aliases: ["молоко овсяное без сахара"],
+        raw: { kcal: 43, protein: 1, fat: 1.5, carbs: 6.7 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "молоко-миндальное": {
+        name: "Молоко миндальное без сахара",
+        category: "dairy",
+        aliases: ["молоко миндальное без сахара"],
+        raw: { kcal: 15, protein: 0.6, fat: 1.2, carbs: 0.3 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "сок-томатный": {
+        name: "Сок томатный",
+        category: "drink",
+        aliases: ["сок томатный"],
+        raw: { kcal: 17, protein: 0.9, fat: 0.2, carbs: 3.5 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "кофе-латте": {
+        name: "Кофе латте без сахара",
+        category: "drink",
+        aliases: ["кофе латте без сахара"],
+        raw: { kcal: 43, protein: 2.9, fat: 2, carbs: 3.5 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "капучино": {
+        name: "Капучино без сахара",
+        category: "drink",
+        aliases: ["капучино без сахара"],
+        raw: { kcal: 40, protein: 2.5, fat: 2, carbs: 3 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "какао-на-молоке": {
+        name: "Какао на молоке без сахара",
+        category: "drink",
+        aliases: ["какао на молоке без сахара"],
+        raw: { kcal: 77, protein: 3.5, fat: 3.5, carbs: 7 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "лимонад-сахарный": {
+        name: "Лимонад сладкий",
+        category: "drink",
+        aliases: ["лимонад сладкий"],
+        raw: { kcal: 40, protein: 0, fat: 0, carbs: 10 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "соус-цезарь": {
+        name: "Соус цезарь",
+        category: "condiment",
+        aliases: ["соус цезарь"],
+        raw: { kcal: 542, protein: 2, fat: 57, carbs: 4 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "соус-ранч": {
+        name: "Соус ранч",
+        category: "condiment",
+        aliases: ["соус ранч"],
+        raw: { kcal: 430, protein: 1.5, fat: 44, carbs: 6 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "майонез-легкий": {
+        name: "Майонез лёгкий",
+        category: "condiment",
+        aliases: ["майонез лёгкий"],
+        raw: { kcal: 310, protein: 1, fat: 30, carbs: 8 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "соус-сальса": {
+        name: "Соус сальса",
+        category: "condiment",
+        aliases: ["соус сальса"],
+        raw: { kcal: 36, protein: 1.5, fat: 0.2, carbs: 7 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "соус-песто": {
+        name: "Соус песто",
+        category: "condiment",
+        aliases: ["соус песто"],
+        raw: { kcal: 430, protein: 5, fat: 43, carbs: 6 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "соус-соевый": {
+        name: "Соус соевый",
+        category: "condiment",
+        aliases: ["соус соевый"],
+        raw: { kcal: 53, protein: 8.1, fat: 0.6, carbs: 4.9 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "соус-устричный": {
+        name: "Соус устричный",
+        category: "condiment",
+        aliases: ["соус устричный"],
+        raw: { kcal: 51, protein: 1.4, fat: 0.3, carbs: 11 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "кокосовое-масло": {
+        name: "Масло кокосовое",
+        category: "oil",
+        aliases: ["масло кокосовое"],
+        raw: { kcal: 892, protein: 0, fat: 99, carbs: 0 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "масло-кунжутное": {
+        name: "Масло кунжутное",
+        category: "oil",
+        aliases: ["масло кунжутное"],
+        raw: { kcal: 884, protein: 0, fat: 100, carbs: 0 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "масло-льняное": {
+        name: "Масло льняное",
+        category: "oil",
+        aliases: ["масло льняное"],
+        raw: { kcal: 884, protein: 0, fat: 100, carbs: 0 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "маргарин": {
+        name: "Маргарин",
+        category: "oil",
+        aliases: ["маргарин"],
+        raw: { kcal: 717, protein: 0.2, fat: 80, carbs: 0.7 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "масло-сливочное-82": {
+        name: "Масло сливочное 82%",
+        category: "dairy",
+        aliases: ["масло сливочное 82%"],
+        raw: { kcal: 748, protein: 0.5, fat: 82, carbs: 0.8 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "масло-ги": {
+        name: "Масло гхи",
+        category: "dairy",
+        aliases: ["масло гхи"],
+        raw: { kcal: 900, protein: 0, fat: 100, carbs: 0 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "масло-авокадо": {
+        name: "Масло авокадо",
+        category: "oil",
+        aliases: ["масло авокадо"],
+        raw: { kcal: 884, protein: 0, fat: 100, carbs: 0 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "кокосовая-стружка": {
+        name: "Кокосовая стружка",
+        category: "nuts",
+        aliases: ["кокосовая стружка"],
+        raw: { kcal: 660, protein: 6.9, fat: 64.5, carbs: 23.7 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "арахис-соленый": {
+        name: "Арахис жареный солёный",
+        category: "nuts",
+        aliases: ["арахис жареный солёный"],
+        raw: { kcal: 587, protein: 24.4, fat: 49.7, carbs: 21.3 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "кешью-жареный": {
+        name: "Кешью жареный",
+        category: "nuts",
+        aliases: ["кешью жареный"],
+        raw: { kcal: 574, protein: 15.3, fat: 46.4, carbs: 32.7 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+    },
+
+    "миндаль-жареный": {
+        name: "Миндаль жареный",
+        category: "nuts",
+        aliases: ["миндаль жареный"],
+        raw: { kcal: 607, protein: 21, fat: 54, carbs: 19 },
+        cookedWeightRatio: 1,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     }
 };
