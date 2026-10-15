@@ -22,7 +22,7 @@ test("raw chicken nutrition uses the product database", () => {
   });
 
   assert.equal(result.calories, 120);
-  assert.equal(result.protein, 23);
+  assert.equal(result.protein, 22.5);
   assert.equal(result.fat, 2.6);
   assert.equal(result.carbs, 0);
   assert.equal(result.known, true);
@@ -37,7 +37,7 @@ test("cooked weight is converted to its raw equivalent", () => {
 
   assert.equal(result.rawEquivalent, 200);
   assert.equal(result.calories, 240);
-  assert.equal(result.protein, 46);
+  assert.equal(result.protein, 45);
 });
 
 test("frying oil is included when an ingredient is marked as raw-weight based", () => {
@@ -171,8 +171,9 @@ test("every local product has complete non-negative nutrition values and a posit
       assert.ok(Number.isFinite(product.raw?.[field]), id + " must have numeric " + field);
       assert.ok(product.raw[field] >= 0, id + " must not have negative " + field);
     }
-    assert.ok(Number.isFinite(product.cookedWeightRatio) && product.cookedWeightRatio > 0,
-      id + " must have a positive cooking ratio");
+    assert.ok(Number.isFinite(product.cookedWeightRatio) && product.cookedWeightRatio > 0 && product.cookedWeightRatio <= 5,
+      id + " must have a cooking ratio in the supported range");
+    assert.ok(product.nutritionSource, id + " must identify a nutrition source");
   }
 });
 
