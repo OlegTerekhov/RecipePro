@@ -12,6 +12,8 @@ window.products = {
         },
         cookedWeightRatio: 0.75,
         pieceWeight: 250
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "куриное-бедро": {
@@ -26,6 +28,8 @@ window.products = {
         },
         cookedWeightRatio: 0.72,
         pieceWeight: 150
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "индейка": {
@@ -40,6 +44,8 @@ window.products = {
         },
         cookedWeightRatio: 0.75,
         pieceWeight: 250
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "говядина": {
@@ -54,6 +60,8 @@ window.products = {
         },
         cookedWeightRatio: 0.7,
         pieceWeight: 200
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "свинина": {
@@ -68,6 +76,8 @@ window.products = {
         },
         cookedWeightRatio: 0.7,
         pieceWeight: 200
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
 
@@ -83,6 +93,8 @@ window.products = {
         },
         cookedWeightRatio: 0.8,
         pieceWeight: 200
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "тунец": {
@@ -138,6 +150,8 @@ window.products = {
         },
         cookedWeightRatio: 0.85,
         pieceWeight: 150
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "лук": {
@@ -152,6 +166,8 @@ window.products = {
         },
         cookedWeightRatio: 0.9,
         pieceWeight: 100
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "морковь": {
@@ -166,6 +182,8 @@ window.products = {
         },
         cookedWeightRatio: 0.9,
         pieceWeight: 80
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "помидоры": {
@@ -180,6 +198,8 @@ window.products = {
         },
         cookedWeightRatio: 0.9,
         pieceWeight: 120
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "огурец": {
@@ -194,6 +214,8 @@ window.products = {
         },
         cookedWeightRatio: 0.95,
         pieceWeight: 120
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "перец": {
@@ -208,6 +230,8 @@ window.products = {
         },
         cookedWeightRatio: 0.9,
         pieceWeight: 150
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "брокколи": {
@@ -222,6 +246,8 @@ window.products = {
         },
         cookedWeightRatio: 0.9,
         pieceWeight: 300
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "капуста": {
@@ -236,6 +262,8 @@ window.products = {
         },
         cookedWeightRatio: 0.9,
         pieceWeight: 1500
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "кабачок": {
@@ -250,6 +278,8 @@ window.products = {
         },
         cookedWeightRatio: 0.9,
         pieceWeight: 250
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "чеснок": {
@@ -264,6 +294,8 @@ window.products = {
         },
         cookedWeightRatio: 0.9,
         pieceWeight: 5
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
 
@@ -279,6 +311,8 @@ window.products = {
         },
         cookedWeightRatio: 0.95,
         pieceWeight: 50
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
 
@@ -294,6 +328,8 @@ window.products = {
         },
         cookedWeightRatio: 1,
         pieceWeight: 20
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "моцарелла": {
@@ -308,6 +344,8 @@ window.products = {
         },
         cookedWeightRatio: 1,
         pieceWeight: 20
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "молоко": {
@@ -321,6 +359,8 @@ window.products = {
             carbs: 4.7
         },
         cookedWeightRatio: 1
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "творог": {
@@ -335,6 +375,8 @@ window.products = {
         },
         cookedWeightRatio: 1,
         pieceWeight: 200
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "йогурт": {
@@ -348,6 +390,8 @@ window.products = {
             carbs: 4
         },
         cookedWeightRatio: 1
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "сметана": {
@@ -361,6 +405,8 @@ window.products = {
             carbs: 3.6
         },
         cookedWeightRatio: 1
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
 
@@ -375,6 +421,8 @@ window.products = {
             carbs: 79
         },
         cookedWeightRatio: 2.8
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "гречка": {
@@ -388,6 +436,8 @@ window.products = {
             carbs: 71.5
         },
         cookedWeightRatio: 2.5
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "овсянка": {
@@ -401,6 +451,8 @@ window.products = {
             carbs: 62
         },
         cookedWeightRatio: 2.5
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "паста": {
@@ -414,6 +466,8 @@ window.products = {
             carbs: 70
         },
         cookedWeightRatio: 2.4
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "хлеб": {
@@ -428,6 +482,8 @@ window.products = {
         },
         cookedWeightRatio: 1,
         pieceWeight: 30
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
 
@@ -442,6 +498,8 @@ window.products = {
             carbs: 63
         },
         cookedWeightRatio: 2.5
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "фасоль": {
@@ -455,6 +513,8 @@ window.products = {
             carbs: 60
         },
         cookedWeightRatio: 2.4
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
 
@@ -470,6 +530,8 @@ window.products = {
         },
         cookedWeightRatio: 1,
         pieceWeight: 120
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "яблоко": {
@@ -484,6 +546,8 @@ window.products = {
         },
         cookedWeightRatio: 1,
         pieceWeight: 180
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "апельсин": {
@@ -498,6 +562,8 @@ window.products = {
         },
         cookedWeightRatio: 1,
         pieceWeight: 180
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
 
@@ -512,6 +578,8 @@ window.products = {
             carbs: 0
         },
         cookedWeightRatio: 1
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "сливочное-масло": {
@@ -525,6 +593,8 @@ window.products = {
             carbs: 0.8
         },
         cookedWeightRatio: 1
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "мед": {
@@ -538,6 +608,8 @@ window.products = {
             carbs: 82.4
         },
         cookedWeightRatio: 1
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     },
 
     "сахар": {
@@ -551,6 +623,8 @@ window.products = {
             carbs: 99.8
         },
         cookedWeightRatio: 1
+    ,
+        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
     }
 ,
 
