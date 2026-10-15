@@ -8,6 +8,7 @@ const fmt=(n,d=1)=>Number(Number(n||0).toFixed(d)).toLocaleString("ru-RU",{maxim
 const today=()=>{const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,"0"),String(d.getDate()).padStart(2,"0")].join("-");};
 function read(key,fallback){try{return JSON.parse(localStorage.getItem(key))??fallback;}catch(_){return fallback;}}
 function norm(v){return String(v||"").toLowerCase().replace(/ё/g,"е").replace(/[^а-яa-z0-9]+/gi," ").trim();}
+function nutritionSourceLabel(product){const source=product?.nutritionSource;if(source&&typeof source==="object"&&source.database)return String(source.database);if(typeof source==="string"&&/reference estimate|справочн|усреднен/i.test(source))return"Справочная оценка";if(typeof source==="string"&&source.trim())return source.trim();if(product?.source==="Open Food Facts")return"Open Food Facts";return"Справочные данные";}
 function findProduct(value){const q=norm(value);if(!q||!window.products)return null;const external=[...externalProducts.values()].find(p=>norm(p.name)===q||norm(p.id)===q);if(external)return{id:external.id,product:external};const all=Object.entries(window.products);
 for(const [id,p] of all)if(norm(id)===q||norm(p.name)===q)return{id,product:p};
 for(const [id,p] of all)if((p.aliases||[]).some(a=>norm(a)===q))return{id,product:p};
@@ -35,7 +36,7 @@ if(searchTimer)clearTimeout(searchTimer);
 const request=++searchRequest;
 const q=input.value.trim();if(!q){host.hidden=true;host.innerHTML="";return;}
 const matches=productMatches(q);
-host.innerHTML=matches.map(({id,product})=>'<button type="button" class="rp-product-suggestion" role="option" data-product-id="'+escapeHtml(id)+'"><span>'+escapeHtml(product.name)+'</span><small>'+fmt(product.raw?.kcal||0,0)+' ккал · '+fmt(product.raw?.protein||0)+' г белка / 100 г · RecipePro</small></button>').join("");
+host.innerHTML=matches.map(({id,product})=>'<button type="button" class="rp-product-suggestion" role="option" data-product-id="'+escapeHtml(id)+'"><span>'+escapeHtml(product.name)+'</span><small>'+fmt(product.raw?.kcal||0,0)+' ккал · '+fmt(product.raw?.protein||0)+' г белка / 100 г · '+escapeHtml(nutritionSourceLabel(product))+'</small></button>').join("");
 host.hidden=!matches.length;
 if(q.length>=3&&!/^\d{8,14}$/.test(q))searchTimer=setTimeout(()=>searchOpenFoodFacts(q,request),450);
 else if(/^\d{8,14}$/.test(q))searchTimer=setTimeout(()=>searchOpenFoodFacts(q,request),250);
@@ -56,7 +57,7 @@ const host=$("rpProductSuggestions"),input=$("rpFoodProduct");if(!host||!input||
 const existing=new Set(productMatches(input.value).map(x=>x.id));
 const remote=[];
 for(const item of products||[]){const p=offProductToRecord(item);if(!p||existing.has(p.id))continue;externalProducts.set(p.id,p);remote.push(p);if(remote.length>=5)break;}
-const local=productMatches(input.value).map(({id,product})=>'<button type="button" class="rp-product-suggestion" role="option" data-product-id="'+escapeHtml(id)+'"><span>'+escapeHtml(product.name)+'</span><small>'+fmt(product.raw?.kcal||0,0)+' ккал · '+fmt(product.raw?.protein||0)+' г белка / 100 г · RecipePro</small></button>').join("");
+const local=productMatches(input.value).map(({id,product})=>'<button type="button" class="rp-product-suggestion" role="option" data-product-id="'+escapeHtml(id)+'"><span>'+escapeHtml(product.name)+'</span><small>'+fmt(product.raw?.kcal||0,0)+' ккал · '+fmt(product.raw?.protein||0)+' г белка / 100 г · '+escapeHtml(nutritionSourceLabel(product))+'</small></button>').join("");
 const external=remote.map(p=>'<button type="button" class="rp-product-suggestion rp-product-suggestion-external" role="option" data-product-id="'+escapeHtml(p.id)+'"><span>'+escapeHtml(p.name)+'</span><small>'+fmt(p.raw.kcal,0)+' ккал · Б '+fmt(p.raw.protein)+' · Ж '+fmt(p.raw.fat)+' · У '+fmt(p.raw.carbs)+' / 100 г</small><small>Open Food Facts · данные упаковки, если указаны</small></button>').join("");
 if(local||external){host.innerHTML=local+external;host.hidden=false;}
 if(!local&&!external){host.innerHTML='<div class="rp-product-search-note">В каталоге ничего не найдено. Попробуй название с упаковки или штрихкод.</div>';host.hidden=false;}
