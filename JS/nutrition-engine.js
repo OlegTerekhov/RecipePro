@@ -46,6 +46,19 @@
         return window.products?.[id] || null;
     }
 
+    function isOilIngredient(row) {
+        const reference = row?.product || row?.productId || row?.key;
+        const product = getProduct(reference);
+        const id = normalizeProductId(
+            typeof reference === "string" ? reference : (product?.name || reference?.name)
+        );
+        const name = normalizeProductId(product?.name || "");
+        return product?.category === "oil"
+            || /масл|oil/.test(name)
+            || /масл|oil/.test(id)
+            || id === "cookingoil";
+    }
+
     function isNegligiblePantry(row) {
         if (row?.pantry !== true && row?.required !== false) return false;
         const id = normalizeProductId(row?.product || row?.productId || row?.key);
@@ -67,8 +80,7 @@
         if (normalizeState(row?.state) !== "fried") return 0;
         if (row?.pantry === true) return 0;
 
-        const id = normalizeProductId(row?.product || row?.productId);
-        if (row?.product?.category === "oil" || normalizeProductId(row?.product?.name) === "масло" || id === "масло" || id === "cookingoil" || id === "растительное масло") return 0;
+        if (isOilIngredient(row)) return 0;
 
         if (row?.oilAmount !== undefined) {
             return Math.max(0, number(row.oilAmount));
@@ -247,17 +259,11 @@
     function setCookingState(recipe, state, options = {}) {
         const normalizedState = normalizeState(state);
         const ingredients = Array.isArray(recipe?.ingredients) ? recipe.ingredients : [];
-        const hasExplicitOil = ingredients.some(row => {
-            const id = normalizeProductId(row?.product || row?.productId || row?.key);
-            return id === "масло" || id === "cookingoil" || id === "растительное масло";
-        });
+        const hasExplicitOil = ingredients.some(isOilIngredient);
 
-        const eligible = ingredients.filter(row => {
-            const id = normalizeProductId(row?.product || row?.productId || row?.key);
-            const isPantry = row?.pantry === true;
-            const isOil = id === "масло" || id === "cookingoil" || id === "растительное масло";
-            return !isPantry && !isOil && number(row?.amount) > 0;
-        });
+        const eligible = ingredients.filter(row =>
+            row?.pantry !== true && !isOilIngredient(row) && number(row?.amount) > 0
+        );
 
         const totalFoodWeight = eligible.reduce((sum, row) => sum + Math.max(0, number(row?.amount)), 0);
         const oilPer100 = hasExplicitOil
@@ -271,9 +277,8 @@
         return {
             ...recipe,
             ingredients: ingredients.map(row => {
-                const id = normalizeProductId(row?.product || row?.productId || row?.key);
                 const isPantry = row?.pantry === true;
-                const isOil = id === "масло" || id === "cookingoil" || id === "растительное масло";
+                const isOil = isOilIngredient(row);
 
                 if (isPantry || isOil) return { ...row };
 
@@ -302,10 +307,7 @@
     function compareStates(recipe) {
         const states = ["raw", "boiled", "fried"];
         const ingredients = Array.isArray(recipe?.ingredients) ? recipe.ingredients : [];
-        const alreadyContainsOil = ingredients.some(row => {
-            const id = normalizeProductId(row?.product || row?.productId);
-            return id === "масло" || id === "cookingoil" || id === "растительное масло";
-        });
+        const alreadyContainsOil = ingredients.some(isOilIngredient);
         const defaultOilPer100 = alreadyContainsOil ? 0 : 5;
 
         return states.map(state => {
