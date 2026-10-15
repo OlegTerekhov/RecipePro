@@ -1,39 +1,40 @@
 # RecipePro nutrition data audit
 
-Audit date: 2026-10-13
+Audit date: 2026-10-15
 
 ## Scope
 
-Reviewed the 39-item local product catalog, the shared nutrition engine, the food diary resolver, and all 8 bundled recipes.
+Reviewed the current 506-item local product catalog, shared nutrition engine, food-diary product resolver, bundled recipes, product lookup/cache flow, and automated repository checks.
 
-## Changes made
+## Current checks
 
-- Corrected tuna to a named reference food: raw yellowfin tuna, USDA FoodData Central SR Legacy record 175159 — 109 kcal, 24.4 g protein, 0.5 g fat, 0 g carbohydrate per 100 g.
-- Corrected shrimp to raw shrimp, USDA FoodData Central SR Legacy record 175179 — 85 kcal, 20.1 g protein, 0.5 g fat, 0 g carbohydrate per 100 g.
-- Added source metadata to these two records so their origin is inspectable in code.
-- Updated approximate cooked-yield factors for tuna and shrimp so cooked-weight estimates start from the raw reference values rather than treating cooked-food nutrition as raw-food nutrition.
-- Added the 5 g of cooking oil to the omelet, rice-and-chicken, and chicken-pasta recipes, whose instructions explicitly fry ingredients. The chicken-and-potato recipe already listed its oil.
-- Removed the low-calorie filter from oatmeal with banana and milk; the full serving is not reliably low-calorie.
-- Added automated checks for catalog completeness, raw seafood reference values, recipe ingredient IDs, quantities, units, steps, oil accounting, and the oatmeal filter.
-- Kept generic product matching conservative: an unknown or ambiguous food should not silently become a different food.
+- The local catalog contains 506 unique product IDs.
+- Each catalog record includes a display name, raw nutrition values, a cooking-yield ratio, and nutrition-source metadata.
+- The catalog's cooking-yield ratios are positive and within the validator's allowed range. Dry grains and legumes use higher ratios to account approximately for absorbed water.
+- Five records link to specific USDA FoodData Central SR Legacy entries: raw chicken breast (171077), raw yellowfin tuna (175159), raw shrimp (175179), potato (170026), and dry long-grain rice (169756).
+- The other entries are generic reference estimates, not verified matches to every brand, cut, species, or package sold.
+- Automated tests cover raw and cooked-weight calculations, frying-oil accounting, unknown product handling, catalog completeness, product resolution, recommendations, meal planning, security baselines, and cloud-save account binding.
+- The nutrition engine prevents a recipe that already lists oil from having additional frying oil automatically added a second time.
+- The external product resolver rejects results with missing macro values instead of silently importing those missing values as zero, and persists usable product snapshots in its local cache.
 
-## Data quality and interpretation
+## Interpretation and limits
 
-All local catalog records have a display name, numeric non-negative kcal/protein/fat/carbohydrate fields, and a positive cooking-yield factor. All bundled recipe ingredients reference known product IDs and use supported units.
+Nutrition values are stated per 100 g unless the record or source says otherwise. Use the package label when available, especially for branded products.
 
-Most of the other catalog entries are generic reference estimates, not exact matches to a specific branded package or a single verified USDA record. For example, “cheese”, “pork”, “beef”, “yogurt”, and “salmon” vary materially by fat content, cut, species, and manufacturer. Their numbers are useful estimates, not guaranteed label values. When a package label is available, use that label as the authority.
+Cooking-yield factors are approximations. Water absorption and loss depend on cooking method, time, and how much water remains in the food. A single ratio cannot model every boiled, roasted, grilled, and fried preparation. The current engine also does not fully model nutrients lost with rendered fat or discarded cooking liquid, so cooked-weight results are estimates rather than laboratory measurements.
 
-Cooking-yield factors are also approximations. Water absorption and loss depend on cooking method, time, and the amount of water retained. A single yield ratio cannot model every boiled, roasted, grilled, and fried preparation, and the current engine does not fully model nutrients lost with rendered fat or discarded cooking liquid. We should not describe every cooked-weight result as laboratory-accurate.
-
-Calories do not always equal a simple 4/4/9 calculation from displayed macros: food databases may use food-specific energy factors, carbohydrates may include fiber, and values are rounded. Therefore, the audit does not overwrite source calories merely to force every record to match a simple macro formula.
+Calories do not always equal a simple 4/4/9 calculation from displayed macros: food databases may use food-specific energy factors, carbohydrates may include fiber, and values are rounded. A macro-calorie difference alone is not sufficient evidence that a record is wrong.
 
 ## References
 
-- USDA FoodData Central data documentation: https://fdc.nal.usda.gov/data-documentation/
+- USDA FoodData Central datasets: https://fdc.nal.usda.gov/download-datasets/
 - USDA FoodData Central API guide: https://fdc.nal.usda.gov/api-guide/
-- Raw yellowfin tuna, USDA SR Legacy FDC 175159: https://fdc.nal.usda.gov/food-details/175159/nutrients
-- Raw shrimp, USDA SR Legacy FDC 175179: https://fdc.nal.usda.gov/food-details/175179/nutrients
+- Raw chicken breast, FDC 171077: https://fdc.nal.usda.gov/food-details/171077/nutrients
+- Raw yellowfin tuna, FDC 175159: https://fdc.nal.usda.gov/food-details/175159/nutrients
+- Raw shrimp, FDC 175179: https://fdc.nal.usda.gov/food-details/175179/nutrients
+- Potato, FDC 170026: https://fdc.nal.usda.gov/food-details/170026/nutrients
+- Dry long-grain rice, FDC 169756: https://fdc.nal.usda.gov/food-details/169756/nutrients
 
-## Remaining limitation
+## Remaining work
 
-The audit validates internal consistency and corrects identified source/state mismatches; it does not claim that every generic estimate is exact for every food sold. A genuinely exact package-level catalog requires a specific brand/product label or a verified source record per item.
+The current checks validate internal consistency and known calculation paths; they do not prove that every estimated nutrition value is exact. Expanding the number of independently verified source records should be done by matching each food to an appropriate database entry, not by assigning guessed values or treating different cuts and preparation states as equivalent.
