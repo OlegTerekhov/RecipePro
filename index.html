@@ -19,6 +19,8 @@
     >
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+    <link rel="preconnect" href="https://yuebufitcmryovekraou.supabase.co" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
     <link
@@ -1463,34 +1465,33 @@
 </div>
 
 
-<script src="JS/products.js?v=20261013-audit1"></script>
-<script src="JS/product-resolver.js?v=20261008-r3"></script>
-<script src="JS/recipes.js?v=20261013-audit1"></script>
-<script src="JS/recipe-intelligence.js?v=20261009-r1"></script>
-<script src="JS/ingredient-intelligence.js?v=20261009-r1"></script>
-<script src="JS/recipe-engine.js?v=20261009-r1"></script>
-<script src="JS/recipe-builder.js?v=20261012-r1"></script>
-<script src="JS/recommendation-engine.js?v=20261009-r4"></script>
-<script src="JS/nutrition-engine.js?v=20261014-fried-oil1"></script>
-<script src="JS/nutrition.js?v=20261009-r2"></script>
-<script src="JS/app.js?v=20261012-photos1"></script>
-    <script src="JS/food-diary.js?v=20261014-nutrition-data1"></script>
-    <script src="JS/custom-dishes.js?v=20261014-v2"></script>
-<script src="JS/calendar.js?v=20261014-four-tabs2"></script>
-    <script src="JS/profile.js?v=20261013-clean1"></script>
-    <script src="JS/backup.js?v=20261013-diary-backup1"></script>
-<script src="JS/meal-planner.js?v=20261012-r3"></script>
-<script src="JS/ai-generator.js?v=20261012-offline2"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="JS/supabase-config.js"></script>
-<script src="JS/cloud-sync.js?v=20261014-abort-detection1"></script>
-<script src="JS/preferences.js?v=20261014-light-default2"></script>
+<script defer src="JS/products.js?v=20261013-audit1"></script>
+<script defer src="JS/product-resolver.js?v=20261008-r3"></script>
+<script defer src="JS/recipes.js?v=20261013-audit1"></script>
+<script defer src="JS/recipe-intelligence.js?v=20261009-r1"></script>
+<script defer src="JS/ingredient-intelligence.js?v=20261009-r1"></script>
+<script defer src="JS/recipe-engine.js?v=20261009-r1"></script>
+<script defer src="JS/recipe-builder.js?v=20261012-r1"></script>
+<script defer src="JS/recommendation-engine.js?v=20261009-r4"></script>
+<script defer src="JS/nutrition-engine.js?v=20261014-fried-oil1"></script> 
+<script defer src="JS/app.js?v=20261012-photos1"></script>
+    <script defer src="JS/food-diary.js?v=20261014-nutrition-data1"></script>
+    <script defer src="JS/custom-dishes.js?v=20261014-v2"></script>
+<script defer src="JS/calendar.js?v=20261014-four-tabs2"></script>
+    <script defer src="JS/profile.js?v=20261013-clean1"></script>
+    <script defer src="JS/backup.js?v=20261013-diary-backup1"></script>
+<script defer src="JS/meal-planner.js?v=20261012-r3"></script>
+<script defer src="JS/ai-generator.js?v=20261012-offline2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="JS/supabase-config.js"></script>
+<script defer src="JS/cloud-sync.js?v=20261014-abort-detection1"></script>
+<script defer src="JS/preferences.js?v=20261014-light-default2"></script>
 
 
 <script>
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", () => {
-        navigator.serviceWorker.register("./sw.js?v=20261014-3").catch(error => {
+        navigator.serviceWorker.register("./sw.js?v=20261015-startup1").catch(error => {
             console.warn("RecipePro offline mode:", error);
         });
     });
@@ -1642,27 +1643,7 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 })();
 </script>
 
-<script>
-(() => {
-    const nav = document.getElementById("recipeProBottomNav");
-    if (!nav) return;
-    const links = [...nav.querySelectorAll("a")];
-    const updateActive = () => {
-        const hash = location.hash || "#home";
-        links.forEach(link => {
-            const active = link.getAttribute("href") === hash || (hash === "#" && link.getAttribute("href") === "#home");
-            if (active) link.setAttribute("aria-current", "page");
-            else link.removeAttribute("aria-current");
-        });
-    };
-    links.forEach(link => link.addEventListener("click", () => {
-        links.forEach(item => item.removeAttribute("aria-current"));
-        link.setAttribute("aria-current", "page");
-    }));
-    window.addEventListener("hashchange", updateActive);
-    updateActive();
-})();
-</script>
+
 
 </body>
 </html>
