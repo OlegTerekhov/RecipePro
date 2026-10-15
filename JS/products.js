@@ -6,14 +6,14 @@ window.products = {
         aliases: ["курица", "куриную грудку", "куриная грудка", "грудка"],
         raw: {
             kcal: 120,
-            protein: 23,
+            protein: 22.5,
             fat: 2.6,
             carbs: 0
         },
         cookedWeightRatio: 0.75,
         pieceWeight: 250
     ,
-        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+        nutritionSource: {"database":"USDA FoodData Central SR Legacy","fdcId":171077,"sourceUrl":"https://fdc.nal.usda.gov/food-details/171077/nutrients","note":"Куриная грудка без кожи и костей, сырая; значения на 100 г."}
     },
 
     "куриное-бедро": {
@@ -146,12 +146,12 @@ window.products = {
             kcal: 77,
             protein: 2,
             fat: 0.1,
-            carbs: 17
+            carbs: 17.5
         },
         cookedWeightRatio: 0.85,
         pieceWeight: 150
     ,
-        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+        nutritionSource: {"database":"USDA FoodData Central SR Legacy","fdcId":170026,"sourceUrl":"https://fdc.nal.usda.gov/food-details/170026/nutrients","note":"Картофель с кожурой, сырой; значения на 100 г."}
     },
 
     "лук": {
@@ -2750,7 +2750,7 @@ window.products = {
         aliases: ["рис длиннозёрный сухой","длиннозерный рис сухой"],
         raw: { kcal: 365, protein: 7.1, fat: 0.7, carbs: 80 },
         cookedWeightRatio: 2.8,
-        nutritionSource: { database: "Reference estimate", note: "Усреднённые справочные значения на 100 г; для точного учёта сверяйся с упаковкой или проверенной базой." }
+        nutritionSource: {"database":"USDA FoodData Central SR Legacy","fdcId":169756,"sourceUrl":"https://fdc.nal.usda.gov/food-details/169756/nutrients","note":"Белый длиннозёрный рис, сухой, необогащённый; значения на 100 г."}
     },
 
     "рис-басмати-сухой": {
