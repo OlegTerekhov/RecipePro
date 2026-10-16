@@ -802,6 +802,9 @@
                 window.clearTimeout(readTimer);
             }
             if (result.error) throw result.error;
+            // The active account may change while the cloud request is pending.
+            // Never merge a previous account's response with the new account's local data.
+            if (!currentUser || currentUser.id !== user.id) return;
             syncStage = "Объединение данных с телефона и облака";
             setStatus("Синхронизация: " + syncStage + "…", "neutral");
             const merged = mergeSnapshot(result.data || { recipes: [], favorites: [] }, user);
@@ -874,6 +877,9 @@
                     window.clearTimeout(readTimer);
                 }
                 if (latest.error) throw latest.error;
+                // A sign-out/account switch can happen while this read is pending.
+                // Do not merge the new account's local storage into the previous account.
+                if (!currentUser || currentUser.id !== targetUser.id) return;
                 const mergedSnapshot = mergeSnapshot(latest.data || { recipes: [], favorites: [] }, targetUser);
                 await uploadSnapshot(mergedSnapshot, targetUser);
                 saveBaseline(mergedSnapshot, targetUser);
