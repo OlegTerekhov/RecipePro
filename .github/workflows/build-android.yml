@@ -1,0 +1,75 @@
+name: Build NUTRIO Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "package.json"
+      - "capacitor.config.json"
+      - ".github/workflows/build-android.yml"
+      - "index.html"
+      - "CSS/**"
+      - "JS/**"
+      - "icon*.svg"
+      - "manifest.webmanifest"
+      - "sw.js"
+
+permissions:
+  contents: read
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Install Capacitor
+        run: npm install
+
+      - name: Prepare bundled app files
+        run: |
+          mkdir -p www
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='node_modules/' \
+            --exclude='www/' \
+            --exclude='android/' \
+            --exclude='tests/' \
+            --exclude='docs/' \
+            --exclude='supabase/' \
+            --exclude='package.json' \
+            --exclude='package-lock.json' \
+            --exclude='capacitor.config.json' \
+            --exclude='README.md' \
+            ./ www/
+
+      - name: Add Android platform
+        run: npx cap add android
+
+      - name: Synchronize web assets
+        run: npx cap sync android
+
+      - name: Build test APK
+        run: cd android && ./gradlew assembleDebug
+
+      - name: Upload test APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NUTRIO-android-debug
+          path: android/app/build/outputs/apk/debug/app-debug.apk
+          if-no-files-found: error
+          retention-days: 14
