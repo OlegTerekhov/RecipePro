@@ -75,3 +75,11 @@ test("the app keeps dark theme as the first-visit default and preserves explicit
   assert.match(preferences, /recipepro_theme_v1/);
   assert.match(preferences, /localStorage\.getItem\(THEME_KEY\)/);
 });
+
+
+test("cloud sync abandons stale requests when the active account changes", () => {
+  const sync = read("JS/cloud-sync.js");
+
+  assert.match(sync, /currentUser\.id !== user\.id/);
+  assert.match(sync, /currentUser\.id !== targetUser\.id/);
+});
