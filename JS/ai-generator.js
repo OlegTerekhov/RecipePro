@@ -93,9 +93,9 @@
 <div class="ai-generator-modal" role="dialog" aria-modal="true" aria-labelledby="aiGeneratorTitle">
 <button class="ai-generator-close" id="aiGeneratorClose" type="button" aria-label="Закрыть">×</button>
 <div class="ai-generator-head">
-<div class="ai-generator-kicker">RECIPEPRO OFFLINE / RECIPE BUILDER</div>
+<div class="ai-generator-kicker">NUTRIO OFFLINE / RECIPE BUILDER</div>
 <h2 id="aiGeneratorTitle">Придумаем блюдо из твоих продуктов</h2>
-<p>Опиши продукты и пожелания обычными словами. RecipePro распознает продукты, калории, белок, время и порции.</p>
+<p>Опиши продукты и пожелания обычными словами. NUTRIO распознает продукты, калории, белок, время и порции.</p>
 </div>
 <div class="ai-generator-body">
 <label class="ai-generator-label" for="aiGeneratorInput">Твой запрос</label>
@@ -124,7 +124,7 @@
                 const resolved=resolver.localResolve(input);
                 return [...new Set([...local,...(Array.isArray(resolved)?resolved:[])])].slice(0,10);
             } catch(error) {
-                console.warn("RecipePro local product matching:",error);
+                console.warn("NUTRIO local product matching:",error);
             }
         }
         return local.slice(0,10);
@@ -220,7 +220,7 @@
             return window.recipeProRecipeEngine.build(ids, intent);
         }
         return {
-            title: "Блюдо RecipePro",
+            title: "Блюдо NUTRIO",
             description: "Не удалось запустить Recipe Engine.",
             emoji: "🍽️",
             time: 30,
@@ -336,7 +336,7 @@
         }
 
         if(constraints.faster){
-            warnings.push("Запрос на более быстрое приготовление учтён, но время не уменьшено автоматически: RecipePro не должен обещать ускорение без подтверждённого изменения способа приготовления.");
+            warnings.push("Запрос на более быстрое приготовление учтён, но время не уменьшено автоматически: NUTRIO не должен обещать ускорение без подтверждённого изменения способа приготовления.");
         }
         if(constraints.maxTime&&r.time>constraints.maxTime){
             warnings.push("Оценочное время рецепта — "+r.time+" мин, это больше заданного лимита "+constraints.maxTime+" мин. Лимит времени не выполнен; время не было искусственно уменьшено.");
@@ -363,7 +363,7 @@
             warnings.push("Цель по калориям не достигнута: "+r.nutrition.calories+" ккал при лимите "+constraints.maxCalories+" ккал.");
         }
 
-        if(constraints.highProtein)r.description="Адаптировано под высокий белок: RecipePro увеличил белковую основу и сократил лишние калорийные добавки.";
+        if(constraints.highProtein)r.description="Адаптировано под высокий белок: NUTRIO увеличил белковую основу и сократил лишние калорийные добавки.";
         if(constraints.maxCalories)r.description+=" Калорийность автоматически скорректирована под заданный лимит насколько позволяют ингредиенты.";
 
         r.aiChanges=changes;
@@ -391,7 +391,7 @@
         const chips=constraintHtml(constraints).map(x=>`<span class="ai-generator-constraint">${esc(x)}</span>`).join("");
         const warnings=(recipe.aiWarnings||[]).map(x=>`<div class="ai-generator-warning">⚠️ ${esc(x)}</div>`).join("");
         const nutritionWarning=recipe.nutritionUnknownCount>0?`<div class="ai-generator-warning">⚠️ КБЖУ рассчитано не полностью: для ${recipe.nutritionUnknownCount} ингредиент(а/ов) нет данных о пищевой ценности. Значения не включают эти продукты.</div>`:"";
-        const changes=recipe.aiChanges?.length?`<div class="ai-generator-changes"><strong>RecipePro изменил рецепт</strong><ul>${recipe.aiChanges.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:"";
+        const changes=recipe.aiChanges?.length?`<div class="ai-generator-changes"><strong>NUTRIO изменил рецепт</strong><ul>${recipe.aiChanges.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></div>`:"";
         $("#aiGeneratorResult").innerHTML=`
 <div class="ai-generator-result">
 <div class="ai-generator-result-top"><div class="ai-generator-result-emoji">${esc(recipe.emoji)}</div><div><h3>${esc(recipe.title)}</h3><p>${esc(recipe.description)}</p></div></div>
@@ -426,7 +426,7 @@ ${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-gen
             $("#aiGeneratorSave").disabled=true;$("#aiGeneratorSave").textContent="✓ Сохранено";
             $("#aiGeneratorResult").insertAdjacentHTML("beforeend",'<div class="ai-generator-saved">Рецепт сохранён в «Мои рецепты»</div>');
             setTimeout(()=>{close();window.location.hash="#my-recipes";window.location.reload();},700);
-        }catch(error){console.error("RecipePro offline recipe save error:",error);alert("Не удалось сохранить рецепт. Попробуй ещё раз.");}
+        }catch(error){console.error("NUTRIO offline recipe save error:",error);alert("Не удалось сохранить рецепт. Попробуй ещё раз.");}
     }
 
     async function generate(){
@@ -435,10 +435,10 @@ ${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-gen
             result.innerHTML='<div class="ai-generator-result"><strong>Опиши продукты</strong><p style="margin-top:7px">Напиши, что есть дома и, если хочешь, добавь ограничения по калориям, белку, времени или порциям.</p></div>';
             return;
         }
-        result.innerHTML='<div class="ai-generator-result"><strong>RecipePro ищет продукты…</strong><p style="margin-top:7px">Проверяю локальный каталог продуктов — интернет не требуется.</p></div>';
+        result.innerHTML='<div class="ai-generator-result"><strong>NUTRIO ищет продукты…</strong><p style="margin-top:7px">Проверяю локальный каталог продуктов — интернет не требуется.</p></div>';
         const detected=await detectProducts(input);
         if(!detected.length){
-            result.innerHTML='<div class="ai-generator-result"><strong>Не удалось распознать продукты</strong><p style="margin-top:7px">Попробуй написать названия продуктов через запятую и используй названия из локального каталога RecipePro.</p></div>';
+            result.innerHTML='<div class="ai-generator-result"><strong>Не удалось распознать продукты</strong><p style="margin-top:7px">Попробуй написать названия продуктов через запятую и используй названия из локального каталога NUTRIO.</p></div>';
             return;
         }
         const constraints=parseRequest(input);
@@ -450,7 +450,7 @@ ${alternatives.length?`<div class="ai-generator-alternatives"><div class="ai-gen
         const ranked=recommendation?.candidates||[];
         const primary=ranked[0]?.recipe||built||buildRecipe(detected,constraints);
         if(!primary){
-            result.innerHTML='<div class="ai-generator-result"><strong>Не удалось собрать подходящее блюдо</strong><p style="margin-top:7px">RecipePro не будет добавлять отсутствующие обязательные продукты. Попробуй добавить ещё один продукт или попроси другой тип блюда.</p></div>';
+            result.innerHTML='<div class="ai-generator-result"><strong>Не удалось собрать подходящее блюдо</strong><p style="margin-top:7px">NUTRIO не будет добавлять отсутствующие обязательные продукты. Попробуй добавить ещё один продукт или попроси другой тип блюда.</p></div>';
             return;
         }
         const recipe=adaptRecipe(primary,constraints);
