@@ -165,7 +165,7 @@
     function getPantry(type,ids){
         const oil=hasId(ids,"масло")||hasId(ids,"сливочное-масло");
         const map={stew:["water","salt","pepper"],roast:["cookingOil","salt","pepper"],bowl:["salt"],salad:["cookingOil","salt","pepper"],omelet:["cookingOil","salt","pepper"],pasta:["salt"],porridge:["salt"]};
-        return (map[type]||[]).filter(key=>!(key==="cookingOil"&&oil)).map(key=>({type:"pantry",key,source:"RecipePro",required:false}));
+        return (map[type]||[]).filter(key=>!(key==="cookingOil"&&oil)).map(key=>({type:"pantry",key,source:"NUTRIO",required:false}));
     }
 
     function explain(type,ids,pantry=[]){
@@ -178,7 +178,7 @@
             missing:best?.missing||[],
             replacements:best?.replacements||[],
             pantry:pantry.map(item=>item.key),
-            message:pantry.length?"RecipePro использовал ваши продукты и добавил базовые кухонные ингредиенты.":"RecipePro построил блюдо из указанных продуктов."
+            message:pantry.length?"NUTRIO использовал ваши продукты и добавил базовые кухонные ингредиенты.":"NUTRIO построил блюдо из указанных продуктов."
         };
     }
 
