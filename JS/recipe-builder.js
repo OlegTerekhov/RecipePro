@@ -316,13 +316,13 @@
             state:"raw",
             required:false,
             pantry:true,
-            source:"RecipePro"
+            source:"NUTRIO"
         }));
 
         const allIngredients=ingredients.concat(pantryIngredients);
         const warnings = [];
         if (intent.type && intent.type !== type) {
-            warnings.push("Запрошенный тип блюда («" + intent.type + "») не подходит к указанным продуктам. RecipePro выбрал безопасный вариант без отсутствующих обязательных ингредиентов.");
+            warnings.push("Запрошенный тип блюда («" + intent.type + "») не подходит к указанным продуктам. NUTRIO выбрал безопасный вариант без отсутствующих обязательных ингредиентов.");
         }
         if (dishChoice?.missing?.length && !compatibleDish) {
             warnings.push("Для ближайшего классического рецепта не хватает: " + dishChoice.missing.join(", ") + ". Поэтому показан адаптированный вариант из имеющихся продуктов.");
@@ -330,7 +330,7 @@
         if (compatibleDish?.replacements?.length) {
             warnings.push("Использованы допустимые замены: " + compatibleDish.replacements.join(", ") + ".");
         }
-        if (!selected.length) warnings.push("RecipePro не нашёл продуктов с известной пищевой ролью. Рецепт собран как базовая закуска.");
+        if (!selected.length) warnings.push("NUTRIO не нашёл продуктов с известной пищевой ролью. Рецепт собран как базовая закуска.");
 
         const hasSubstitutions = Boolean(compatibleDish?.replacements?.length);
         const useCanonicalDish = Boolean(compatibleDish && !hasSubstitutions);
@@ -341,7 +341,7 @@
             emoji:compatibleDish?.dish?.emoji||template.emoji,
             description:hasSubstitutions
                 ? "Адаптированный рецепт: название и шаги учитывают фактически выбранные продукты."
-                : "Рецепт собран RecipePro из продуктов, которые указал пользователь.",
+                : "Рецепт собран NUTRIO из продуктов, которые указал пользователь.",
             time:useCanonicalDish ? compatibleDish.dish.time : template.time,
             servings:targetServings,
             tags:["AI Recipe","Из ваших продуктов"],
@@ -352,7 +352,7 @@
             requiredProducts:ingredients.map(item=>item.productId),
             steps:useCanonicalDish ? compatibleDish.dish.steps : buildSteps(type,selected,template),
             aiGenerated:true,
-            generatedBy:"RecipePro Recipe Builder",
+            generatedBy:"NUTRIO Recipe Builder",
             intelligence:{
                 dishId:compatibleDish?.dish?.id||null,
                 dishMatch:!!compatibleDish,
