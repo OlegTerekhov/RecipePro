@@ -70,7 +70,7 @@
     const link = document.createElement("a");
     const date = new Date().toISOString().slice(0, 10);
     link.href = url;
-    link.download = "recipepro-backup-" + date + ".json";
+    link.download = "nutrio-backup-" + date + ".json";
     link.style.display = "none";
     document.body.appendChild(link);
     link.click();
@@ -81,7 +81,7 @@
 
   function validateBackup(parsed) {
     if (!parsed || typeof parsed !== "object" || parsed.format !== "RecipeProBackup" || parsed.version !== 1 || !parsed.data || typeof parsed.data !== "object") {
-      throw new Error("Это не резервная копия RecipePro поддерживаемого формата.");
+      throw new Error("Это не резервная копия NUTRIO поддерживаемого формата.");
     }
     const d = parsed.data;
     if (!Array.isArray(d.recipes) || !Array.isArray(d.favorites) || !d.plan || typeof d.plan !== "object" || Array.isArray(d.plan) || !Array.isArray(d.shopping) || !Array.isArray(d.history)) {
