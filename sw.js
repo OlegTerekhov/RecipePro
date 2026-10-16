@@ -1,6 +1,6 @@
 "use strict";
 
-const CACHE_NAME = "recipepro-shell-v105";
+const CACHE_NAME = "recipepro-shell-v106";
 const CORE_SHELL = ["./", "./index.html"];
 const APP_ASSETS = [
     "./CSS/style.css", "./CSS/preferences.css", "./JS/preferences.js", "./CSS/meal-planner.css", "./CSS/mobile.css", "./JS/calendar.js", "./JS/meal-planner.js", "./JS/backup.js", "./JS/products.js", "./JS/product-resolver.js",
@@ -35,9 +35,9 @@ self.addEventListener("install", event => {
                 const url = new URL(path, self.registration.scope).href;
                 const response = await fetchWithTimeout(new Request(url, { cache: "reload" }));
                 if (response.ok) await cache.put(url, response);
-                else console.warn("RecipePro: asset not cached", path, response.status);
+                else console.warn("NUTRIO: asset not cached", path, response.status);
             } catch (error) {
-                console.warn("RecipePro: asset cache failed", path, error);
+                console.warn("NUTRIO: asset cache failed", path, error);
             }
         }));
 
@@ -49,7 +49,7 @@ self.addEventListener("install", event => {
                 );
                 if (response.ok && response.type !== "opaque") await cache.put(url, response);
             } catch (error) {
-                console.warn("RecipePro: optional cloud SDK not cached", error);
+                console.warn("NUTRIO: optional cloud SDK not cached", error);
             }
         }));
 
@@ -80,7 +80,7 @@ self.addEventListener("fetch", event => {
                 if (response.ok && response.type !== "opaque") await cache.put(request, response.clone());
                 return response;
             } catch {
-                return new Response("/* RecipePro cloud sync unavailable offline. */", {
+                return new Response("/* NUTRIO cloud sync unavailable offline. */", {
                     status: 200,
                     headers: { "Content-Type": "application/javascript; charset=utf-8" }
                 });
@@ -111,7 +111,7 @@ self.addEventListener("fetch", event => {
             if (response && response.ok) return response;
 
             return new Response(
-                "<!doctype html><html lang='ru'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>RecipePro</title><body style='font:16px system-ui;padding:24px;color:#20372f;background:#f7f3ed'><h1>RecipePro</h1><p>Офлайн-версия ещё не сохранена на этом устройстве.</p><p>Подключись к интернету, открой приложение на несколько секунд и повтори попытку.</p></body></html>",
+                "<!doctype html><html lang='ru'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>NUTRIO</title><body style='font:16px system-ui;padding:24px;color:#20372f;background:#f7f3ed'><h1>NUTRIO</h1><p>Офлайн-версия ещё не сохранена на этом устройстве.</p><p>Подключись к интернету, открой приложение на несколько секунд и повтори попытку.</p></body></html>",
                 { headers: { "Content-Type": "text/html; charset=utf-8" } }
             );
         })());
