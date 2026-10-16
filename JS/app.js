@@ -352,7 +352,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
           handleRecipeSubmit(event);
         } catch (error) {
-          console.error("RecipePro: ошибка сохранения рецепта", error);
+          console.error("NUTRIO: ошибка сохранения рецепта", error);
           alert("Не удалось сохранить рецепт. Ошибка: " + (error?.message || "неизвестная ошибка"));
         }
       },
@@ -3048,7 +3048,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="adaptation-modal" role="dialog" aria-modal="true" aria-labelledby="adaptationModalTitle">
         <div class="adaptation-modal-header">
           <div>
-            <span class="adaptation-modal-eyebrow">RecipePro AI</span>
+            <span class="adaptation-modal-eyebrow">NUTRIO AI</span>
             <h2 id="adaptationModalTitle">Адаптировать рецепт</h2>
             <p id="adaptationModalRecipeName"></p>
           </div>
@@ -5272,10 +5272,10 @@ document.addEventListener("DOMContentLoaded", () => {
       constraintSummary.length
     ) {
       description =
-        `${description} Персональная адаптация RecipePro: ${constraintSummary.join(" · ")}.`;
+        `${description} Персональная адаптация NUTRIO: ${constraintSummary.join(" · ")}.`;
     } else {
       description =
-        `${description} Персональная адаптация RecipePro по запросу пользователя.`;
+        `${description} Персональная адаптация NUTRIO по запросу пользователя.`;
     }
 
 
@@ -5435,7 +5435,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
           <p>
             Создайте свой первый рецепт
-            и сохраните его в RecipePro.
+            и сохраните его в NUTRIO.
           </p>
 
         </div>
