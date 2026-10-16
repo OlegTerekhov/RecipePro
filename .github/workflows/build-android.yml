@@ -59,16 +59,22 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
+      - name: Generate NUTRIO Android icon and store icon
+        run: node scripts/generate-android-assets.js
+
       - name: Synchronize web assets
         run: npx cap sync android
 
-      - name: Build test APK
-        run: cd android && ./gradlew assembleDebug
+      - name: Build Android test APK and release bundle
+        run: cd android && ./gradlew assembleDebug bundleRelease
 
-      - name: Upload test APK
+      - name: Upload Android builds and store icon
         uses: actions/upload-artifact@v4
         with:
-          name: NUTRIO-android-debug
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: NUTRIO-android-builds
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/app/build/outputs/bundle/release/app-release.aab
+            assets/nutrio-icon-512.png
           if-no-files-found: error
           retention-days: 14
