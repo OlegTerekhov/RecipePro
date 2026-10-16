@@ -1,0 +1,11 @@
+{
+  "appId": "ru.oterex.nutrio",
+  "appName": "NUTRIO",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
