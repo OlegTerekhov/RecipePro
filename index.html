@@ -6,16 +6,17 @@
         name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"
     >
 
-    <title>RecipePro — дневник питания и КБЖУ</title>
+    <title>NUTRIO — дневник питания и КБЖУ</title>
     <meta name="theme-color" content="#111915">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="NUTRIO">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <link rel="manifest" href="./manifest.webmanifest">
     <link rel="icon" type="image/svg+xml" href="./icon.svg">
 
     <meta
         name="description"
-        content="RecipePro — дневник питания: быстро добавляй продукты, контролируй калории и БЖУ и отслеживай личную дневную цель."
+        content="NUTRIO — дневник питания: быстро добавляй продукты, контролируй калории и БЖУ и отслеживай личную дневную цель."
     >
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -42,7 +43,7 @@
 
         <a href="#" class="logo">
             <span class="logo-mark">R</span>
-            <span class="logo-text">RecipePro</span>
+            <span class="logo-text">NUTRIO</span>
         </a>
 
         <nav class="main-nav">
@@ -123,7 +124,7 @@
       </form><div id="rpBarcodeScanner" class="rp-scanner-modal" role="dialog" aria-modal="true" aria-labelledby="rpScannerTitle" hidden><div class="rp-scanner-backdrop" data-close-scanner></div><section class="rp-scanner-card"><div class="rp-scanner-head"><div><span class="rp-diary-kicker">Быстрое добавление</span><h3 id="rpScannerTitle">Сканер штрихкода</h3></div><button id="rpCloseScanner" class="rp-scanner-close" type="button" aria-label="Закрыть сканер">×</button></div><div class="rp-scanner-view"><video id="rpScannerVideo" playsinline muted aria-label="Изображение с камеры"></video><div class="rp-scanner-frame" aria-hidden="true"></div></div><p id="rpScannerStatus" class="rp-scanner-status" role="status">Наведи камеру на штрихкод упаковки.</p><button id="rpScannerManual" class="rp-diary-secondary rp-scanner-manual" type="button">Ввести штрихкод вручную</button></section></div><p class="rp-diary-status" id="rpFoodStatus" role="status">Расчёт основан на встроенном каталоге. Значения могут отличаться от этикетки конкретного продукта.</p>
     </section>
     <section class="rp-diary-panel rp-custom-dish-panel" id="rpCustomDishPanel" aria-labelledby="rpCustomDishTitle">
-      <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Салаты · гарниры · супы</span><h3 id="rpCustomDishTitle">Рассчитать своё блюдо</h3><p>Добавь ингредиенты, укажи вес готового блюда — RecipePro рассчитает КБЖУ на 100 г и на порцию.</p></div></div>
+      <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Салаты · гарниры · супы</span><h3 id="rpCustomDishTitle">Рассчитать своё блюдо</h3><p>Добавь ингредиенты, укажи вес готового блюда — NUTRIO рассчитает КБЖУ на 100 г и на порцию.</p></div></div>
       <form id="rpCustomDishForm" class="rp-custom-dish-form">
         <label class="rp-custom-dish-name">Название блюда<input id="rpCustomDishName" type="text" maxlength="100" placeholder="Например, домашний борщ" required></label>
         <div id="rpCustomDishIngredients" class="rp-custom-dish-ingredients" aria-label="Ингредиенты"></div>
@@ -135,7 +136,7 @@
         <label>Приём пищи<select id="rpCustomDishMeal"><option>Завтрак</option><option>Обед</option><option>Ужин</option><option>Перекус</option></select></label>
         <div id="rpCustomDishResult" class="rp-custom-dish-result" aria-live="polite"><p>Добавь ингредиенты, чтобы увидеть расчёт.</p></div>
         <div class="rp-custom-dish-buttons"><button class="rp-diary-secondary" id="rpNewCustomDish" type="button">Новое блюдо</button><button class="rp-diary-secondary" id="rpSaveCustomDish" type="button">Сохранить блюдо</button><button class="rp-diary-primary" type="submit">Добавить порцию в дневник <span>+</span></button></div>
-        <p id="rpCustomDishStatus" class="rp-diary-status" role="status">КБЖУ рассчитывается по каталогу RecipePro. Учитывай масло, соусы и другие добавки отдельными ингредиентами.</p>
+        <p id="rpCustomDishStatus" class="rp-diary-status" role="status">КБЖУ рассчитывается по каталогу NUTRIO. Учитывай масло, соусы и другие добавки отдельными ингредиентами.</p>
       </form>
       <div class="rp-saved-dishes-wrap"><h4>Мои блюда</h4><div id="rpSavedCustomDishes" class="rp-saved-custom-dishes"><p class="rp-diary-empty">Пока нет сохранённых блюд.</p></div></div>
     </section>
@@ -203,12 +204,12 @@
     <div class="rp-section-intro">
       <span class="rp-diary-kicker">Личный профиль</span>
       <h2>Настройка дневной нормы</h2>
-      <p>Укажи собственные цели по калориям, белкам, жирам и углеводам. RecipePro будет сравнивать с ними твой дневник.</p>
+      <p>Укажи собственные цели по калориям, белкам, жирам и углеводам. NUTRIO будет сравнивать с ними твой дневник.</p>
     </div>
     <div class="rp-settings-goals">
       <section class="rp-diary-panel rp-goals-feature" id="rpGoalsPanel" aria-labelledby="rpGoalsTitle">
           <div class="rp-diary-panel-head"><div><span class="rp-diary-kicker">Личный профиль</span><h3 id="rpGoalsTitle">Моя дневная норма</h3></div><span class="rp-diary-icon" aria-hidden="true">◎</span></div>
-          <p class="rp-diary-help">Внеси значения, которые подходят именно тебе. RecipePro не будет назначать норму за тебя.</p>
+          <p class="rp-diary-help">Внеси значения, которые подходят именно тебе. NUTRIO не будет назначать норму за тебя.</p>
           <form id="rpGoalsForm" class="rp-goals-form">
             <label>Калории, ккал<input type="number" id="rpGoalCalories" min="1" max="15000" step="1" placeholder="Например, 2100" required></label>
             <label>Белки, г<input type="number" id="rpGoalProtein" min="0" max="1000" step="0.1" placeholder="Например, 130" required></label>
@@ -494,7 +495,7 @@
             <div>
                 <div class="rp-tools-kicker">Планируй заранее</div>
                 <h2>Меню на неделю</h2>
-                <p>Распредели любимые блюда по дням, а RecipePro соберёт ингредиенты в общий список покупок. План синхронизируется с аккаунтом и доступен без интернета.</p>
+                <p>Распредели любимые блюда по дням, а NUTRIO соберёт ингредиенты в общий список покупок. План синхронизируется с аккаунтом и доступен без интернета.</p>
             </div>
             <div class="rp-muted-count" id="rpPlanSummary">0 приёмов пищи запланировано</div>
         </div>
@@ -549,7 +550,7 @@
                 <div>
                     <div class="rp-tools-kicker">Продолжай с того места</div>
                     <h3>Недавно просмотренные</h3>
-                    <p>История последних 12 рецептов, которые ты открывал в RecipePro.</p>
+                    <p>История последних 12 рецептов, которые ты открывал в NUTRIO.</p>
                 </div>
                 <button class="rp-tool-button secondary" id="rpClearHistoryBtn" type="button">Очистить историю</button>
             </div>
@@ -581,7 +582,7 @@
                 </h2>
 
                 <p>
-                    В будущем RecipePro сможет учитывать
+                    В будущем NUTRIO сможет учитывать
                     твои цели автоматически.
                 </p>
             </div>
@@ -748,7 +749,7 @@
             <div class="modal-hero-content">
 
                 <div class="modal-kicker">
-                    RECIPEPRO
+                    NUTRIO
                 </div>
 
                 <h2 id="modalTitle">
@@ -940,7 +941,7 @@
             <div>
 
                 <div class="modal-kicker">
-                    RECIPEPRO / MY RECIPES
+                    NUTRIO / MY RECIPES
                 </div>
 
                 <h2 id="createRecipeTitle">
@@ -949,7 +950,7 @@
 
                 <p>
                     Сохрани любимое блюдо в своей
-                    личной коллекции RecipePro.
+                    личной коллекции NUTRIO.
                 </p>
 
             </div>
@@ -1279,7 +1280,7 @@
 
                 <p class="form-section-description">
                     Добавь продукты и их количество.
-                    RecipePro автоматически рассчитает КБЖУ.
+                    NUTRIO автоматически рассчитает КБЖУ.
                 </p>
 
 
@@ -1356,7 +1357,7 @@
 
                     <div>
                         <span>
-                            RecipePro nutrition
+                            NUTRIO nutrition
                         </span>
 
                         <h3>
@@ -1492,7 +1493,7 @@
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
     window.addEventListener("load", () => {
         navigator.serviceWorker.register("./sw.js?v=20261015-startup1").catch(error => {
-            console.warn("RecipePro offline mode:", error);
+            console.warn("NUTRIO offline mode:", error);
         });
     });
 }
@@ -1515,7 +1516,7 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
         installButton.id = "recipeProInstallBtn";
         installButton.textContent = "Установить";
         installButton.hidden = true;
-        installButton.setAttribute("aria-label", "Установить RecipePro на устройство");
+        installButton.setAttribute("aria-label", "Установить NUTRIO на устройство");
         installButton.style.marginRight = "10px";
         installButton.addEventListener("click", async () => {
             if (!installPrompt) return;
@@ -1526,7 +1527,7 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
                 installPrompt = null;
                 installButton.hidden = true;
             } catch (error) {
-                console.warn("RecipePro install prompt:", error);
+                console.warn("NUTRIO install prompt:", error);
             } finally {
                 installButton.disabled = false;
             }
@@ -1564,7 +1565,7 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
     button.type = "button";
     button.id = "recipeProMobileInstallHelp";
     button.textContent = "＋ Установить приложение";
-    button.setAttribute("aria-label", "Как установить RecipePro на телефон");
+    button.setAttribute("aria-label", "Как установить NUTRIO на телефон");
 
     button.addEventListener("click", () => {
         const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
@@ -1572,11 +1573,11 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
         const isAndroid = /Android/i.test(navigator.userAgent);
 
         if (isIOS) {
-            alert("Установка RecipePro на iPhone:\n\n1. Открой сайт в Safari (не внутри Telegram или другого приложения).\n2. Нажми кнопку «Поделиться» — квадрат со стрелкой вверх.\n3. Выбери «На экран Домой» (при необходимости — «Ещё»).\n4. Нажми «Добавить».\n\nЕсли пункта нет, прокрути список действий вниз.");
+            alert("Установка NUTRIO на iPhone:\n\n1. Открой сайт в Safari (не внутри Telegram или другого приложения).\n2. Нажми кнопку «Поделиться» — квадрат со стрелкой вверх.\n3. Выбери «На экран Домой» (при необходимости — «Ещё»).\n4. Нажми «Добавить».\n\nЕсли пункта нет, прокрути список действий вниз.");
         } else if (isAndroid) {
-            alert("Установка RecipePro на Android:\n\n1. Открой сайт в Chrome.\n2. Нажми меню ⋮ в правом верхнем углу.\n3. Выбери «Установить приложение» или «Добавить на главный экран».\n4. Подтверди установку.\n\nЕсли пункта нет, обнови страницу и подожди несколько секунд.");
+            alert("Установка NUTRIO на Android:\n\n1. Открой сайт в Chrome.\n2. Нажми меню ⋮ в правом верхнем углу.\n3. Выбери «Установить приложение» или «Добавить на главный экран».\n4. Подтверди установку.\n\nЕсли пункта нет, обнови страницу и подожди несколько секунд.");
         } else {
-            alert("Открой RecipePro в браузере телефона.\n\nНа iPhone: Safari → «Поделиться» → «На экран Домой».\nНа Android: Chrome → меню ⋮ → «Установить приложение» или «Добавить на главный экран».");
+            alert("Открой NUTRIO в браузере телефона.\n\nНа iPhone: Safari → «Поделиться» → «На экран Домой».\nНа Android: Chrome → меню ⋮ → «Установить приложение» или «Добавить на главный экран».");
         }
     });
 
