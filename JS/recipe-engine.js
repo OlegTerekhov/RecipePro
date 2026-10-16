@@ -199,13 +199,13 @@
         if (!selected.length) selected = unique.slice(0, 7);
 
         const titleMap = {
-            pasta: protein ? name(protein) + " с пастой" : "Паста RecipePro",
-            porridge: fruits[0] ? "Овсянка с " + name(fruits[0]) : "Овсянка RecipePro",
-            omelet: "Омлет RecipePro",
+            pasta: protein ? name(protein) + " с пастой" : "Паста NUTRIO",
+            porridge: fruits[0] ? "Овсянка с " + name(fruits[0]) : "Овсянка NUTRIO",
+            omelet: "Омлет NUTRIO",
             salad: protein ? "Салат с " + name(protein) : "Свежий салат",
             stew: protein ? name(protein) + " с овощами" : "Овощное рагу",
             roast: protein ? name(protein) + " с гарниром" : "Запечённое блюдо",
-            bowl: protein ? "Боул с " + name(protein) : "Боул RecipePro"
+            bowl: protein ? "Боул с " + name(protein) : "Боул NUTRIO"
         };
 
         const stepsByType = {
@@ -238,9 +238,9 @@
         const recipe = {
             engineVersion: ENGINE_VERSION,
             type: type.id,
-            title: titleMap[type.id] || "Блюдо RecipePro",
+            title: titleMap[type.id] || "Блюдо NUTRIO",
             emoji: type.emoji,
-            description: "RecipePro собрал блюдо из доступных продуктов и базовых кухонных ингредиентов.",
+            description: "NUTRIO собрал блюдо из доступных продуктов и базовых кухонных ингредиентов.",
             time: Math.max(5, time),
             servings: 1,
             ingredients,
@@ -253,7 +253,7 @@
         };
 
         if (intent.maxTime && type.baseTime > intent.maxTime) {
-            recipe.aiWarnings.push("Оценочное время исходного формата выше заданного лимита, поэтому RecipePro выбрал максимально быстрый вариант.");
+            recipe.aiWarnings.push("Оценочное время исходного формата выше заданного лимита, поэтому NUTRIO выбрал максимально быстрый вариант.");
         }
 
         if ((intent.highProtein || intent.minProtein) && !protein) {
