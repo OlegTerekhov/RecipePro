@@ -176,7 +176,7 @@
             saveCache();
             return key;
         } catch (error) {
-            console.warn("RecipePro product database:", error);
+            console.warn("NUTRIO product database:", error);
             return null;
         }
     }
