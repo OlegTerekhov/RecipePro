@@ -1,13 +1,13 @@
 "use strict";
 
-const CACHE_NAME = "recipepro-shell-v108";
+const CACHE_NAME = "recipepro-shell-v109";
 const CORE_SHELL = ["./", "./index.html"];
 const APP_ASSETS = [
     "./CSS/style.css", "./CSS/preferences.css", "./JS/preferences.js", "./CSS/meal-planner.css", "./CSS/mobile.css", "./JS/calendar.js", "./JS/meal-planner.js", "./JS/backup.js", "./JS/products.js", "./JS/product-resolver.js",
     "./JS/recipes.js", "./JS/recipe-intelligence.js", "./JS/ingredient-intelligence.js",
     "./JS/recipe-engine.js", "./JS/recipe-builder.js", "./JS/recommendation-engine.js",
     "./JS/nutrition-engine.js", "./JS/app.js", "./JS/food-diary.js", "./JS/custom-dishes.js", "./CSS/custom-dishes.css", "./JS/profile.js", "./JS/ai-generator.js",
-    "./JS/supabase-config.js", "./JS/cloud-sync.js", "./manifest.webmanifest", "./icon.svg"
+    "./JS/supabase-config.js", "./JS/cloud-sync.js", "./manifest.webmanifest", "./icon.svg", "./icon-nutrio.svg"
 ];
 const EXTERNAL_ASSETS = ["https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"];
 
