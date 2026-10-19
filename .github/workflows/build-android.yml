@@ -113,9 +113,9 @@ jobs:
       - name: Build Android test APK
         run: cd android && ./gradlew assembleDebug
 
-      - name: Build signed release APK and AAB
+      - name: Build signed release APK
         if: env.NUTRIO_KEYSTORE_BASE64 != '' && env.NUTRIO_KEYSTORE_PASSWORD != '' && env.NUTRIO_KEY_ALIAS != '' && env.NUTRIO_KEY_PASSWORD != ''
-        run: cd android && ./gradlew assembleRelease bundleRelease
+        run: cd android && ./gradlew assembleRelease
 
       - name: Remove temporary signing key
         if: always()
@@ -128,7 +128,6 @@ jobs:
           path: |
             android/app/build/outputs/apk/debug/app-debug.apk
             android/app/build/outputs/apk/release/app-release.apk
-            android/app/build/outputs/bundle/release/app-release.aab
             assets/nutrio-icon-512.png
           if-no-files-found: warn
           retention-days: 3
