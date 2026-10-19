@@ -12,7 +12,7 @@
   "theme_color": "#111915",
   "icons": [
     {
-      "src": "./icon-nutrio.svg?v=1",
+      "src": "./icon-nutrio.svg?v=2",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"
