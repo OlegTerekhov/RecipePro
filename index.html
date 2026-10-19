@@ -48,7 +48,7 @@
         </a>
 
         <nav class="main-nav">
-            <a href="#home">Дневник</a>
+            <a href="#rpAddProductPage">Добавить продукт</a>
             <a href="#rpIdeasSection">Сегодня</a>
         </nav>
         <div class="rp-preferences" aria-label="Настройки внешнего вида и языка">
@@ -1586,9 +1586,49 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
 })();
 </script>
 
+<script>
+(() => {
+  const main = document.querySelector("main");
+  const diary = document.getElementById("dailyDiary");
+  const heading = diary?.querySelector(".rp-diary-heading");
+  const productPanel = diary?.querySelector(".rp-add-food-panel");
+  const dishPanel = document.getElementById("rpCustomDishPanel");
+  const logPanel = diary?.querySelector(".rp-log-panel");
+  const todayPage = document.getElementById("rpIdeasSection");
+  if (!main || !diary || !productPanel || !dishPanel || !todayPage) return;
+
+  const makePage = (id, className) => {
+    let page = document.getElementById(id);
+    if (page) return page;
+    page = document.createElement("section");
+    page.id = id;
+    page.className = className;
+    const container = document.createElement("div");
+    container.className = "container";
+    page.appendChild(container);
+    main.insertBefore(page, diary);
+    return page;
+  };
+
+  const productPage = makePage("rpAddProductPage", "section rp-diary-section rp-add-product-page");
+  const productContainer = productPage.querySelector(".container");
+  if (heading) productContainer.appendChild(heading);
+  productContainer.appendChild(productPanel);
+
+  const dishPage = makePage("rpAddDishPage", "section rp-diary-section rp-add-dish-page");
+  dishPage.querySelector(".container").appendChild(dishPanel);
+
+  if (logPanel) {
+    const todayContainer = todayPage.querySelector(".rp-ideas-container");
+    if (todayContainer) todayContainer.appendChild(logPanel);
+  }
+})();
+</script>
+
 <nav id="recipeProBottomNav" aria-label="Основная навигация">
-    <a href="#home" aria-current="page"><span aria-hidden="true">⌂</span><span>Главная</span></a>
-    <a href="#rpIdeasSection"><span aria-hidden="true">◷</span><span>Сегодня</span></a>
+    <a href="#rpIdeasSection" aria-current="page"><span aria-hidden="true">◷</span><span>Сегодня</span></a>
+    <a href="#rpAddProductPage"><span aria-hidden="true">＋</span><span>Добавить продукт</span></a>
+    <a href="#rpAddDishPage"><span aria-hidden="true">♨</span><span>Добавить блюдо</span></a>
     <a href="#rpCalendarPanel"><span aria-hidden="true">▦</span><span>Календарь</span></a>
     <a href="#rpSettingsPanel"><span aria-hidden="true">⚙</span><span>Настройка</span></a>
 </nav>
@@ -1600,17 +1640,17 @@ if ("serviceWorker" in navigator && location.protocol !== "file:") {
   if (!nav || !main) return;
   const links = [...nav.querySelectorAll("a")];
   const pages = new Map([
-    ["#home", document.getElementById("dailyDiary")],
-    ["#dailyDiary", document.getElementById("rpIdeasSection")],
     ["#rpIdeasSection", document.getElementById("rpIdeasSection")],
+    ["#rpAddProductPage", document.getElementById("rpAddProductPage")],
+    ["#rpAddDishPage", document.getElementById("rpAddDishPage")],
     ["#rpCalendarPanel", document.getElementById("rpCalendarPanel")],
     ["#rpSettingsPanel", document.getElementById("rpSettingsPanel")]
   ]);
   function route() {
-    const requested = location.hash || "#home";
-    const activeHash = pages.has(requested) ? requested : "#home";
+    const requested = location.hash || "#rpIdeasSection";
+    const activeHash = pages.has(requested) ? requested : "#rpIdeasSection";
     const activePage = pages.get(activeHash);
-    if (activeHash === "#dailyDiary" || activeHash === "#rpIdeasSection") {
+    if (activeHash === "#rpAddProductPage" || activeHash === "#rpIdeasSection") {
       const dateInput = document.getElementById("rpDiaryDate");
       if (dateInput) {
         const now = new Date();
