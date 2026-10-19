@@ -279,7 +279,7 @@ main > #home, main > #dailyDiary, main > #rpIdeasSection, main > #rpCalendarPane
 }
 
 
-/* Keep the four-tab navigation available on desktop too. */
+/* Five-tab navigation for Today, adding food or dish, calendar and settings. */
 #recipeProBottomNav {
   position: fixed;
   z-index: 1000;
@@ -287,8 +287,8 @@ main > #home, main > #dailyDiary, main > #rpIdeasSection, main > #rpCalendarPane
   bottom: 0;
   transform: translateX(-50%);
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  width: min(100%, 560px);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  width: min(100%, 680px);
   min-height: 68px;
   padding: 7px 10px calc(7px + env(safe-area-inset-bottom, 0px));
   border: 1px solid rgba(220,224,216,.95);
@@ -580,4 +580,28 @@ body[data-theme="dark"] #recipeProBottomNav a[aria-current="page"] {
     animation-iteration-count: 1 !important;
     transition-duration: .01ms !important;
   }
+}
+
+
+/* NUTRIO: dedicated screens for adding food and custom dishes. */
+main > #rpAddProductPage,
+main > #rpAddDishPage { min-height: calc(100svh - 82px); }
+#rpAddProductPage .rp-diary-heading { margin-bottom: 22px; }
+#rpAddProductPage .rp-add-food-panel,
+#rpAddDishPage .rp-custom-dish-panel { width: 100%; max-width: 760px; margin: 0 auto 16px; }
+#rpIdeasSection .rp-ideas-container { flex-direction: column; align-items: center; gap: 14px; }
+#rpIdeasSection .rp-log-panel { width: 100%; max-width: 720px; margin: 0 auto; }
+@media (max-width: 760px) {
+  main > #rpAddProductPage,
+  main > #rpAddDishPage {
+    min-height: calc(100svh - var(--rp-mobile-nav-height) - env(safe-area-inset-bottom, 0px));
+    padding-top: 22px;
+    padding-bottom: 28px;
+  }
+  #rpAddProductPage .rp-diary-heading { gap: 14px; margin-bottom: 16px; }
+  #rpAddProductPage .rp-add-food-panel,
+  #rpAddDishPage .rp-custom-dish-panel { max-width: none; }
+  #recipeProBottomNav a { font-size: 9px; gap: 4px; padding: 2px 1px; overflow-wrap: anywhere; }
+  #recipeProBottomNav a span:first-child { font-size: 17px; }
+  #rpIdeasSection .rp-ideas-container { padding-top: 12px; gap: 12px; }
 }
