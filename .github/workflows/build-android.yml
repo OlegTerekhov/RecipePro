@@ -131,3 +131,5 @@ jobs:
             assets/nutrio-icon-512.png
           if-no-files-found: warn
           retention-days: 3
+
+# Rebuild release after signing secrets are configured.
